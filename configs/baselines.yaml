@@ -1,0 +1,36 @@
+# Classical baselines — all run on the SAME reduced feature vectors as the
+# quantum kernel, and additionally on the full pre-reduction feature set (suffix _full).
+use_full_features_variant: true
+cv_folds: 5
+seed: 17
+
+rbf_svm:
+  C_grid: [0.1, 1.0, 10.0, 100.0]
+  gamma_grid: [scale, 0.01, 0.1, 1.0]
+  class_weight: balanced
+
+random_forest:
+  n_estimators: [200, 500]
+  max_depth: [null, 20]
+  class_weight: balanced
+
+knn_bagging:           # VeReMi SOTA-style KNN + bagging
+  k: [5, 9, 15]
+  n_estimators: 10
+  max_samples: 0.8
+
+mlp:
+  hidden: [[64, 32], [128, 64]]
+  alpha: [0.0001, 0.001]
+  max_iter: 400
+  early_stopping: true
+
+ocsvm:                 # classical one-class SVM (RBF) — the honest counterpart to ocsvm_quantum
+  nu_grid: [0.01, 0.05, 0.10]   # same grid as quantum.yaml::ocsvm for a fair head-to-head
+  gamma: scale                  # RBF bandwidth (sklearn 'scale' = 1/(n_features*Var))
+
+rules:                 # non-ML plausibility checks (ART / SSC / DMV style)
+  art_max_range: 800.0          # m, claimed distance beyond max plausible comm range
+  ssc_max_speed: 60.0           # m/s
+  dmv_tolerance: 15.0           # m, |claimed displacement - speed*dt| per message
+  kin_residual_threshold: 25.0  # m, on e_kin

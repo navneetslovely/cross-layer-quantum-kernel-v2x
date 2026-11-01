@@ -1,0 +1,284 @@
+{
+  "protocol": {
+    "protocol": {
+      "split": {
+        "test_frac": 0.3,
+        "val_frac": 0.15,
+        "seed": 7,
+        "cap_train": 3000,
+        "cap_test": 6000,
+        "n_tr": 3023,
+        "n_va": 13920,
+        "n_te": 6000
+      },
+      "kta": {
+        "epochs": 200,
+        "batch": 512,
+        "seed": 11,
+        "lr": 0.05,
+        "init": [
+          1.0,
+          1.0,
+          0.5
+        ]
+      },
+      "label_rule_design": "majority/fully_active relabel the identical window set under the identical split; drop_onset removes 0<frac<1 windows and refits the reducer on retained train"
+    },
+    "label_rule_stats": {
+      "any": {
+        "tr": {
+          "n": 3023,
+          "pos": 683
+        },
+        "va": {
+          "n": 13920,
+          "pos": 3141
+        },
+        "te": {
+          "n": 6000,
+          "pos": 1322
+        }
+      },
+      "majority": {
+        "tr": {
+          "n": 3023,
+          "pos": 675
+        },
+        "va": {
+          "n": 13920,
+          "pos": 3104
+        },
+        "te": {
+          "n": 6000,
+          "pos": 1309
+        }
+      },
+      "fully_active": {
+        "tr": {
+          "n": 3023,
+          "pos": 670
+        },
+        "va": {
+          "n": 13920,
+          "pos": 3074
+        },
+        "te": {
+          "n": 6000,
+          "pos": 1295
+        }
+      },
+      "drop_onset": {
+        "tr": {
+          "n": 3010,
+          "pos": 670
+        },
+        "va": {
+          "n": 13853,
+          "pos": 3074
+        },
+        "te": {
+          "n": 5973,
+          "pos": 1295
+        }
+      }
+    },
+    "n_mixed_windows": 486,
+    "mixed_fraction": 0.005367022627632436
+  },
+  "rows": [
+    {
+      "rule": "any (published)",
+      "model": "qsvm_crosslayer",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1322,
+      "roc_auc": 0.9254389652792644,
+      "pr_auc": 0.8750256616668065,
+      "f1": 0.801449859041482,
+      "mcc": 0.7524356061617912,
+      "pr_auc_lo": 0.8273437158407251,
+      "pr_auc_hi": 0.9184375749707234
+    },
+    {
+      "rule": "any (published)",
+      "model": "rbf_svm",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1322,
+      "roc_auc": 0.9334852876211372,
+      "pr_auc": 0.8924998115568991,
+      "f1": 0.8365582544256895,
+      "mcc": 0.8004099629862984,
+      "pr_auc_lo": 0.8436480085237212,
+      "pr_auc_hi": 0.935702055909938
+    },
+    {
+      "rule": "any (published)",
+      "model": "random_forest",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1322,
+      "roc_auc": 0.9394697812983684,
+      "pr_auc": 0.8921773833761398,
+      "f1": 0.8017278617710584,
+      "mcc": 0.7673901711184877,
+      "pr_auc_lo": 0.8225583346610879,
+      "pr_auc_hi": 0.9466120585321456
+    },
+    {
+      "rule": "majority",
+      "model": "qsvm_crosslayer",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1309,
+      "roc_auc": 0.9178764856846792,
+      "pr_auc": 0.8645250125919773,
+      "f1": 0.8144288577154308,
+      "mcc": 0.7673528145324173,
+      "pr_auc_lo": 0.8095747340759903,
+      "pr_auc_hi": 0.9137813593639627
+    },
+    {
+      "rule": "majority",
+      "model": "rbf_svm",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1309,
+      "roc_auc": 0.929817495882677,
+      "pr_auc": 0.8813210101853912,
+      "f1": 0.8179571663920923,
+      "mcc": 0.7758657244355123,
+      "pr_auc_lo": 0.8263463028175729,
+      "pr_auc_hi": 0.925570554097148
+    },
+    {
+      "rule": "majority",
+      "model": "random_forest",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1309,
+      "roc_auc": 0.939553480739983,
+      "pr_auc": 0.8884521694972767,
+      "f1": 0.7966386554621848,
+      "mcc": 0.7528035587304756,
+      "pr_auc_lo": 0.8146008156940996,
+      "pr_auc_hi": 0.9449776484078604
+    },
+    {
+      "rule": "fully_active",
+      "model": "qsvm_crosslayer",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1295,
+      "roc_auc": 0.9233578014024348,
+      "pr_auc": 0.8700266994939377,
+      "f1": 0.8085280852808528,
+      "mcc": 0.762218645931303,
+      "pr_auc_lo": 0.8126134424891706,
+      "pr_auc_hi": 0.9179102706447819
+    },
+    {
+      "rule": "fully_active",
+      "model": "rbf_svm",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1295,
+      "roc_auc": 0.9365976390843554,
+      "pr_auc": 0.8917498777491345,
+      "f1": 0.8366232675346493,
+      "mcc": 0.801371420748698,
+      "pr_auc_lo": 0.8390106153572041,
+      "pr_auc_hi": 0.9358055193513378
+    },
+    {
+      "rule": "fully_active",
+      "model": "random_forest",
+      "window_set": "full",
+      "n_te": 6000,
+      "n_pos_te": 1295,
+      "roc_auc": 0.9386914438349082,
+      "pr_auc": 0.8838872604641628,
+      "f1": 0.7932203389830509,
+      "mcc": 0.7486993318682836,
+      "pr_auc_lo": 0.8087997904246801,
+      "pr_auc_hi": 0.9414560953880436
+    },
+    {
+      "rule": "drop_onset",
+      "model": "qsvm_crosslayer",
+      "window_set": "onset-dropped",
+      "n_te": 5973,
+      "n_pos_te": 1295,
+      "roc_auc": 0.9252738110369578,
+      "pr_auc": 0.8769429349422659,
+      "f1": 0.8049689440993789,
+      "mcc": 0.7590047772739651,
+      "pr_auc_lo": 0.8241801615599879,
+      "pr_auc_hi": 0.9212886418337517
+    },
+    {
+      "rule": "drop_onset",
+      "model": "rbf_svm",
+      "window_set": "onset-dropped",
+      "n_te": 5973,
+      "n_pos_te": 1295,
+      "roc_auc": 0.9372825399759988,
+      "pr_auc": 0.8960778676544142,
+      "f1": 0.8364859184531316,
+      "mcc": 0.8011327674810665,
+      "pr_auc_lo": 0.847547717998481,
+      "pr_auc_hi": 0.9398846151535846
+    },
+    {
+      "rule": "drop_onset",
+      "model": "random_forest",
+      "window_set": "onset-dropped",
+      "n_te": 5973,
+      "n_pos_te": 1295,
+      "roc_auc": 0.9380831329099818,
+      "pr_auc": 0.8891346182361747,
+      "f1": 0.8001697072549852,
+      "mcc": 0.7573852338359769,
+      "pr_auc_lo": 0.8153067781877896,
+      "pr_auc_hi": 0.94717451676794
+    }
+  ],
+  "fraction_sweep": [
+    {
+      "tau": 0.0,
+      "label": "any (frac>0)",
+      "n_pos": 1322,
+      "roc_auc": 0.9254389652792645,
+      "pr_auc": 0.8750256616668065
+    },
+    {
+      "tau": 0.25,
+      "label": "frac>=0.25",
+      "n_pos": 1316,
+      "roc_auc": 0.9263339727300336,
+      "pr_auc": 0.8758414876242766
+    },
+    {
+      "tau": 0.5,
+      "label": "frac>=0.5 (majority)",
+      "n_pos": 1309,
+      "roc_auc": 0.9261912551691478,
+      "pr_auc": 0.8719688007701082
+    },
+    {
+      "tau": 0.75,
+      "label": "frac>=0.75",
+      "n_pos": 1297,
+      "roc_auc": 0.9263453452749446,
+      "pr_auc": 0.8702674321663908
+    },
+    {
+      "tau": 1.0,
+      "label": "frac==1 (fully_active)",
+      "n_pos": 1295,
+      "roc_auc": 0.925939463070175,
+      "pr_auc": 0.8679434166606329
+    }
+  ],
+  "note": "mixed windows are only 0.54% of the dataset, so label-rule sensitivity is bounded a priori; the rows quantify the realised effect. drop_onset test set is 27 windows smaller (5,973)."
+}

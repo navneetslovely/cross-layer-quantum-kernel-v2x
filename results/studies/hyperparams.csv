@@ -1,0 +1,73 @@
+model,hyperparameter,value_or_grid,selection_method,source_file
+_shared_input,reduction.method,per_block_pca,fixed,configs/features.yaml
+_shared_input,reduction.n_mobility,4,fixed,configs/features.yaml
+_shared_input,reduction.n_network,4,fixed,configs/features.yaml
+_shared_input,reduction.clip_quantiles,"[0.005, 0.995]",fixed,configs/features.yaml
+_shared_input,reduction.scale_range,"[0, pi]",fixed,configs/features.yaml
+_shared_protocol,quantum.max_train (matched-N cap),3000,fixed,configs/quantum.yaml
+_shared_protocol,packetloss.full_cap (classical @full rows),15000,fixed,configs/experiments/packetloss.yaml
+_shared_protocol,cv_folds (classical grid-CV),5,fixed,configs/baselines.yaml
+_shared_protocol,grid-CV scoring,average_precision,fixed,src/qkv2x/models/baselines.py:61-62
+_shared_protocol,baseline seed (CV shuffle + model random_state),17,fixed,configs/baselines.yaml
+_shared_protocol,split seed / test_frac / val_frac / group_by,"[7, 0.3, 0.15, ""sender""]",fixed,configs/features.yaml::splits
+rbf_svm,C,"[0.1, 1.0, 10.0, 100.0]",grid-CV,configs/baselines.yaml
+rbf_svm,gamma,"[""scale"", 0.01, 0.1, 1.0]",grid-CV,configs/baselines.yaml
+rbf_svm,class_weight,balanced,fixed,configs/baselines.yaml
+rbf_svm,scaler,StandardScaler (in pipeline),fixed,src/qkv2x/models/baselines.py:52
+random_forest,n_estimators,"[200, 500]",grid-CV,configs/baselines.yaml
+random_forest,max_depth,"[null, 20]",grid-CV,configs/baselines.yaml
+random_forest,class_weight,balanced,fixed,configs/baselines.yaml
+knn_bagging,k (n_neighbors),"[5, 9, 15]",grid-CV,configs/baselines.yaml
+knn_bagging,n_estimators (bagging),10,fixed,configs/baselines.yaml
+knn_bagging,max_samples,0.8,fixed,configs/baselines.yaml
+knn_bagging,scaler,StandardScaler (in pipeline),fixed,src/qkv2x/models/baselines.py:82
+mlp,hidden_layer_sizes,"[[64, 32], [128, 64]]",grid-CV,configs/baselines.yaml
+mlp,alpha,"[0.0001, 0.001]",grid-CV,configs/baselines.yaml
+mlp,max_iter,400,fixed,configs/baselines.yaml
+mlp,early_stopping,False in the binary run_model path (build_baseline hard-codes it; the yaml 'true' feeds only build_multiclass),fixed,src/qkv2x/models/baselines.py:92
+mlp,solver/activation,adam / relu (sklearn defaults),fixed,src/qkv2x/models/baselines.py:91-93
+mlp,scaler,StandardScaler (in pipeline),fixed,src/qkv2x/models/baselines.py:93
+xgboost,n_estimators,"[200, 400]",grid-CV,src/qkv2x/models/baselines.py:110 (code default; no xgboost block in baselines.yaml)
+xgboost,max_depth,"[4, 6, 8]",grid-CV,src/qkv2x/models/baselines.py:111
+xgboost,learning_rate,"[0.05, 0.1]",grid-CV,src/qkv2x/models/baselines.py:112
+xgboost,scale_pos_weight,"[1.0, 3.0, 5.0]",grid-CV,src/qkv2x/models/baselines.py:114
+xgboost,tree_method / eval_metric,hist / logloss,fixed,src/qkv2x/models/baselines.py:28-29
+ocsvm_classical,nu,"[0.01, 0.05, 0.1]",validation (ROC-AUC on va),configs/baselines.yaml; src/qkv2x/experiments/common.py:374-386
+ocsvm_classical,gamma,scale,fixed,configs/baselines.yaml
+ocsvm_classical,kernel,rbf,fixed,src/qkv2x/experiments/common.py:382
+rules,art_max_range,800.0,fixed,configs/baselines.yaml
+rules,ssc_max_speed,60.0,fixed,configs/baselines.yaml
+rules,dmv_tolerance,15.0,fixed,configs/baselines.yaml
+rules,kin_residual_threshold,25.0,fixed,configs/baselines.yaml
+lstm_seq,hidden / layers,"[64, 1]",fixed (code defaults; yaml sets only enabled:true),src/qkv2x/models/seq_baselines.py:17-18; src/qkv2x/experiments/veremi_nextgen_exp.py:596-600
+lstm_seq,epochs / batch / lr,"[40, 256, 0.001]",fixed,src/qkv2x/models/seq_baselines.py:17-18
+lstm_seq,optimiser / loss,Adam / BCEWithLogits(pos_weight=neg:pos),fixed,src/qkv2x/models/seq_baselines.py:76-80
+lstm_seq,model selection,best epoch by validation average precision,validation,src/qkv2x/models/seq_baselines.py (fit loop)
+qsvm_crosslayer,n_qubits,8 (= 4 mobility + 4 network reduced coords),fixed,configs/features.yaml::reduction
+qsvm_crosslayer,feature_map.n_layers,2,fixed,configs/quantum.yaml
+qsvm_crosslayer,feature_map.entangler,cross_layer,fixed,configs/quantum.yaml; src/qkv2x/experiments/common.py:206-208
+qsvm_crosslayer,feature_map.coupling,full_bipartite,fixed,configs/quantum.yaml
+qsvm_crosslayer,feature_map.aoi_modulation (kappa),"[true, 0.5]",fixed,configs/quantum.yaml; configs/features.yaml::aoi
+qsvm_crosslayer,kernel / shots / psd_repair,"[""fidelity"", ""exact statevector (shots=null)"", ""clip""]",fixed,configs/quantum.yaml
+qsvm_crosslayer,svm.C,"[0.1, 1.0, 10.0, 100.0]","grid-CV (5-fold group-aware, average_precision)",configs/quantum.yaml; src/qkv2x/models/qsvm.py:36-60
+qsvm_crosslayer,svm.class_weight,balanced,fixed,configs/quantum.yaml
+qsvm_zz,n_qubits,8 (= 4 mobility + 4 network reduced coords),fixed,configs/features.yaml::reduction
+qsvm_zz,feature_map.n_layers,2,fixed,configs/quantum.yaml
+qsvm_zz,feature_map.entangler,zz_full (fixed ablation),fixed,configs/quantum.yaml; src/qkv2x/experiments/common.py:206-208
+qsvm_zz,feature_map.coupling,full_bipartite,fixed,configs/quantum.yaml
+qsvm_zz,feature_map.aoi_modulation (kappa),"[true, 0.5]",fixed,configs/quantum.yaml; configs/features.yaml::aoi
+qsvm_zz,kernel / shots / psd_repair,"[""fidelity"", ""exact statevector (shots=null)"", ""clip""]",fixed,configs/quantum.yaml
+qsvm_zz,svm.C,"[0.1, 1.0, 10.0, 100.0]","grid-CV (5-fold group-aware, average_precision)",configs/quantum.yaml; src/qkv2x/models/qsvm.py:36-60
+qsvm_zz,svm.class_weight,balanced,fixed,configs/quantum.yaml
+qsvm_crosslayer,KTA optimiser,Adam,fixed,src/qkv2x/quantum/train.py:87-88
+qsvm_crosslayer,KTA lr,0.05,fixed,configs/quantum.yaml
+qsvm_crosslayer,KTA epochs,200,fixed,configs/quantum.yaml
+qsvm_crosslayer,KTA batch (class-balanced),512,fixed,configs/quantum.yaml
+qsvm_crosslayer,KTA objective,centered_kta_weighted (centered KTA vs yy^T target),fixed,configs/quantum.yaml; src/qkv2x/quantum/train.py:22-34
+qsvm_crosslayer,"KTA init (w,u,gamma)","[1.0, 1.0, 0.5]",fixed,configs/quantum.yaml
+qsvm_crosslayer,KTA restarts,1 (single init; best-alignment snapshot across epochs),fixed,src/qkv2x/quantum/train.py:94-121
+qsvm_crosslayer,KTA seed,11,fixed,configs/quantum.yaml
+qsvm_zz,KTA training,NONE -- fixed_params() ablation,fixed,src/qkv2x/experiments/common.py:224-228
+qsvm_projected,projected_gamma,1.0,fixed,configs/quantum.yaml
+ocsvm_quantum,nu,"[0.01, 0.05, 0.1]",validation (ROC-AUC on va),configs/quantum.yaml; src/qkv2x/experiments/common.py:303-313
+_nystrom_opt_in,enabled / landmarks / max_train / seed,"[false, 512, 8000, 13]",fixed (OFF in all headline runs),configs/quantum.yaml

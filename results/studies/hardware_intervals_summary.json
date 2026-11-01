@@ -1,0 +1,147 @@
+{
+  "protocol": {
+    "added_runs": 9,
+    "qpu_seconds_spent": 342,
+    "date_utc": "2026-08-07",
+    "backend": "ibm_marrakesh",
+    "shots": 1024,
+    "pinned_layout": [
+      33,
+      34,
+      35,
+      39,
+      51,
+      52,
+      53,
+      58
+    ],
+    "accounts": "IBM Quantum open plan; QPU time is metered over a 28-day rolling window, so the runs were submitted as separate jobs",
+    "interval": "two-sided 95% t interval; n=5 NextGen pinned, n=4 NextGen default, n=3 dev_grid pinned"
+  },
+  "conditions": [
+    {
+      "dataset": "dev_grid",
+      "layout": "pinned",
+      "n_runs": 3,
+      "hw_roc_values": [
+        0.84,
+        0.84,
+        0.88
+      ],
+      "hw_roc_mean": 0.8533333333333335,
+      "hw_roc_sd": 0.023094010767584987,
+      "hw_roc_ci95_halfwidth": 0.05736870306332605,
+      "sim_roc": 0.88,
+      "r_mean": NaN,
+      "r_sd": NaN,
+      "r_ci95_halfwidth": NaN,
+      "r_n": 0,
+      "n_test_windows": 10
+    },
+    {
+      "dataset": "veremi_nextgen",
+      "layout": "default",
+      "n_runs": 4,
+      "hw_roc_values": [
+        0.44,
+        0.68,
+        0.72,
+        0.8
+      ],
+      "hw_roc_mean": 0.66,
+      "hw_roc_sd": 0.15491933384829668,
+      "hw_roc_ci95_halfwidth": 0.2465112308112625,
+      "sim_roc": NaN,
+      "r_mean": 0.8822153977071452,
+      "r_sd": 0.22412322915185745,
+      "r_ci95_halfwidth": 0.27828574479903373,
+      "r_n": 5,
+      "n_test_windows": 10
+    },
+    {
+      "dataset": "veremi_nextgen",
+      "layout": "pinned",
+      "n_runs": 5,
+      "hw_roc_values": [
+        0.64,
+        0.68,
+        0.92,
+        0.92,
+        1.0
+      ],
+      "hw_roc_mean": 0.8320000000000001,
+      "hw_roc_sd": 0.16099689437998485,
+      "hw_roc_ci95_halfwidth": 0.1999040475742411,
+      "sim_roc": NaN,
+      "r_mean": 0.9768662405390802,
+      "r_sd": 0.012743209125500766,
+      "r_ci95_halfwidth": 0.015822783992715975,
+      "r_n": 5,
+      "n_test_windows": 10
+    }
+  ],
+  "layout_claim_restated": {
+    "pinned_values": [
+      0.64,
+      0.68,
+      0.92,
+      0.92,
+      1.0
+    ],
+    "default_values": [
+      0.44,
+      0.68,
+      0.72,
+      0.8
+    ],
+    "pinned_mean": 0.8320000000000001,
+    "default_mean": 0.66,
+    "mean_gap": 0.17200000000000004,
+    "samples_overlap": true,
+    "welch_t_test": {
+      "available": true,
+      "t": 1.626409370115303,
+      "p_two_sided": 0.14992190587363363,
+      "significant_at_05": false
+    },
+    "mannwhitney_u": {
+      "available": true,
+      "U": 14.5,
+      "p_two_sided": 0.32312112726881437,
+      "significant_at_05": false
+    },
+    "published_comparison": {
+      "default": 0.48,
+      "pinned": 0.92,
+      "note": "these are the MIN of the default sample and (near) the MAX of the pinned sample; with n=3 each the comparison is far less clean than a 0.48-vs-0.92 headline implies"
+    }
+  },
+  "stability_r_vs_roc": {
+    "r_min": 0.481331706821768,
+    "r_max": 0.9905650719766644,
+    "r_mean": 0.9295408191231125,
+    "r_sd": 0.15775205581300966,
+    "n_runs": 10,
+    "hw_roc_min": 0.44000000000000006,
+    "hw_roc_max": 1.0,
+    "reading": "r (120 kernel entries per run) is stable to ~0.01 across every run and device condition, while hardware ROC-AUC (10 test windows) spans a wide range; r is the stable quantity and hardware ROC-AUC is illustrative."
+  },
+  "default_layout_collapse_reproduction": {
+    "published_default_r": 0.481331706821768,
+    "repeat_default_r": [
+      0.9797643350870465,
+      0.9805252296552708,
+      0.9816516357593172,
+      0.9878040812123229
+    ],
+    "pinned_r": [
+      0.9794662734844017,
+      0.9905650719766644,
+      0.9850334560545005,
+      0.9713093304239572,
+      0.9579570707558771
+    ],
+    "reproduced": false,
+    "reading": "the default-layout estimability collapse (r=0.48) that motivates the layout-sensitivity claim did NOT reproduce: 4 fresh default-layout runs on the same device return r~0.98, indistinguishable from the pinned runs. The original collapse therefore looks like a device/calibration state at that time rather than a property of the default layout."
+  }
+}

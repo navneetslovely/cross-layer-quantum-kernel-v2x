@@ -1,0 +1,273 @@
+{
+  "item": "packetloss_retention",
+  "script": "scripts/studies/packetloss_retention.py",
+  "generated": "2026-08-07T02:39:04",
+  "wall_time_s": 41.5,
+  "protocol": {
+    "source": {
+      "predictions": "<repo>/results/packetloss_dev/predictions.parquet",
+      "results_csv": "<repo>/results/packetloss_dev/packetloss_results.csv",
+      "source_run_provenance": "results/packetloss_dev/provenance.json (2026-06-09, commit c8e6892, split seed 7, GroupShuffleSplit re-run per level)"
+    },
+    "bootstrap": {
+      "n_boot": 1000,
+      "seed": 20260807,
+      "unit": "transmitter (group), resampled with replacement; 1%-FPR threshold re-derived inside every replicate",
+      "ci": "percentile [2.5, 97.5]"
+    },
+    "operating_point": {
+      "rule": "allowed = floor(0.01*n_neg); thr = (allowed+1)-th largest present-negative score; detect iff score > thr (FPR <= 1% under ties)",
+      "fpr_target": 0.01
+    },
+    "fixed_population": "p=0 TEST windows of the per-level intersection fleet G_cap(p) = test groups at p=0 AND at p. The literal '(group,t_end) windows present at p=0' key is infeasible: windows are message-index entities that change identity under thinning (V2a) and the test split is re-randomised per level (V2b).",
+    "failure_accounting": "per-group count-based: absent_pos = sum_g max(0, n_pos_p0(g) - n_pos_p(g)); absent positives = misses (scored below every present window via sentinel min(present)-1 for the conservative AP).",
+    "absent_negatives": "dropped, because a never-formed window cannot raise a false alarm; for PR/recall purposes identical to scoring it -inf (never crosses a positive threshold). Counting it as a correct rejection would overclaim.",
+    "population_stats_model": "qsvm_crosslayer (valid for all models by check V1)",
+    "irrecoverable": {
+      "exact_crosslevel_window_matching": "IRRECOVERABLE -- predictions.parquet lacks t_start/rx_node and window identity is message-index-based; re-windowed thinned streams do not map 1:1 to p=0 windows.",
+      "scores_for_p0_test_groups_resplit_into_train": "IRRECOVERABLE -- predictions cover each level's own test split only; ~63-70% of p=0 test transmitters land outside the level-p test split (V2b), hence the intersection-fleet restriction."
+    }
+  },
+  "verified_checks": {
+    "levels": [
+      0.0,
+      0.2,
+      0.4,
+      0.6,
+      0.8
+    ],
+    "v1_window_population_model_invariant": true,
+    "label_iff_attackname_violations": 0,
+    "group_tend_key_collisions_per_level": {
+      "0.0": 1,
+      "0.2": 1,
+      "0.4": 0,
+      "0.6": 0,
+      "0.8": 0
+    },
+    "v2a_keys_at_p_not_in_p0_frac": {
+      "0.2": 0.9631,
+      "0.4": 0.9673,
+      "0.6": 0.9647,
+      "0.8": 0.9724
+    },
+    "v2b_test_group_overlap_with_p0": {
+      "0.0": {
+        "n_groups": 926,
+        "n_common_with_p0": 926
+      },
+      "0.2": {
+        "n_groups": 924,
+        "n_common_with_p0": 342
+      },
+      "0.4": {
+        "n_groups": 922,
+        "n_common_with_p0": 353
+      },
+      "0.6": {
+        "n_groups": 918,
+        "n_common_with_p0": 326
+      },
+      "0.8": {
+        "n_groups": 900,
+        "n_common_with_p0": 266
+      }
+    },
+    "pergroup_monotonicity_on_intersection": {
+      "0.2": {
+        "groups_with_more_total_windows_at_p": 0,
+        "groups_with_more_pos_windows_at_p": 1,
+        "excess_pos_windows": 1
+      },
+      "0.4": {
+        "groups_with_more_total_windows_at_p": 0,
+        "groups_with_more_pos_windows_at_p": 2,
+        "excess_pos_windows": 2
+      },
+      "0.6": {
+        "groups_with_more_total_windows_at_p": 0,
+        "groups_with_more_pos_windows_at_p": 0,
+        "excess_pos_windows": 0
+      },
+      "0.8": {
+        "groups_with_more_total_windows_at_p": 0,
+        "groups_with_more_pos_windows_at_p": 0,
+        "excess_pos_windows": 0
+      }
+    }
+  },
+  "retention": {
+    "table": "packetloss_retention.csv",
+    "absent_pos_by_attack_on_intersection_fleet": {
+      "0.2": {
+        "const_offset": 33,
+        "const_pos": 20,
+        "data_falsification": 21,
+        "drift": 38,
+        "eventual_stop": 56,
+        "random_offset": 68,
+        "random_pos": 24,
+        "replay": 64,
+        "sybil": 86
+      },
+      "0.4": {
+        "const_offset": 118,
+        "const_pos": 85,
+        "data_falsification": 33,
+        "drift": 70,
+        "eventual_stop": 151,
+        "random_offset": 114,
+        "random_pos": 67,
+        "replay": 111,
+        "sybil": 202
+      },
+      "0.6": {
+        "const_offset": 120,
+        "const_pos": 146,
+        "data_falsification": 32,
+        "drift": 88,
+        "eventual_stop": 182,
+        "random_offset": 185,
+        "random_pos": 71,
+        "replay": 133,
+        "sybil": 418
+      },
+      "0.8": {
+        "const_offset": 144,
+        "const_pos": 127,
+        "data_falsification": 36,
+        "drift": 126,
+        "eventual_stop": 191,
+        "random_offset": 262,
+        "random_pos": 128,
+        "replay": 182,
+        "sybil": 324
+      }
+    }
+  },
+  "pr_auc_existence": {
+    "pr_auc_in_packetloss_results_csv": true,
+    "pr_auc_ci_columns_present": true,
+    "pr_figure_files_already_rendered": [
+      "pr_auc_vs_packetloss.pdf",
+      "pr_auc_vs_packetloss.png"
+    ],
+    "verdict": "PR-vs-loss data (and a rendered PR figure) already existed; the caption defect is a figure-selection error, not missing data. packetloss_curves.csv carries both curves for a 2-panel fix."
+  },
+  "curves_crosscheck": {
+    "max_abs_diff_roc_auc": 0.0,
+    "max_abs_diff_pr_auc": 0.0
+  },
+  "headline": {
+    "retention": {
+      "0.4": {
+        "retention_full_alllevels_windows": 0.5858,
+        "ratio_test_pos": 0.697,
+        "ratio_test_neg": 0.5824,
+        "retention_nested_overall": 0.5854,
+        "retention_nested_pos": 0.5909,
+        "retention_nested_neg": 0.5838,
+        "n_groups": 922,
+        "n_groups_common_p0": 353
+      },
+      "0.6": {
+        "retention_full_alllevels_windows": 0.3808,
+        "ratio_test_pos": 0.42,
+        "ratio_test_neg": 0.3837,
+        "retention_nested_overall": 0.382,
+        "retention_nested_pos": 0.3804,
+        "retention_nested_neg": 0.3825,
+        "n_groups": 918,
+        "n_groups_common_p0": 326
+      },
+      "0.8": {
+        "retention_full_alllevels_windows": 0.181,
+        "ratio_test_pos": 0.2317,
+        "ratio_test_neg": 0.1737,
+        "retention_nested_overall": 0.1796,
+        "retention_nested_pos": 0.1797,
+        "retention_nested_neg": 0.1796,
+        "n_groups": 900,
+        "n_groups_common_p0": 266
+      }
+    },
+    "failures_vs_survivors": {
+      "qsvm_crosslayer": {
+        "0.6": {
+          "recall_fixedpop": 0.1618,
+          "recall_fixedpop_ci": [
+            0.1015,
+            0.2146
+          ],
+          "recall_survivors_common": 0.4254,
+          "recall_survivors_common_ci": [
+            0.2654,
+            0.5641
+          ],
+          "recall_survivors_fulltest": 0.4495,
+          "bias_gap": 0.2636,
+          "ap_conservative_fixedpop": 0.591,
+          "ap_survivors_common": 0.8234,
+          "n_pos_fixed": 2219,
+          "n_absent_pos": 1375
+        },
+        "0.8": {
+          "recall_fixedpop": 0.0577,
+          "recall_fixedpop_ci": [
+            0.0397,
+            0.0863
+          ],
+          "recall_survivors_common": 0.3213,
+          "recall_survivors_common_ci": [
+            0.2199,
+            0.4777
+          ],
+          "recall_survivors_fulltest": 0.3646,
+          "bias_gap": 0.2636,
+          "ap_conservative_fixedpop": 0.6756,
+          "ap_survivors_common": 0.8165,
+          "n_pos_fixed": 1853,
+          "n_absent_pos": 1520
+        }
+      },
+      "rbf_svm": {
+        "0.6": {
+          "recall_fixedpop": 0.2542,
+          "recall_fixedpop_ci": [
+            0.2226,
+            0.2887
+          ],
+          "recall_survivors_common": 0.6682,
+          "recall_survivors_common_ci": [
+            0.5796,
+            0.7567
+          ],
+          "recall_survivors_fulltest": 0.7028,
+          "bias_gap": 0.4141,
+          "ap_conservative_fixedpop": 0.6173,
+          "ap_survivors_common": 0.8927,
+          "n_pos_fixed": 2219,
+          "n_absent_pos": 1375
+        },
+        "0.8": {
+          "recall_fixedpop": 0.1101,
+          "recall_fixedpop_ci": [
+            0.074,
+            0.1354
+          ],
+          "recall_survivors_common": 0.6126,
+          "recall_survivors_common_ci": [
+            0.4141,
+            0.748
+          ],
+          "recall_survivors_fulltest": 0.6579,
+          "bias_gap": 0.5025,
+          "ap_conservative_fixedpop": 0.6861,
+          "ap_survivors_common": 0.8747,
+          "n_pos_fixed": 1853,
+          "n_absent_pos": 1520
+        }
+      }
+    }
+  }
+}

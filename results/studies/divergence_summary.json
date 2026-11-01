@@ -1,0 +1,319 @@
+{
+  "generated": "2026-08-07T02:43:10",
+  "runtime_s": 130.2,
+  "item": "divergence_reestimation",
+  "protocol": {
+    "divergences_reported_separately": true,
+    "never_combined_note": "energy and mmd_u are NEVER averaged or combined into one number; each is its own CSV row.",
+    "energy_estimator": "V-statistic (biased) energy distance, identical to published a1._energy: 2*mean(d(A,B)) - mean(d(A,A)) - mean(d(B,B)); Euclidean d; means include the zero diagonal; non-negative by construction.",
+    "mmd_estimator": "UNBIASED U-statistic RBF-MMD^2: sum_{i!=j}k(a_i,a_j)/(m(m-1)) + sum_{i!=j}k(b_i,b_j)/(n(n-1)) - 2/(mn) sum k(a_i,b_j); k(x,y)=exp(-||x-y||^2/(2 sigma^2)); raw value kept in D_raw (may be negative), D = max(D_raw, 0).",
+    "bandwidth_rule": "median heuristic: sigma = median NONZERO pairwise Euclidean distance among <=512 standardised benign windows of the FITTING fold only (never the scored fold, never attack windows); fallback sigma=1.0; recomputed per scope (full/phys) on sliced columns.",
+    "feature_scaling": "per-feature clip to the benign FIT fold's [q0.005, q0.995], then (x - mu)/sd with mu/sd of the clipped fit fold (sd floor 1e-9) -- a1b's _xfit_standardize refit on fold A only; attack and scored-benign windows never influence the scaler.",
+    "grouped_cross_fitting": "benign transmitter groups split 50/50 into 2 folds; scaler+bandwidth fit on fold A benign only; divergence computed on fold-B benign + attack windows (both transformed by fold-A stats); roles swapped; attack draw shared by the two fold-orders.",
+    "fold_count": 2,
+    "fold_aggregation": "arithmetic mean of the raw statistic over the 2 fold-orders",
+    "point_estimate": "mean over 3 seeded repetitions (whole-group subsampling WITHOUT replacement, seed sequence [20260807, ds_idx, atk_idx, s])",
+    "subsampling": {
+      "n_per_class_target": 300,
+      "n_fit_target": 1000,
+      "n_bandwidth_rows": 512,
+      "rule": "whole transmitter groups accumulated until the target is reached (overshoot by at most one group; a1b._grouped_sample rule)"
+    },
+    "ci_method": "grouped percentile bootstrap: transmitter groups resampled WITH replacement (attack groups from the full pool; benign groups within each fold of a fresh 50/50 split), B=200, seed sequence [913, ds_idx, atk_idx, b]; CI = [0.025, 0.975] percentiles of the replicate RAW statistic (mmd_u CIs are on the raw, un-clamped value).",
+    "dataset_wise_normalisation": "NONE across datasets: divergences are reported per dataset; rank_in_dataset (scipy rankdata, ascending, average ties) is provided for downstream pooled analyses (pooling itself deferred to correlations).",
+    "phys_scope": "feature subset with controllability == 'phys' in results/frontier/feature_controllability.csv for the dataset's network_mode (dev_grid=rssi, nextgen=timing), selected exactly as a1._controllability_for; same window draws as full, columns sliced; own bandwidth.",
+    "loaders": "raw un-standardised windows, mirroring a1b._loaders: dev_grid via qkv2x load_experiment_data(runs/dev_grid, configs/features.yaml); nextgen via results/veremi_nextgen/checkpoints/assembled.npz",
+    "attack_selection": "sorted attacks with y==1, excluding none/benign/empty, >= 30 windows (a1's rule; reproduces the published 15 points)",
+    "published_baseline_context": {
+      "published_D_source": "results/frontier/controllability.csv (energy only)",
+      "published_pooled_rho": {
+        "n": 15,
+        "spearman_rho": 0.8203756627046467,
+        "spearman_p": 0.00017940728782808013,
+        "kendall_tau": 0.6698641270570838,
+        "kendall_p": 0.0005236624799359954,
+        "loao_spearman": 0.48078660842603477
+      },
+      "published_scaling_caveat": "a1 standardised on ALL data (benign+attack pooled) BEFORE the divergence and subsampled random windows, not groups"
+    },
+    "interpreter": "python",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3"
+  },
+  "sanity": {
+    "dev_grid": {
+      "energy": {
+        "spearman_Dfull_vs_publishedY": {
+          "n": 9,
+          "rho": 0.7,
+          "p": 0.03576957497026173
+        },
+        "spearman_Dphys_vs_publishedY": {
+          "n": 9,
+          "rho": 0.7666666666666667,
+          "p": 0.01594401657897403
+        }
+      },
+      "mmd_u": {
+        "spearman_Dfull_vs_publishedY": {
+          "n": 9,
+          "rho": 0.7,
+          "p": 0.03576957497026173
+        },
+        "spearman_Dphys_vs_publishedY": {
+          "n": 9,
+          "rho": 0.7666666666666667,
+          "p": 0.01594401657897403
+        }
+      },
+      "spearman_new_energy_vs_published_energy_Dfull": {
+        "n": 9,
+        "rho": 0.8666666666666667,
+        "p": 0.002495398285990204
+      }
+    },
+    "nextgen": {
+      "energy": {
+        "spearman_Dfull_vs_publishedY": {
+          "n": 6,
+          "rho": 0.942857142857143,
+          "p": 0.004804664723032055
+        },
+        "spearman_Dphys_vs_publishedY": {
+          "n": 6,
+          "rho": 0.7142857142857143,
+          "p": 0.11078717201166179
+        }
+      },
+      "mmd_u": {
+        "spearman_Dfull_vs_publishedY": {
+          "n": 6,
+          "rho": 0.942857142857143,
+          "p": 0.004804664723032055
+        },
+        "spearman_Dphys_vs_publishedY": {
+          "n": 6,
+          "rho": 0.6,
+          "p": 0.208
+        }
+      },
+      "spearman_new_energy_vs_published_energy_Dfull": {
+        "n": 6,
+        "rho": 0.942857142857143,
+        "p": 0.004804664723032055
+      }
+    }
+  },
+  "headline": {
+    "per_dataset_per_metric_spearman_Dfull_vs_Y": {
+      "dev_grid": {
+        "energy": {
+          "n": 9,
+          "rho": 0.7,
+          "p": 0.03576957497026173
+        },
+        "mmd_u": {
+          "n": 9,
+          "rho": 0.7,
+          "p": 0.03576957497026173
+        }
+      },
+      "nextgen": {
+        "energy": {
+          "n": 6,
+          "rho": 0.942857142857143,
+          "p": 0.004804664723032055
+        },
+        "mmd_u": {
+          "n": 6,
+          "rho": 0.942857142857143,
+          "p": 0.004804664723032055
+        }
+      }
+    },
+    "published_energy_only_spearman": {
+      "dev_grid": {
+        "n": 9,
+        "spearman_rho": 0.7666666666666667,
+        "spearman_p": 0.01594401657897403,
+        "kendall_tau": 0.611111111111111,
+        "kendall_p": 0.02474096119929453,
+        "loao_spearman": -0.016666666666666666
+      },
+      "nextgen": {
+        "n": 6,
+        "spearman_rho": 0.8857142857142858,
+        "spearman_p": 0.01884548104956266,
+        "kendall_tau": 0.7333333333333333,
+        "kendall_p": 0.05555555555555555,
+        "loao_spearman": 0.3142857142857143
+      }
+    },
+    "energy_vs_mmdu_rank_consistency": {
+      "dev_grid": {
+        "full": {
+          "n": 9,
+          "rho": 1.0,
+          "p": 0.0
+        },
+        "phys": {
+          "n": 9,
+          "rho": 1.0,
+          "p": 0.0
+        }
+      },
+      "nextgen": {
+        "full": {
+          "n": 6,
+          "rho": 0.8285714285714287,
+          "p": 0.04156268221574335
+        },
+        "phys": {
+          "n": 6,
+          "rho": 0.942857142857143,
+          "p": 0.004804664723032055
+        }
+      }
+    },
+    "ci_widths": {
+      "energy": {
+        "min": 0.11363979861038646,
+        "max": 8.56449628110332,
+        "by_scope": {
+          "full": {
+            "min": 0.11363979861038646,
+            "max": 7.747147420930958
+          },
+          "phys": {
+            "min": 0.11730551177922398,
+            "max": 8.56449628110332
+          }
+        }
+      },
+      "mmd_u": {
+        "min": 0.01232963308620313,
+        "max": 0.42762768368097215,
+        "by_scope": {
+          "full": {
+            "min": 0.01232963308620313,
+            "max": 0.42762768368097215
+          },
+          "phys": {
+            "min": 0.013966793148092982,
+            "max": 0.4064375999887653
+          }
+        }
+      }
+    },
+    "bandwidth_ordering_stability_spearman": {
+      "dev_grid": {
+        "full": {
+          "0.5x_vs_1.0x": 0.9166666666666666,
+          "1.0x_vs_2.0x": 0.9500000000000001,
+          "0.5x_vs_2.0x": 0.8333333333333333
+        },
+        "phys": {
+          "0.5x_vs_1.0x": 0.9833333333333333,
+          "1.0x_vs_2.0x": 1.0,
+          "0.5x_vs_2.0x": 0.9833333333333333
+        }
+      },
+      "nextgen": {
+        "full": {
+          "0.5x_vs_1.0x": 0.6,
+          "1.0x_vs_2.0x": 0.8285714285714287,
+          "0.5x_vs_2.0x": 0.4285714285714286
+        },
+        "phys": {
+          "0.5x_vs_1.0x": 0.8857142857142858,
+          "1.0x_vs_2.0x": 0.942857142857143,
+          "0.5x_vs_2.0x": 0.7714285714285715
+        }
+      }
+    },
+    "negative_raw_mmd_points": [],
+    "point_set_vs_published": {
+      "points_computed": 15,
+      "published_points": 15,
+      "missing_vs_published": [],
+      "extra_vs_published": []
+    }
+  },
+  "point_details": {
+    "dev_grid/const_offset": {
+      "n_point_evals": 3,
+      "sigma_full": 5.052767668652074,
+      "sigma_phys": 4.322548014398396
+    },
+    "dev_grid/const_pos": {
+      "n_point_evals": 3,
+      "sigma_full": 5.036297088047475,
+      "sigma_phys": 4.295566593442285
+    },
+    "dev_grid/data_falsification": {
+      "n_point_evals": 3,
+      "sigma_full": 5.189799986898527,
+      "sigma_phys": 4.4453793522050224
+    },
+    "dev_grid/drift": {
+      "n_point_evals": 3,
+      "sigma_full": 5.0286463797216765,
+      "sigma_phys": 4.332996677063019
+    },
+    "dev_grid/eventual_stop": {
+      "n_point_evals": 3,
+      "sigma_full": 5.046435609420145,
+      "sigma_phys": 4.329526929231922
+    },
+    "dev_grid/random_offset": {
+      "n_point_evals": 3,
+      "sigma_full": 5.154766499733045,
+      "sigma_phys": 4.462620427560407
+    },
+    "dev_grid/random_pos": {
+      "n_point_evals": 3,
+      "sigma_full": 5.063382638829072,
+      "sigma_phys": 4.358950934998308
+    },
+    "dev_grid/replay": {
+      "n_point_evals": 3,
+      "sigma_full": 5.1040302719536825,
+      "sigma_phys": 4.380352599972633
+    },
+    "dev_grid/sybil": {
+      "n_point_evals": 3,
+      "sigma_full": 5.092348398079909,
+      "sigma_phys": 4.3555832371139855
+    },
+    "nextgen/constantPositionOffset": {
+      "n_point_evals": 3,
+      "sigma_full": 4.84973551930399,
+      "sigma_phys": 4.080914531248113
+    },
+    "nextgen/dataReplay": {
+      "n_point_evals": 3,
+      "sigma_full": 4.909730590475526,
+      "sigma_phys": 4.1749621270609545
+    },
+    "nextgen/dosAttack": {
+      "n_point_evals": 3,
+      "sigma_full": 4.749290777803977,
+      "sigma_phys": 4.008693134118112
+    },
+    "nextgen/randomPositionOffset": {
+      "n_point_evals": 3,
+      "sigma_full": 4.750010368111383,
+      "sigma_phys": 4.01060205600995
+    },
+    "nextgen/randomSpeedOffset": {
+      "n_point_evals": 3,
+      "sigma_full": 4.771076117642706,
+      "sigma_phys": 4.014472539469802
+    },
+    "nextgen/timeDelayAttack": {
+      "n_point_evals": 3,
+      "sigma_full": 4.870026398424485,
+      "sigma_phys": 4.107071107733041
+    }
+  }
+}

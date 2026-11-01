@@ -1,0 +1,41 @@
+# Cross-layer feature extraction for VeReMi. Identical to configs/features.yaml EXCEPT
+# receiver_set: all — VeReMi is pure vehicle-to-vehicle (no RSUs), so 'rsu' drops every row.
+# Each VeReMi vehicle logs the BSMs it receives from neighbours over time, giving long
+# per-(sender, receiver) streams, so 'all' windows fine here (unlike our dev_grid, where the
+# co-sim bugs fragmented V2V — fixed now, but RSU windowing is the dev_grid choice).
+window:
+  size: 10
+  stride: 10
+  min_messages: 5
+
+label_rule: any
+receiver_set: all     # VeReMi has no RSUs — use every (vehicle) receiver
+
+propagation:
+  tx_power_dbm: 20.0
+  path_loss_exponent: 2.75
+  ref_loss_db: 47.86
+  ref_distance: 1.0
+
+sybil:
+  radius: 50.0
+  min_overlap: 6
+
+aoi:
+  kappa: 0.5
+
+reduction:
+  method: per_block_pca
+  n_mobility: 4
+  n_network: 4
+  select:
+    mobility: [e_kin_mean, e_kin_max, spd_consistency_mean, heading_consistency_mean]
+    network:  [e_xl_mean, e_xl_max, rate_ratio, seq_loss_frac]
+  scale_range: [0.0, 3.141592653589793]
+  clip_quantiles: [0.005, 0.995]
+
+splits:
+  test_frac: 0.30
+  val_frac: 0.15
+  group_by: sender
+  seed: 7

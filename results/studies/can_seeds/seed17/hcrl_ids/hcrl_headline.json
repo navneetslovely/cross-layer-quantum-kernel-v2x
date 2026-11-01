@@ -1,0 +1,14 @@
+{
+  "fit_note": "can_seeds seed replication; pipeline unchanged",
+  "crosslayer_vs_zz": {
+    "cl_roc": 0.9924847792998478,
+    "zz_roc": 0.9930555555555556,
+    "beats": false
+  },
+  "no_advantage": {
+    "best_classical": "mlp",
+    "best_classical_roc": 0.9968512176560121,
+    "qsvm_crosslayer_roc": 0.9924847792998478,
+    "no_quantum_advantage": true
+  }
+}

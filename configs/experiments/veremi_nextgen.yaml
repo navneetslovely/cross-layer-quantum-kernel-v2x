@@ -1,0 +1,78 @@
+# External comparability #2: VeReMi NextGen
+# Hermann et al., IEEE VNC 2026 — MOSAIC+SUMO InTAS, official Train/Val/Test splits.
+kind: veremi_nextgen
+name: veremi_nextgen
+root: data/veremi_nextgen            # dl/ (zips from Zenodo 19665762) + extracted/
+features_config: configs/features_veremi_nextgen.yaml   # network_mode: timing (no RSSI)
+quantum_config: configs/quantum.yaml
+baselines_config: configs/baselines.yaml
+out_dir: results/veremi_nextgen
+
+# The InTAS_*_2 scenario pair (one urban + one highway context). Attack subsets:
+# the ones matching our SUMO+ns-3 taxonomy (position falsification, Sybil, DoS)
+# plus NextGen-new classes (speed falsification, replay, timing).
+scenarios: [InTAS_highway_2, InTAS_urban_2]
+attacks: [constantPositionOffset, randomPositionOffset, trafficCongestionSybil,
+          dosAttack, randomSpeedOffset, dataReplay, timeDelayAttack]
+
+# The no-attack baseline subsets lack the distance_to_road_edge enrichment that
+# the offroad map-plausibility feature needs; the attack subsets are majority-
+# benign, so benign coverage stays large without them.
+include_baseline: false
+
+# Receiver-scope Sybil pass: NextGen ghosts are one-shot pseudonyms (~3 msgs
+# each, < window.min_messages) — only the pooled per-RECEIVER stream view can
+# see the ghost storm (sybil_neighbors / claim_overlap / rate_ratio).
+sybil_receiver:
+  enabled: true
+  subset: trafficCongestionSybil
+  models: [qsvm_crosslayer, qsvm_zz, rbf_svm, random_forest]
+
+# CAMs are ~1 Hz in NextGen (ETSI CAM triggering)
+nominal_rate_hz: 1.0
+
+# Official-split stratified caps (quantum Gram is O(N^2) — keep train ~3k on CPU).
+# Ratios follow the official 50/10/40 split design.
+max_windows:
+  Train: 3000
+  Validation: 600
+  Test: 2400
+
+models: [qsvm_crosslayer, qsvm_zz, rbf_svm, random_forest, knn_bagging, mlp, rules,
+         xgboost]
+multiclass_models: [qsvm_crosslayer, random_forest, knn_bagging, mlp, rbf_svm, xgboost]
+
+# earlier — multi-seed replication: first seed is the primary (full model zoo +
+# ablations + multiclass + sybil + scale); the others re-run the headline models
+# (binary, full features) for mean±std reporting.
+# Extend the multi-seed set to the strong classical baselines
+# (XGBoost, MLP, kNN-bagging) so the NextGen operating-point/mean±std table carries
+# error bars for every comparator, not just the four headline models. All three are
+# run_model-native (per-seed deterministic). NOTE: the LSTM sequence baseline is still
+# primary-seed only (it stages per-seq windowing + a torch fit; multi-seeding it is a
+# separate structural change).
+seeds: [7, 17, 27]
+multiseed_models: [qsvm_crosslayer, qsvm_zz, rbf_svm, random_forest,
+                   xgboost, mlp, knn_bagging]
+
+# earlier — LSTM sequence baseline (published-SOTA-style recurrent comparator)
+lstm:
+  enabled: true
+
+# earlier — Nyström-at-scale: official splits at large caps; quantum
+# kernels via explicit Nyström features (Phi = C W^-1/2) + linear SVM, classical
+# tree/boosting models at the SAME N. Removes the matched-N asterisk externally.
+scale:
+  enabled: true
+  max_windows: {Train: 20000, Validation: 1500, Test: 8000}
+  landmarks: 512
+  landmark_seed: 13
+  C_grid: [0.01, 0.1, 1.0, 10.0]
+  models: [qsvm_crosslayer, qsvm_zz, random_forest, xgboost]
+
+# Network-blind ablation: zero the network feature block (what does the
+# delay-anchored network block add over mobility-only?)
+network_ablation: true
+ablation_models: [qsvm_crosslayer, rbf_svm, random_forest]
+
+bootstrap: 200

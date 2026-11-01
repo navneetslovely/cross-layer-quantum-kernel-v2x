@@ -1,0 +1,24 @@
+# Sybil power-control ablation.
+# Compares detection across the attacker's sybil_power_mode (same|offset|random).
+# Requires the matching co-sim sweep first:
+#  python -m qkv2x.cli cosim   --config configs/sim/sybil_ablation.yaml
+#  python -m qkv2x.cli features --runs runs/sybil_ablation --config configs/features.yaml
+#  python -m qkv2x.cli experiment --config configs/experiments/sybil_ablation.yaml
+kind: ablation
+name: sybil_ablation
+runs_root: runs/sybil_ablation
+features_config: configs/features.yaml
+quantum_config: configs/quantum.yaml
+baselines_config: configs/baselines.yaml
+out_dir: results/sybil_ablation
+
+axis: sybil_power_mode
+# qsvm_crosslayer = cross-layer quantum kernel; rules keys on the |RSSI-diff| baseline;
+# rbf_svm/random_forest are classical references on the same features.
+models: [qsvm_crosslayer, rbf_svm, random_forest, rules]
+
+# READOUT: a sybil-only mix is positive-heavy (each Sybil emits 4 identities), so PR-AUC
+# saturates near 1. The informative columns in ablation_results.csv are
+# `sybil_rssi_corr_max_mean_attack` (the cross-ID RSSI signature — should fall from
+# ~same to offset/random as the attacker varies per-ghost power) and per-mode recall /
+# fpr_at_tpr. ablation_pr_auc.png plots PR-AUC per model across the three modes.

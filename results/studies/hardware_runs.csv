@@ -1,0 +1,15 @@
+dataset,file,backend,layout,shots,n_test_windows,hw_roc,hw_roc_reconstructed,sim_roc,r_hw_vs_sim,contraction_a,qpu_s
+veremi_nextgen,done_ibm_marrakesh_crosslayer_1024.json,ibm_marrakesh,pinned,1024,10,,False,,,,
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1781504200.json,ibm_marrakesh,default,1024,10,,False,,0.481331706821768,0.03261255870029355,37
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1781538654.json,ibm_marrakesh,pinned,1024,10,0.92,False,0.68,0.9794662734844017,0.22555932615546836,38
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1783767858.json,ibm_marrakesh,pinned,1024,10,0.6799999999999999,False,0.68,0.9905650719766644,0.2639255342667111,38
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1786073799.json,ibm_marrakesh,default,1024,10,0.8,False,0.68,0.9797643350870465,0.2668722859851902,38
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1786073868.json,ibm_marrakesh,default,1024,10,0.7200000000000001,False,0.68,0.9805252296552708,0.27657451553035434,38
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1786073939.json,ibm_marrakesh,pinned,1024,10,1.0,False,0.68,0.9850334560545005,0.18481386626852658,38
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1786077808.json,ibm_marrakesh,default,1024,10,0.6799999999999999,False,0.68,0.9816516357593172,0.22245563909399735,37
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1786077900.json,ibm_marrakesh,default,1024,10,0.44000000000000006,False,0.68,0.9878040812123229,0.26985284875626264,37
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1786078054.json,ibm_marrakesh,pinned,1024,10,0.6400000000000001,False,0.68,0.9713093304239572,0.12441708280164583,38
+veremi_nextgen,multidevice_ibm_marrakesh_crosslayer_1024_1786078146.json,ibm_marrakesh,pinned,1024,10,0.92,False,0.68,0.9579570707558771,0.09567225670210355,38
+dev_grid,devgrid_hw_ibm_marrakesh_s7_1781542641.json,ibm_marrakesh,pinned,1024,10,0.88,False,0.88,,,38
+dev_grid,devgrid_hw_ibm_marrakesh_s7_1786074009.json,ibm_marrakesh,pinned,1024,10,0.8400000000000001,False,0.88,,,38
+dev_grid,devgrid_hw_ibm_marrakesh_s7_1786074076.json,ibm_marrakesh,pinned,1024,10,0.8400000000000001,False,0.88,,,38

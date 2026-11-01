@@ -1,0 +1,9 @@
+attack,catch_f1_urban2,catch_f1_highway2,ours_qsvm_f1,ours_rf_f1,ours_xgb_f1,ours_lstm_f1
+constantPositionOffset,0.846,0.646,0.707,0.872,0.837,0.875
+randomPositionOffset,0.94,0.79,0.739,0.91,0.865,0.931
+randomSpeedOffset,0.808,0.665,0.09,0.598,0.667,0.892
+dataReplay,0.273,0.279,0.728,0.884,0.838,0.878
+dosAttack,0.353,0.502,0.911,0.964,0.949,0.968
+timeDelayAttack,0.062,0.126,0.0,0.0,0.0,0.0
+trafficCongestionSybil,0.259,0.366,,,,
+trafficCongestionSybil(receiver-scope),0.259,0.366,0.97,0.983,,

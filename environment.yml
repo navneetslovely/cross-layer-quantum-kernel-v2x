@@ -1,0 +1,8 @@
+name: qkv2x
+# Conda environment for qkv2x (CPU-only). pip deps hard-pinned in requirements.txt.
+channels: [conda-forge]
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - -r requirements.txt

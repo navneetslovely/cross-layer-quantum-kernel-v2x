@@ -1,0 +1,43 @@
+network_mode,feature,block,controllability,rule
+rssi,e_kin_mean,mobility,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+rssi,e_kin_max,mobility,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+rssi,e_kin_std,mobility,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+rssi,speed_consistency_mean,mobility,ctrl,claimed-kinematics payload (attacker-controllable)
+rssi,speed_consistency_max,mobility,ctrl,claimed-kinematics payload (attacker-controllable)
+rssi,heading_consistency_mean,mobility,ctrl,claimed-kinematics payload (attacker-controllable)
+rssi,accel_abs_mean,mobility,ctrl,claimed-kinematics payload (attacker-controllable)
+rssi,e_xl_mean,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+rssi,e_xl_max,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+rssi,e_xl_std,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+rssi,rate_ratio,network,phys,defining-lever: rate/PDR (DoS cannot flood without it)
+rssi,interarrival_std,network,phys,defining-lever: rate/PDR (DoS cannot flood without it)
+rssi,pdr_proxy,network,phys,defining-lever: rate/PDR (DoS cannot flood without it)
+rssi,sybil_neighbors_mean,network,phys,defining-lever: Sybil co-location/RSSI signature
+rssi,sybil_neighbors_max,network,phys,defining-lever: Sybil co-location/RSSI signature
+rssi,sybil_rssi_absdiff_min,network,phys,defining-lever: Sybil co-location/RSSI signature
+rssi,sybil_rssi_corr_max,network,phys,defining-lever: Sybil co-location/RSSI signature
+rssi,rssi_std,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+rssi,aoi_mean,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,e_kin_mean,mobility,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,e_kin_max,mobility,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,e_kin_std,mobility,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,speed_consistency_mean,mobility,ctrl,claimed-kinematics payload (attacker-controllable)
+timing,speed_consistency_max,mobility,ctrl,claimed-kinematics payload (attacker-controllable)
+timing,heading_consistency_mean,mobility,ctrl,claimed-kinematics payload (attacker-controllable)
+timing,accel_abs_mean,mobility,ctrl,claimed-kinematics payload (attacker-controllable)
+timing,e_xl_mean,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,e_xl_max,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,e_xl_std,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,rate_ratio,network,phys,defining-lever: rate/PDR (DoS cannot flood without it)
+timing,interarrival_std,network,phys,defining-lever: rate/PDR (DoS cannot flood without it)
+timing,pdr_proxy,network,phys,defining-lever: rate/PDR (DoS cannot flood without it)
+timing,sybil_neighbors_mean,network,phys,defining-lever: Sybil co-location/RSSI signature
+timing,sybil_neighbors_max,network,phys,defining-lever: Sybil co-location/RSSI signature
+timing,sybil_rssi_absdiff_min,network,phys,defining-lever: Sybil co-location/RSSI signature
+timing,sybil_rssi_corr_max,network,phys,defining-lever: Sybil co-location/RSSI signature
+timing,delay_std,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,aoi_mean,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,offroad_max,mobility,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,offroad_mean,mobility,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,overlap_3m_max,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)
+timing,overlap_3m_mean,network,phys,residual: claim-vs-physics (e_kin/e_xl/RSSI/delay/map)

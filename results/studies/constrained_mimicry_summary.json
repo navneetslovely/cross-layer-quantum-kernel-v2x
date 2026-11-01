@@ -1,0 +1,764 @@
+{
+  "item": "constrained_mimicry -- temporally-constrained mimicry",
+  "generated_utc": "2026-08-07T02:53:40Z",
+  "runtime_s": 18.4,
+  "protocol": {
+    "dataset": "VeReMi NextGen, results/veremi_nextgen/checkpoints/assembled.npz (official Train/Test splits)",
+    "published_attack": "scripts/mimicry_evasion.py::_candidates -- an INDEPENDENT benign donor window per attack window (rng.choice over benign TRAIN windows), per-window white-box best-of-K minimum. Copied here, not modified.",
+    "constrained_attack": "one benign donor STREAM per attacker STREAM; attacker window k (t_end order) receives donor window k (t_end order); best-of-K over K candidate donor STREAMS, white-box per model.",
+    "pool_matched_control": "same restricted donor pool as the constrained attack (streams of length >= m) but per-window independent donor WINDOWS drawn from the union of those streams' windows + per-window best-of-K -- isolates temporal coherence from the pool restriction. Control RNG seed 108 (kept off the main stream).",
+    "grouping": "`groups` = physical transmitter id (leakage-safe grouping used throughout the project); `t_end` orders windows within a stream, ties broken by row index.",
+    "donor_pool": "benign TRAIN windows (identical to the published attack), grouped into streams; feasible pool for an m-window attacker stream = benign streams of length >= m.",
+    "selection_objectives": {
+      "mean_score (PRIMARY)": "argmin_j mean over the stream's windows of the model score -- the group-level lift of the per-window score minimum",
+      "min_flagged (sensitivity)": "argmin_j #windows above threshold, ties broken by mean score -- the attacker-optimal choice under the same constraint"
+    },
+    "fallbacks": {
+      "pool_smaller_than_K": "all unique feasible donor streams are used; candidate axis padded by repetition (duplicates cannot change a min). The reduced option set is part of the constraint's cost and is reported.",
+      "attacker_stream_longer_than_every_donor": "cyclic indexing (k mod L) over the longest benign streams -- a loop-back trajectory; counts reported per envelope."
+    },
+    "envelopes": {
+      "conservative": [
+        "e_kin_mean",
+        "e_kin_max",
+        "e_kin_std",
+        "speed_consistency_mean",
+        "speed_consistency_max",
+        "heading_consistency_mean",
+        "accel_abs_mean",
+        "offroad_max",
+        "offroad_mean"
+      ],
+      "strong": [
+        "e_kin_mean",
+        "e_kin_max",
+        "e_kin_std",
+        "speed_consistency_mean",
+        "speed_consistency_max",
+        "heading_consistency_mean",
+        "accel_abs_mean",
+        "offroad_max",
+        "offroad_mean",
+        "e_xl_mean",
+        "e_xl_max",
+        "e_xl_std",
+        "overlap_3m_max",
+        "overlap_3m_mean"
+      ]
+    },
+    "models_thresholds": {
+      "qsvm_crosslayer": 0.0,
+      "random_forest": 0.5,
+      "xgboost": 0.5
+    },
+    "qsvm_path": "cached qtrain_binary_full_qsvm_crosslayer.pt params + gram_binary_full_qsvm_crosslayer.npz train Gram; BlockReducer fit on Train rows; fidelity_gram against train statevectors (identical to mimicry_evasion)",
+    "baselines_path": "cached results/evasion/checkpoints/model_{random_forest,xgboost}.joblib (NOT refit)",
+    "seed": 7,
+    "k_cand_streams": 32,
+    "bootstrap": {
+      "B": 1000,
+      "unit": "attacker stream (physical transmitter group)",
+      "type": "percentile, paired for the delta",
+      "seed_root": 7,
+      "per_attack": "resamples only that attack's streams; no attacker stream mixes attack types"
+    },
+    "score_chunk_rows": 4096,
+    "constraints_deliberately_NOT_imposed": "donors are not restricted to the attacker's scenario (InTAS_highway_2 vs InTAS_urban_2) -- the published donor pool is likewise scenario-blind, so the two arms stay comparable. Adding scenario matching would shrink the pools further and could only weaken the attacker, so the constrained recalls reported here remain a LOWER bound on recall under a fully scenario-matched physical constraint. Kinematic continuity ACROSS the attacker's own window boundary (donor windows are consecutive within the donor stream but the attacker's own uncontrollable features are unchanged) is enforced only through the donor's own coherence.",
+    "verified_at_runtime": "no attacker stream mixes attack types; no `groups` id spans more than one (scenario, subset), so stream grouping never merges distinct vehicles.",
+    "modified_files": "none -- mimicry_evasion.py, src/, configs/ and all existing results are untouched"
+  },
+  "population": {
+    "n_attack_test_windows": 517,
+    "n_attacker_streams": 366,
+    "attacker_stream_size_hist": {
+      "1": 262,
+      "2": 78,
+      "3": 14,
+      "4": 7,
+      "5": 2,
+      "6": 2,
+      "7": 1
+    },
+    "n_benign_train_windows": 2328,
+    "n_benign_donor_streams": 1833,
+    "benign_donor_stream_size_hist": {
+      "1": 1438,
+      "2": 312,
+      "3": 69,
+      "4": 11,
+      "5": 3
+    },
+    "n_windows_in_multiwindow_attacker_streams": 255,
+    "attacker_stream_ids_also_present_as_benign_donor_streams": 15,
+    "note_on_that_overlap": "the official NextGen split is not transmitter-disjoint, so a few attackers have their OWN benign windows in the donor pool. This is a property of the published setup (identical donor pool) and is not introduced by constrained_mimicry."
+  },
+  "donor_feasibility": {
+    "conservative": {
+      "max_benign_stream_len": 5,
+      "n_streams_pool_lt_K": 12,
+      "n_windows_pool_lt_K": 57,
+      "n_streams_cyclic_fallback": 3,
+      "n_windows_cyclic_fallback": 19,
+      "n_donor_picks": 11712,
+      "n_donor_picks_cross_scenario": 2287
+    },
+    "strong": {
+      "max_benign_stream_len": 5,
+      "n_streams_pool_lt_K": 12,
+      "n_windows_pool_lt_K": 57,
+      "n_streams_cyclic_fallback": 3,
+      "n_windows_cyclic_fallback": 19,
+      "n_donor_picks": 11712,
+      "n_donor_picks_cross_scenario": 2287
+    }
+  },
+  "replication_check": {
+    "max_abs_diff_replicated_vs_published_recall_after": 0.0,
+    "note": "the published per-window candidate tensors results/evasion/checkpoints/cand_{envelope}.npz are re-scored through this script's path; a ~0 difference certifies that the constrained-vs-unconstrained gap is due to the donor rule alone."
+  },
+  "robustness_gap_qsvm_vs_trees": {
+    "ALL/conservative": {
+      "qsvm_minus_random_forest": {
+        "unconstrained_published": 0.207,
+        "constrained": 0.1818
+      },
+      "qsvm_minus_xgboost": {
+        "unconstrained_published": 0.0948,
+        "constrained": 0.0948
+      }
+    },
+    "ALL/strong": {
+      "qsvm_minus_random_forest": {
+        "unconstrained_published": 0.2476,
+        "constrained": 0.1896
+      },
+      "qsvm_minus_xgboost": {
+        "unconstrained_published": 0.1219,
+        "constrained": 0.1103
+      }
+    },
+    "dosAttack/conservative": {
+      "qsvm_minus_random_forest": {
+        "unconstrained_published": 0.4658,
+        "constrained": 0.3973
+      },
+      "qsvm_minus_xgboost": {
+        "unconstrained_published": 0.2009,
+        "constrained": 0.1918
+      }
+    },
+    "dosAttack/strong": {
+      "qsvm_minus_random_forest": {
+        "unconstrained_published": 0.5799,
+        "constrained": 0.4429
+      },
+      "qsvm_minus_xgboost": {
+        "unconstrained_published": 0.2831,
+        "constrained": 0.2557
+      }
+    }
+  },
+  "headline": {
+    "ALL": {
+      "conservative/qsvm_crosslayer": {
+        "n": 517,
+        "recall_before": 0.7776,
+        "recall_after_unconstrained_published": 0.4275,
+        "recall_after_unconstrained_replicated": 0.4275,
+        "recall_after_pool_matched_unconstrained": 0.4294,
+        "recall_after_constrained": 0.4313,
+        "recall_after_constrained_ci": [
+          0.3698,
+          0.4881
+        ],
+        "recall_after_constrained_minflag": 0.4313,
+        "delta_constrained_minus_unconstrained": 0.0039,
+        "delta_paired_ci": [
+          0.0,
+          0.01
+        ],
+        "frac_boot_delta_gt0": 0.891,
+        "delta_constrained_minus_poolmatched": 0.0019,
+        "delta_vs_poolmatched_ci": [
+          0.0,
+          0.0062
+        ]
+      },
+      "conservative/random_forest": {
+        "n": 517,
+        "recall_before": 0.8182,
+        "recall_after_unconstrained_published": 0.2205,
+        "recall_after_unconstrained_replicated": 0.2205,
+        "recall_after_pool_matched_unconstrained": 0.2418,
+        "recall_after_constrained": 0.2495,
+        "recall_after_constrained_ci": [
+          0.1969,
+          0.3029
+        ],
+        "recall_after_constrained_minflag": 0.2456,
+        "delta_constrained_minus_unconstrained": 0.029,
+        "delta_paired_ci": [
+          0.0078,
+          0.0548
+        ],
+        "frac_boot_delta_gt0": 0.999,
+        "delta_constrained_minus_poolmatched": 0.0077,
+        "delta_vs_poolmatched_ci": [
+          0.0,
+          0.0174
+        ]
+      },
+      "conservative/xgboost": {
+        "n": 517,
+        "recall_before": 0.8549,
+        "recall_after_unconstrained_published": 0.3327,
+        "recall_after_unconstrained_replicated": 0.3327,
+        "recall_after_pool_matched_unconstrained": 0.3404,
+        "recall_after_constrained": 0.3366,
+        "recall_after_constrained_ci": [
+          0.278,
+          0.3949
+        ],
+        "recall_after_constrained_minflag": 0.3346,
+        "delta_constrained_minus_unconstrained": 0.0039,
+        "delta_paired_ci": [
+          -0.0074,
+          0.0147
+        ],
+        "frac_boot_delta_gt0": 0.711,
+        "delta_constrained_minus_poolmatched": -0.0039,
+        "delta_vs_poolmatched_ci": [
+          -0.0141,
+          0.0077
+        ]
+      },
+      "strong/qsvm_crosslayer": {
+        "n": 517,
+        "recall_before": 0.7776,
+        "recall_after_unconstrained_published": 0.4159,
+        "recall_after_unconstrained_replicated": 0.4159,
+        "recall_after_pool_matched_unconstrained": 0.4178,
+        "recall_after_constrained": 0.412,
+        "recall_after_constrained_ci": [
+          0.3481,
+          0.4782
+        ],
+        "recall_after_constrained_minflag": 0.4081,
+        "delta_constrained_minus_unconstrained": -0.0039,
+        "delta_paired_ci": [
+          -0.0156,
+          0.0076
+        ],
+        "frac_boot_delta_gt0": 0.222,
+        "delta_constrained_minus_poolmatched": -0.0058,
+        "delta_vs_poolmatched_ci": [
+          -0.0158,
+          0.0037
+        ]
+      },
+      "strong/random_forest": {
+        "n": 517,
+        "recall_before": 0.8182,
+        "recall_after_unconstrained_published": 0.1683,
+        "recall_after_unconstrained_replicated": 0.1683,
+        "recall_after_pool_matched_unconstrained": 0.1857,
+        "recall_after_constrained": 0.2224,
+        "recall_after_constrained_ci": [
+          0.1691,
+          0.2753
+        ],
+        "recall_after_constrained_minflag": 0.2108,
+        "delta_constrained_minus_unconstrained": 0.0542,
+        "delta_paired_ci": [
+          0.0218,
+          0.0897
+        ],
+        "frac_boot_delta_gt0": 0.999,
+        "delta_constrained_minus_poolmatched": 0.0368,
+        "delta_vs_poolmatched_ci": [
+          0.0078,
+          0.0657
+        ]
+      },
+      "strong/xgboost": {
+        "n": 517,
+        "recall_before": 0.8549,
+        "recall_after_unconstrained_published": 0.294,
+        "recall_after_unconstrained_replicated": 0.294,
+        "recall_after_pool_matched_unconstrained": 0.2959,
+        "recall_after_constrained": 0.3017,
+        "recall_after_constrained_ci": [
+          0.2426,
+          0.3589
+        ],
+        "recall_after_constrained_minflag": 0.3017,
+        "delta_constrained_minus_unconstrained": 0.0077,
+        "delta_paired_ci": [
+          -0.0097,
+          0.0252
+        ],
+        "frac_boot_delta_gt0": 0.765,
+        "delta_constrained_minus_poolmatched": 0.0058,
+        "delta_vs_poolmatched_ci": [
+          -0.0083,
+          0.0196
+        ]
+      }
+    },
+    "ALL_multiwindow_streams": {
+      "conservative/qsvm_crosslayer": {
+        "n": 255,
+        "recall_before": 0.8902,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.6078,
+        "recall_after_pool_matched_unconstrained": 0.6118,
+        "recall_after_constrained": 0.6118,
+        "recall_after_constrained_ci": [
+          0.5161,
+          0.6982
+        ],
+        "recall_after_constrained_minflag": 0.6118,
+        "delta_constrained_minus_unconstrained": 0.0039,
+        "delta_paired_ci": [
+          0.0,
+          0.0126
+        ],
+        "frac_boot_delta_gt0": 0.631,
+        "delta_constrained_minus_poolmatched": 0.0,
+        "delta_vs_poolmatched_ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "conservative/random_forest": {
+        "n": 255,
+        "recall_before": 0.9137,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.3059,
+        "recall_after_pool_matched_unconstrained": 0.3529,
+        "recall_after_constrained": 0.3686,
+        "recall_after_constrained_ci": [
+          0.2734,
+          0.4622
+        ],
+        "recall_after_constrained_minflag": 0.3608,
+        "delta_constrained_minus_unconstrained": 0.0627,
+        "delta_paired_ci": [
+          0.0205,
+          0.1119
+        ],
+        "frac_boot_delta_gt0": 1.0,
+        "delta_constrained_minus_poolmatched": 0.0157,
+        "delta_vs_poolmatched_ci": [
+          0.0037,
+          0.034
+        ]
+      },
+      "conservative/xgboost": {
+        "n": 255,
+        "recall_before": 0.9216,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.4863,
+        "recall_after_pool_matched_unconstrained": 0.502,
+        "recall_after_constrained": 0.502,
+        "recall_after_constrained_ci": [
+          0.3975,
+          0.6031
+        ],
+        "recall_after_constrained_minflag": 0.498,
+        "delta_constrained_minus_unconstrained": 0.0157,
+        "delta_paired_ci": [
+          0.0038,
+          0.0329
+        ],
+        "frac_boot_delta_gt0": 0.987,
+        "delta_constrained_minus_poolmatched": 0.0,
+        "delta_vs_poolmatched_ci": [
+          -0.0154,
+          0.0157
+        ]
+      },
+      "strong/qsvm_crosslayer": {
+        "n": 255,
+        "recall_before": 0.8902,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.5882,
+        "recall_after_pool_matched_unconstrained": 0.5961,
+        "recall_after_constrained": 0.6039,
+        "recall_after_constrained_ci": [
+          0.5021,
+          0.6985
+        ],
+        "recall_after_constrained_minflag": 0.5961,
+        "delta_constrained_minus_unconstrained": 0.0157,
+        "delta_paired_ci": [
+          0.0037,
+          0.0323
+        ],
+        "frac_boot_delta_gt0": 0.979,
+        "delta_constrained_minus_poolmatched": 0.0078,
+        "delta_vs_poolmatched_ci": [
+          0.0,
+          0.0201
+        ]
+      },
+      "strong/random_forest": {
+        "n": 255,
+        "recall_before": 0.9137,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.2275,
+        "recall_after_pool_matched_unconstrained": 0.2667,
+        "recall_after_constrained": 0.3333,
+        "recall_after_constrained_ci": [
+          0.2435,
+          0.4218
+        ],
+        "recall_after_constrained_minflag": 0.3098,
+        "delta_constrained_minus_unconstrained": 0.1059,
+        "delta_paired_ci": [
+          0.0476,
+          0.1712
+        ],
+        "frac_boot_delta_gt0": 1.0,
+        "delta_constrained_minus_poolmatched": 0.0667,
+        "delta_vs_poolmatched_ci": [
+          0.0198,
+          0.1223
+        ]
+      },
+      "strong/xgboost": {
+        "n": 255,
+        "recall_before": 0.9216,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.4353,
+        "recall_after_pool_matched_unconstrained": 0.4549,
+        "recall_after_constrained": 0.4706,
+        "recall_after_constrained_ci": [
+          0.3654,
+          0.5694
+        ],
+        "recall_after_constrained_minflag": 0.4706,
+        "delta_constrained_minus_unconstrained": 0.0353,
+        "delta_paired_ci": [
+          0.0081,
+          0.0659
+        ],
+        "frac_boot_delta_gt0": 0.994,
+        "delta_constrained_minus_poolmatched": 0.0157,
+        "delta_vs_poolmatched_ci": [
+          -0.0075,
+          0.0382
+        ]
+      }
+    },
+    "ALL_singleton_streams": {
+      "conservative/qsvm_crosslayer": {
+        "n": 262,
+        "recall_before": 0.6679,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.2519,
+        "recall_after_pool_matched_unconstrained": 0.2519,
+        "recall_after_constrained": 0.2557,
+        "recall_after_constrained_ci": [
+          0.2061,
+          0.3131
+        ],
+        "recall_after_constrained_minflag": 0.2557,
+        "delta_constrained_minus_unconstrained": 0.0038,
+        "delta_paired_ci": [
+          0.0,
+          0.0115
+        ],
+        "frac_boot_delta_gt0": 0.602,
+        "delta_constrained_minus_poolmatched": 0.0038,
+        "delta_vs_poolmatched_ci": [
+          0.0,
+          0.0115
+        ]
+      },
+      "conservative/random_forest": {
+        "n": 262,
+        "recall_before": 0.7252,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.1374,
+        "recall_after_pool_matched_unconstrained": 0.1336,
+        "recall_after_constrained": 0.1336,
+        "recall_after_constrained_ci": [
+          0.0916,
+          0.1756
+        ],
+        "recall_after_constrained_minflag": 0.1336,
+        "delta_constrained_minus_unconstrained": -0.0038,
+        "delta_paired_ci": [
+          -0.0115,
+          0.0
+        ],
+        "frac_boot_delta_gt0": 0.0,
+        "delta_constrained_minus_poolmatched": 0.0,
+        "delta_vs_poolmatched_ci": [
+          -0.0115,
+          0.0115
+        ]
+      },
+      "conservative/xgboost": {
+        "n": 262,
+        "recall_before": 0.7901,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.1832,
+        "recall_after_pool_matched_unconstrained": 0.1832,
+        "recall_after_constrained": 0.1756,
+        "recall_after_constrained_ci": [
+          0.1298,
+          0.2214
+        ],
+        "recall_after_constrained_minflag": 0.1756,
+        "delta_constrained_minus_unconstrained": -0.0076,
+        "delta_paired_ci": [
+          -0.0229,
+          0.0076
+        ],
+        "frac_boot_delta_gt0": 0.092,
+        "delta_constrained_minus_poolmatched": -0.0076,
+        "delta_vs_poolmatched_ci": [
+          -0.0229,
+          0.0076
+        ]
+      },
+      "strong/qsvm_crosslayer": {
+        "n": 262,
+        "recall_before": 0.6679,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.2481,
+        "recall_after_pool_matched_unconstrained": 0.2443,
+        "recall_after_constrained": 0.2252,
+        "recall_after_constrained_ci": [
+          0.1793,
+          0.2748
+        ],
+        "recall_after_constrained_minflag": 0.2252,
+        "delta_constrained_minus_unconstrained": -0.0229,
+        "delta_paired_ci": [
+          -0.042,
+          -0.0076
+        ],
+        "frac_boot_delta_gt0": 0.0,
+        "delta_constrained_minus_poolmatched": -0.0191,
+        "delta_vs_poolmatched_ci": [
+          -0.0382,
+          -0.0038
+        ]
+      },
+      "strong/random_forest": {
+        "n": 262,
+        "recall_before": 0.7252,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.1107,
+        "recall_after_pool_matched_unconstrained": 0.1069,
+        "recall_after_constrained": 0.1145,
+        "recall_after_constrained_ci": [
+          0.0763,
+          0.1528
+        ],
+        "recall_after_constrained_minflag": 0.1145,
+        "delta_constrained_minus_unconstrained": 0.0038,
+        "delta_paired_ci": [
+          -0.0077,
+          0.0191
+        ],
+        "frac_boot_delta_gt0": 0.601,
+        "delta_constrained_minus_poolmatched": 0.0076,
+        "delta_vs_poolmatched_ci": [
+          -0.0115,
+          0.0305
+        ]
+      },
+      "strong/xgboost": {
+        "n": 262,
+        "recall_before": 0.7901,
+        "recall_after_unconstrained_published": null,
+        "recall_after_unconstrained_replicated": 0.1565,
+        "recall_after_pool_matched_unconstrained": 0.1412,
+        "recall_after_constrained": 0.1374,
+        "recall_after_constrained_ci": [
+          0.0954,
+          0.1794
+        ],
+        "recall_after_constrained_minflag": 0.1374,
+        "delta_constrained_minus_unconstrained": -0.0191,
+        "delta_paired_ci": [
+          -0.042,
+          0.0
+        ],
+        "frac_boot_delta_gt0": 0.015,
+        "delta_constrained_minus_poolmatched": -0.0038,
+        "delta_vs_poolmatched_ci": [
+          -0.023,
+          0.0153
+        ]
+      }
+    },
+    "dosAttack": {
+      "conservative/qsvm_crosslayer": {
+        "n": 219,
+        "recall_before": 1.0,
+        "recall_after_unconstrained_published": 0.9863,
+        "recall_after_unconstrained_replicated": 0.9863,
+        "recall_after_pool_matched_unconstrained": 0.9863,
+        "recall_after_constrained": 0.9863,
+        "recall_after_constrained_ci": [
+          0.9673,
+          1.0
+        ],
+        "recall_after_constrained_minflag": 0.9863,
+        "delta_constrained_minus_unconstrained": 0.0,
+        "delta_paired_ci": [
+          0.0,
+          0.0
+        ],
+        "frac_boot_delta_gt0": 0.0,
+        "delta_constrained_minus_poolmatched": 0.0,
+        "delta_vs_poolmatched_ci": [
+          0.0,
+          0.0
+        ]
+      },
+      "conservative/random_forest": {
+        "n": 219,
+        "recall_before": 0.9817,
+        "recall_after_unconstrained_published": 0.5205,
+        "recall_after_unconstrained_replicated": 0.5205,
+        "recall_after_pool_matched_unconstrained": 0.5708,
+        "recall_after_constrained": 0.589,
+        "recall_after_constrained_ci": [
+          0.4973,
+          0.6683
+        ],
+        "recall_after_constrained_minflag": 0.5799,
+        "delta_constrained_minus_unconstrained": 0.0685,
+        "delta_paired_ci": [
+          0.0195,
+          0.1275
+        ],
+        "frac_boot_delta_gt0": 0.998,
+        "delta_constrained_minus_poolmatched": 0.0183,
+        "delta_vs_poolmatched_ci": [
+          -0.0001,
+          0.04
+        ]
+      },
+      "conservative/xgboost": {
+        "n": 219,
+        "recall_before": 0.9954,
+        "recall_after_unconstrained_published": 0.7854,
+        "recall_after_unconstrained_replicated": 0.7854,
+        "recall_after_pool_matched_unconstrained": 0.8037,
+        "recall_after_constrained": 0.7945,
+        "recall_after_constrained_ci": [
+          0.7253,
+          0.8552
+        ],
+        "recall_after_constrained_minflag": 0.79,
+        "delta_constrained_minus_unconstrained": 0.0091,
+        "delta_paired_ci": [
+          -0.0183,
+          0.0351
+        ],
+        "frac_boot_delta_gt0": 0.696,
+        "delta_constrained_minus_poolmatched": -0.0091,
+        "delta_vs_poolmatched_ci": [
+          -0.039,
+          0.0175
+        ]
+      },
+      "strong/qsvm_crosslayer": {
+        "n": 219,
+        "recall_before": 1.0,
+        "recall_after_unconstrained_published": 0.9772,
+        "recall_after_unconstrained_replicated": 0.9772,
+        "recall_after_pool_matched_unconstrained": 0.9817,
+        "recall_after_constrained": 0.968,
+        "recall_after_constrained_ci": [
+          0.94,
+          0.9902
+        ],
+        "recall_after_constrained_minflag": 0.9589,
+        "delta_constrained_minus_unconstrained": -0.0091,
+        "delta_paired_ci": [
+          -0.0393,
+          0.0178
+        ],
+        "frac_boot_delta_gt0": 0.199,
+        "delta_constrained_minus_poolmatched": -0.0137,
+        "delta_vs_poolmatched_ci": [
+          -0.0392,
+          0.0088
+        ]
+      },
+      "strong/random_forest": {
+        "n": 219,
+        "recall_before": 0.9817,
+        "recall_after_unconstrained_published": 0.3973,
+        "recall_after_unconstrained_replicated": 0.3973,
+        "recall_after_pool_matched_unconstrained": 0.4384,
+        "recall_after_constrained": 0.5251,
+        "recall_after_constrained_ci": [
+          0.4419,
+          0.6102
+        ],
+        "recall_after_constrained_minflag": 0.4977,
+        "delta_constrained_minus_unconstrained": 0.1279,
+        "delta_paired_ci": [
+          0.0534,
+          0.2044
+        ],
+        "frac_boot_delta_gt0": 1.0,
+        "delta_constrained_minus_poolmatched": 0.0868,
+        "delta_vs_poolmatched_ci": [
+          0.0256,
+          0.1535
+        ]
+      },
+      "strong/xgboost": {
+        "n": 219,
+        "recall_before": 0.9954,
+        "recall_after_unconstrained_published": 0.6941,
+        "recall_after_unconstrained_replicated": 0.6941,
+        "recall_after_pool_matched_unconstrained": 0.6986,
+        "recall_after_constrained": 0.7123,
+        "recall_after_constrained_ci": [
+          0.6301,
+          0.7869
+        ],
+        "recall_after_constrained_minflag": 0.7123,
+        "delta_constrained_minus_unconstrained": 0.0183,
+        "delta_paired_ci": [
+          -0.0207,
+          0.0594
+        ],
+        "frac_boot_delta_gt0": 0.772,
+        "delta_constrained_minus_poolmatched": 0.0137,
+        "delta_vs_poolmatched_ci": [
+          -0.022,
+          0.0453
+        ]
+      }
+    }
+  },
+  "finding": {
+    "direction": "constrained mimicry is WEAKER than the published per-window-donor mimicry for 5/6 (envelope, model) pairs at attack=ALL, so the published evasion numbers are an ATTACKER UPPER BOUND",
+    "largest_effect": {
+      "envelope": "strong",
+      "model": "random_forest",
+      "recall_after_unconstrained": 0.1683,
+      "recall_after_constrained": 0.2224,
+      "delta": 0.0542,
+      "delta_ci": [
+        0.0218,
+        0.0897
+      ]
+    },
+    "magnitude_caveat": "the overall effect is small because 262 of 366 attacker streams (and 262 of 517 windows) contain a single window, where the temporal constraint is vacuous; the effect is concentrated on the multi-window subset and on dosAttack.",
+    "unchanged_claims": "content attacks (constant/random position offset, dataReplay, randomSpeedOffset) are driven to the same recall floor under BOTH donor rules, so the published 'mimicry erases controllable content separability' conclusion is NOT an artefact of the teleporting donor.",
+    "no_quantum_advantage_claim": "this study characterises an adversary idealisation; it makes no quantum-advantage claim."
+  }
+}

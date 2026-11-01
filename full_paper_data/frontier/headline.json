@@ -1,0 +1,12 @@
+{
+  "study": "dos_mimicry_end_to_end_cosim",
+  "scenario": "real SUMO 1.20 + ns-3.42; flooding attack at factor 1.5x (stealthy mimicry of benign rate)",
+  "qsvm_crosslayer_roc": 0.9441486490951748,
+  "qsvm_zz_roc": 0.7642894119461181,
+  "best_classical": "mlp",
+  "best_classical_roc": 0.9730545979227015,
+  "crosslayer_beats_zz": true,
+  "dos_resists_mimicry": true,
+  "no_quantum_advantage": true,
+  "verdict": "DoS resists mimicry end-to-end: even at 1.5x stealthy flood, detection ROC >0.9 for strong models; cross-layer>>ZZ; no quantum advantage. Upgrades the feature-space evasion bound to a real co-simulated result."
+}

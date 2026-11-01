@@ -1,0 +1,57 @@
+# Co-simulation sweep for the SYBIL POWER-CONTROL ablation.
+# One axis only: sybil_power_mode in {same, offset, random}. Sybil-only attack mix at a
+# fixed density, so every run differs ONLY in how the attacker powers its ghost
+# identities. Small + CPU-friendly (3 modes x 2 seeds = 6 short runs).
+scenario:
+  name: sybil_ablation
+  sumocfg: cosim/sumo/scenarios/dev_grid/dev_grid.sumocfg
+  step_length: 0.1
+  warmup: 20.0
+  duration: 120.0
+
+out_root: runs/sybil_ablation
+seeds: [1, 2]
+node_pool: 400
+
+rsu:
+  count: 4
+  margin: 100.0
+  z: 6.0
+
+sweep:
+  sybil_power_mode: [same, offset, random]   # the ablation axis
+
+channel:
+  path_loss_exponent: 2.75
+  ref_loss_db: 47.86
+  ref_distance: 1.0
+  shadowing_sigma_db: 3.0
+  shadowing_tau_s: 1.0
+  nakagami: false
+  rx_sensitivity_dbm: -94.0
+  cca_threshold_dbm: -84.0
+  tx_power_dbm: 20.0
+  datarate: OfdmRate6MbpsBW10MHz
+
+bsm:
+  rate_hz: 10.0
+  size_bytes: 300
+
+attacks:
+  # Keep most vehicles benign: each Sybil attacker emits 4 identities (primary + 3
+  # ghosts), so even 0.15 leaves the positive class well-represented while preserving
+  # enough benign windows for a valid group-aware train/test split per mode.
+  fraction: 0.15
+  onset_uniform: [5.0, 15.0]
+  mix:
+    sybil: 1                    # Sybil ONLY — the attack the power modes act on
+  params:
+    sybil_ghosts: 3
+    sybil_spacing: 8.0
+    sybil_power_mode: same      # default; OVERRIDDEN by the sweep axis above
+    sybil_power_offset_db: 6.0  # per-ghost step (offset) / +-range (random)
+
+ns3:
+  run_via_wrapper: true
+n_jobs: 3
+sumo_binary: sumo

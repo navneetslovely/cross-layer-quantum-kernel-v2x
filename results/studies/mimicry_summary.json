@@ -1,0 +1,190 @@
+{
+  "protocol": {
+    "whitebox": "per-model best-of-K substitution (each model faces the candidate minimising ITS OWN score) -- stated explicitly",
+    "common_realisation": "candidates chosen once against the random_forest surrogate, identical adversarial windows evaluated on every model (transfer)",
+    "k_grid_present": [
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "missing_runs": [],
+    "envelopes": "conservative = mobility + off-road plausibility; strong = + e_xl + claim-overlap. Rate/timing features are never substituted (goal-constrained: lowering rate removes the flooding effect)."
+  },
+  "saturation": {
+    "conservative/qsvm_crosslayer": {
+      "k_grid": [
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "recall_after": [
+        0.437137330754352,
+        0.4352030947775628,
+        0.4274661508704062,
+        0.4274661508704062,
+        0.4274661508704062
+      ],
+      "delta_first_to_last": -0.009671179883945835
+    },
+    "conservative/random_forest": {
+      "k_grid": [
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "recall_after": [
+        0.2456479690522243,
+        0.2340425531914893,
+        0.2205029013539652,
+        0.2166344294003868,
+        0.2050290135396518
+      ],
+      "delta_first_to_last": -0.0406189555125725
+    },
+    "conservative/xgboost": {
+      "k_grid": [
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "recall_after": [
+        0.3500967117988394,
+        0.3462282398452611,
+        0.3326885880077369,
+        0.3288201160541586,
+        0.3152804642166344
+      ],
+      "delta_first_to_last": -0.03481624758220497
+    },
+    "strong/qsvm_crosslayer": {
+      "k_grid": [
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "recall_after": [
+        0.4235976789168278,
+        0.4216634429400386,
+        0.4158607350096712,
+        0.4042553191489361,
+        0.3965183752417795
+      ],
+      "delta_first_to_last": -0.027079303675048294
+    },
+    "strong/random_forest": {
+      "k_grid": [
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "recall_after": [
+        0.2321083172147001,
+        0.1992263056092843,
+        0.1682785299806576,
+        0.1353965183752417,
+        0.1141199226305609
+      ],
+      "delta_first_to_last": -0.1179883945841392
+    },
+    "strong/xgboost": {
+      "k_grid": [
+        8,
+        16,
+        32,
+        64,
+        128
+      ],
+      "recall_after": [
+        0.3326885880077369,
+        0.3075435203094777,
+        0.2940038684719536,
+        0.2746615087040619,
+        0.2398452611218568
+      ],
+      "delta_first_to_last": -0.09284332688588007
+    }
+  },
+  "transfer_vs_whitebox_k32": [
+    {
+      "envelope": "conservative",
+      "model": "qsvm_crosslayer",
+      "recall_after_whitebox": 0.4274661508704062,
+      "recall_after_common": 0.4429400386847195,
+      "transfer_gap": 0.015473887814313303
+    },
+    {
+      "envelope": "conservative",
+      "model": "random_forest",
+      "recall_after_whitebox": 0.2205029013539652,
+      "recall_after_common": 0.2205029013539652,
+      "transfer_gap": 0.0
+    },
+    {
+      "envelope": "conservative",
+      "model": "xgboost",
+      "recall_after_whitebox": 0.3326885880077369,
+      "recall_after_common": 0.3558994197292069,
+      "transfer_gap": 0.023210831721470038
+    },
+    {
+      "envelope": "strong",
+      "model": "qsvm_crosslayer",
+      "recall_after_whitebox": 0.4158607350096712,
+      "recall_after_common": 0.4235976789168278,
+      "transfer_gap": 0.007736943907156624
+    },
+    {
+      "envelope": "strong",
+      "model": "random_forest",
+      "recall_after_whitebox": 0.1682785299806576,
+      "recall_after_common": 0.1682785299806576,
+      "transfer_gap": 0.0
+    },
+    {
+      "envelope": "strong",
+      "model": "xgboost",
+      "recall_after_whitebox": 0.2940038684719536,
+      "recall_after_common": 0.3210831721470019,
+      "transfer_gap": 0.027079303675048294
+    }
+  ],
+  "dos_gap": {
+    "published_numbers": {
+      "qsvm_strong": 0.977,
+      "rf_strong": 0.397
+    },
+    "rf_native_importance_split": {
+      "mobility_block": 0.696739643322526,
+      "network_block": 0.3032603566774739
+    },
+    "rf_permutation_auc_drop_dos_vs_benign": {
+      "mobility_block": {
+        "mean_auc_drop": 0.06553560770384172,
+        "std": 0.0035317369493909644
+      },
+      "network_block": {
+        "mean_auc_drop": 0.042922617054624676,
+        "std": 0.004246283946190087
+      }
+    },
+    "base_auc_dos_vs_benign_rf": 0.99946743724494,
+    "mechanism": "DoS is rate-defined and the substitution never touches rate/timing features; recall lost under mimicry therefore measures reliance on substitutable (mobility/plausibility) features. The RF spreads weight onto the mobility block (see importances), so benign-looking mobility values flip its DoS windows; the trained cross-layer QSVM anchors DoS on the network-block rate signal and keeps recall.",
+    "threshold_calibration": {
+      "qsvm_crosslayer": "margin threshold 0.0 (SVM decision function sign)",
+      "random_forest/xgboost": "probability threshold 0.5",
+      "fpr_note": "benign windows are untouched by the substitution, so each model's FPR is unchanged by construction; recall_before/after are therefore compared at each model's own fixed operating point (not at matched FPR) -- the published caveat stands, and threshold_protocol supplies validation-calibrated matched-FPR points."
+    }
+  }
+}

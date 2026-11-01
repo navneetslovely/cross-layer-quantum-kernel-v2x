@@ -1,0 +1,179 @@
+{
+  "study": "frontier_grouped_crossfit",
+  "method": "transmitter-grouped subsampling + cross-fit standardisation (benign fold-1 fits, fold-2 scored) + grouped bootstrap CI; energy distance. Compare to ungrouped rho=0.82.",
+  "params": {
+    "n_per_class": 300,
+    "boot_dfull": 200,
+    "boot_rho": 3000
+  },
+  "per_dataset": {
+    "dev_grid": {
+      "d_full": {
+        "const_offset": {
+          "D_full_grouped": 3.356585213439847,
+          "D_full_ci": [
+            1.994631220677008,
+            4.750574089717906
+          ],
+          "n_attack_groups": 80
+        },
+        "const_pos": {
+          "D_full_grouped": 6.194792509058041,
+          "D_full_ci": [
+            4.047666174133261,
+            8.202852419042031
+          ],
+          "n_attack_groups": 80
+        },
+        "data_falsification": {
+          "D_full_grouped": 5.191116933384417,
+          "D_full_ci": [
+            2.8352228340612005,
+            8.281566302459312
+          ],
+          "n_attack_groups": 80
+        },
+        "drift": {
+          "D_full_grouped": 3.770301284820337,
+          "D_full_ci": [
+            2.3890064690228545,
+            5.3577830010356005
+          ],
+          "n_attack_groups": 97
+        },
+        "eventual_stop": {
+          "D_full_grouped": 3.372702209698989,
+          "D_full_ci": [
+            1.7044870676964616,
+            5.316432268148359
+          ],
+          "n_attack_groups": 94
+        },
+        "random_offset": {
+          "D_full_grouped": 32.48691066040797,
+          "D_full_ci": [
+            31.510192866111133,
+            33.444046378194045
+          ],
+          "n_attack_groups": 117
+        },
+        "random_pos": {
+          "D_full_grouped": 35.23240051122536,
+          "D_full_ci": [
+            34.228810597377965,
+            36.250150024192074
+          ],
+          "n_attack_groups": 76
+        },
+        "replay": {
+          "D_full_grouped": 0.7179129666835925,
+          "D_full_ci": [
+            0.3816428054741082,
+            1.3857463661627685
+          ],
+          "n_attack_groups": 82
+        },
+        "sybil": {
+          "D_full_grouped": 5.584096979434564,
+          "D_full_ci": [
+            4.382113912074065,
+            6.860986766155936
+          ],
+          "n_attack_groups": 243
+        }
+      },
+      "frontier": {
+        "n_attacks": 9,
+        "spearman_rho": 0.7333333333333334,
+        "rho_ci": [
+          -0.052631578947368425,
+          1.0
+        ],
+        "attacks": [
+          "const_offset",
+          "const_pos",
+          "data_falsification",
+          "drift",
+          "eventual_stop",
+          "random_offset",
+          "random_pos",
+          "replay",
+          "sybil"
+        ]
+      }
+    },
+    "nextgen": {
+      "d_full": {
+        "constantPositionOffset": {
+          "D_full_grouped": 7.5394838903169275,
+          "D_full_ci": [
+            6.978525980057598,
+            8.141969786005346
+          ],
+          "n_attack_groups": 123
+        },
+        "dataReplay": {
+          "D_full_grouped": 22.819306689716605,
+          "D_full_ci": [
+            20.378570544531883,
+            24.9919763063291
+          ],
+          "n_attack_groups": 123
+        },
+        "dosAttack": {
+          "D_full_grouped": 10.640462176263277,
+          "D_full_ci": [
+            8.994451331064047,
+            11.896287477105018
+          ],
+          "n_attack_groups": 283
+        },
+        "randomPositionOffset": {
+          "D_full_grouped": 28.869972064656096,
+          "D_full_ci": [
+            27.03883795742787,
+            32.074686775991054
+          ],
+          "n_attack_groups": 125
+        },
+        "randomSpeedOffset": {
+          "D_full_grouped": 8.865445167832352,
+          "D_full_ci": [
+            8.122307644205657,
+            9.839921537835869
+          ],
+          "n_attack_groups": 133
+        },
+        "timeDelayAttack": {
+          "D_full_grouped": 0.09053269825157631,
+          "D_full_ci": [
+            0.06193632680010297,
+            0.13119506074833584
+          ],
+          "n_attack_groups": 116
+        }
+      },
+      "frontier": {
+        "n_attacks": 6,
+        "spearman_rho": 0.942857142857143,
+        "rho_ci": [
+          0.5000000000000001,
+          1.0
+        ],
+        "attacks": [
+          "constantPositionOffset",
+          "dataReplay",
+          "dosAttack",
+          "randomPositionOffset",
+          "randomSpeedOffset",
+          "timeDelayAttack"
+        ]
+      }
+    }
+  },
+  "pooled_within_standardized": {
+    "n": 15,
+    "spearman_rho": 0.8293122167646101,
+    "note": "D_full z-standardised WITHIN each dataset before pooling (avoids scale-pooling)."
+  }
+}

@@ -1,0 +1,73 @@
+# Quantum feature map + kernel
+device: auto            # auto | cuda | cpu | mps. auto = cuda if available else cpu.
+                        # On Mac, auto -> cpu (Torch complex ops are unreliable on MPS;
+                        # set mps explicitly only if your Torch build supports them).
+dtype: complex64
+
+feature_map:
+  n_layers: 2           # data re-uploading depth L
+  entangler: cross_layer    # cross_layer (novel) | zz_full (ZZFeatureMap-style ablation) | none
+  coupling: full_bipartite  # full_bipartite | banded (|i-j|<=1 across registers)
+  aoi_modulation: true      # x_i -> exp(-AoI_i/kappa) * x_i  (kappa from features.yaml)
+
+kernel: fidelity        # fidelity | projected
+projected_gamma: 1.0
+shots: null             # null = exact statevector kernel; int M = binomial shot sampling
+psd_repair: clip        # clip | none  (applied after shot sampling)
+
+train:                  # trainable map parameters (w, u, gamma) via kernel-target alignment
+  enabled: true
+  objective: centered_kta_weighted
+  lr: 0.05
+  epochs: 200           # final-quality KTA training (user-set 2026-06-09; up from dev's 40). NOTE:
+                        # the map is RETRAINED per attack/point (TD-5), so 200 epochs makes
+                        # crossattack/lowlabel MUCH slower (~5x the dev cost) — implement param
+                        # caching (TD-5) to avoid re-paying it. Watch for OOM/long runtimes.
+  batch: 512            # subsampled rows per epoch (class-balanced)
+  seed: 11
+  init_w: 1.0
+  init_u: 1.0
+  init_gamma: 0.5
+
+# Cap on #train windows feeding the O(N^2) fidelity Gram. The clean dev_grid has ~90k
+# windows; an uncapped train split (~63k) needs a 63k^2 complex matrix (~30 GB) and
+# OOM-kills the process. 3000 builds a 3000^2 Gram (~72 MB) in seconds on CPU. Applied
+# group-wise (leakage-safe) in run_model to ALL quantum callers (quick CLI, robustness,
+# crossattack). lowlabel (n_train_grid) and veremi (max_windows) already cap upstream.
+max_train: 3000
+
+svm:
+  C_grid: [0.1, 1.0, 10.0, 100.0]
+  cv_folds: 5
+  class_weight: balanced
+
+ocsvm:
+  nu_grid: [0.01, 0.05, 0.10]
+
+# Nyström landmark approximation — WIRED into the supervised quantum-SVM
+# path (qsvm_crosslayer / qsvm_zz / qsvm_projected) in experiments/common.py::run_model.
+# When enabled, only the [N_train, landmarks] + [landmarks, landmarks] quantum overlaps
+# are evaluated (O(N*l) instead of O(N^2)) and the Gram is reconstructed as
+# K ~= C W^+ C^T, so N_train may exceed the dense `max_train` cap (use nystrom.max_train).
+# Left OFF by default so the headline experiments reproduce the exact full-Gram numbers;
+# switch on for VeReMi-scale N_train. (ocsvm_quantum always uses the full benign Gram.)
+nystrom:
+  enabled: false
+  landmarks: 512        # l: number of landmark training points (random, seeded)
+  max_train: 8000       # train cap used when Nyström is on (quantum cost is O(N*l))
+  seed: 13
+
+diagnostics:
+  centered_kta: true
+  geometric_difference: true
+  gcq_reg: 1.0e-6
+  variance_monitor: true       # exponential-concentration guard rail
+  shots_sweep: [128, 512, 2048, 8192]
+  depolarizing:                #  sensitivity to global depolarising noise — WIRED
+    enabled: true              # into experiments/common.py::noise_sensitivity (run by the
+                               # robustness experiment). Uses the analytic global-depolarising
+                               # contraction k -> (1-p)^2 k + (1-(1-p)^2)/2^n (cheap, exact for
+                               # a single global channel) rather than a per-gate density-matrix
+                               # sim, so the sweep runs on a subsample, not a few points.
+    p_grid: [0.0, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2]
+    max_samples: 300

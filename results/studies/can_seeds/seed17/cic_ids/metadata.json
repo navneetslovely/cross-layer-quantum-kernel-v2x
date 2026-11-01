@@ -1,0 +1,48 @@
+{
+  "study": "cic_ids_detection",
+  "timestamp": "2026-10-17T13:54:41",
+  "wall_time_s": 51.338,
+  "python": "3.11.15",
+  "executable": "python",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "machine": "arm64",
+  "lib_versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.0",
+    "pandas": "3.0.3",
+    "pennylane": "0.45.0",
+    "torch": "2.12.0",
+    "xgboost": "3.2.0"
+  },
+  "config_path": null,
+  "hyperparams": {
+    "models": [
+      "qsvm_crosslayer",
+      "qsvm_zz",
+      "rbf_svm",
+      "random_forest",
+      "xgboost",
+      "mlp"
+    ],
+    "seed": 17,
+    "max_windows": 2400
+  },
+  "splits": {},
+  "complexity": {},
+  "results_summary": {
+    "fit_note": "can_seeds seed replication; pipeline unchanged",
+    "crosslayer_vs_zz": {
+      "cl_roc": 1.0,
+      "zz_roc": 0.9999932968682969,
+      "beats": true
+    },
+    "no_advantage": {
+      "best_classical": "random_forest",
+      "best_classical_roc": 1.0,
+      "qsvm_crosslayer_roc": 1.0,
+      "no_quantum_advantage": true
+    }
+  },
+  "notes": "can_seeds seed replication; pipeline unchanged"
+}

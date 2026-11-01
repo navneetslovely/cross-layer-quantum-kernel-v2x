@@ -1,0 +1,41 @@
+{
+  "protocol": {
+    "source": "mimicry_evasion.py --k-cand 32 --dump-scores (published white-box per-model best-of-K setting)",
+    "resampling_unit": "attacker physical transmitter group (windows of one attacker are not independent)",
+    "n_boot": 2000,
+    "seed": 7,
+    "interval": "percentile 2.5/97.5",
+    "paired": "before/after share the same windows, so the recall DROP is bootstrapped as a paired quantity",
+    "reproduction_tolerance": 0.005
+  },
+  "reproduction_mismatches": [],
+  "dos_robustness_gap": {
+    "conservative": {
+      "qsvm_recall_after": 0.9863013698630136,
+      "qsvm_ci": [
+        0.9686092785199446,
+        1.0
+      ],
+      "rf_recall_after": 0.5205479452054794,
+      "rf_ci": [
+        0.43437416062315337,
+        0.6008433661926309
+      ],
+      "intervals_disjoint": true
+    },
+    "strong": {
+      "qsvm_recall_after": 0.9771689497716894,
+      "qsvm_ci": [
+        0.9559422634595143,
+        0.9953051643192489
+      ],
+      "rf_recall_after": 0.3972602739726027,
+      "rf_ci": [
+        0.3257865937072503,
+        0.4684792447950342
+      ],
+      "intervals_disjoint": true
+    }
+  },
+  "n_rows": 42
+}

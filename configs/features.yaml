@@ -1,0 +1,39 @@
+# Cross-layer feature extraction
+window:
+  size: 10            # messages per (claimed_sender, receiver) window  (was smaller: normal-rate RSU streams qualify)
+  stride: 10
+  min_messages: 5     # windows with fewer received messages are dropped (loss thins windows)  (was 10)
+
+label_rule: any       # window is malicious if ANY message in it was sent with attack active (any|majority)
+receiver_set: rsu     # all | rsu | vehicles  (infrastructure-based windowing; 'all' fragmented benign into 1-msg V2V contacts)
+
+# Receiver's assumed propagation model for the F2 inversion (defaults mirror sim config;
+# deliberately mismatch in robustness studies if desired)
+propagation:
+  tx_power_dbm: 20.0
+  path_loss_exponent: 2.75
+  ref_loss_db: 47.86
+  ref_distance: 1.0
+
+sybil:
+  radius: 50.0        # m, co-location radius between claimed positions of different IDs
+  min_overlap: 6      # min paired messages to compute cross-ID RSSI correlation
+
+aoi:
+  kappa: 0.5          # s, lambda(AoI) = exp(-AoI / kappa)
+
+reduction:
+  method: per_block_pca   # per_block_pca | select  (block structure preserved for the quantum register split)
+  n_mobility: 4           # -> mobility qubits Q_m
+  n_network: 4            # -> network qubits Q_N
+  select:                 # used when method=select (names from features/crosslayer.py)
+    mobility: [e_kin_mean, e_kin_max, spd_consistency_mean, heading_consistency_mean]
+    network:  [e_xl_mean, e_xl_max, rate_ratio, seq_loss_frac]
+  scale_range: [0.0, 3.141592653589793]   # features mapped into [0, pi] for rotation encoding
+  clip_quantiles: [0.005, 0.995]
+
+splits:
+  test_frac: 0.30
+  val_frac: 0.15
+  group_by: sender     # group-aware split: no claimed sender identity appears in two splits
+  seed: 7

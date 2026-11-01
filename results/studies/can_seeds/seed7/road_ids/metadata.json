@@ -1,0 +1,352 @@
+{
+  "study": "road_ids_detection",
+  "timestamp": "2026-10-17T13:52:22",
+  "wall_time_s": 72.457,
+  "python": "3.11.15",
+  "executable": "python",
+  "platform": "macOS-27.0.1-arm64-arm-64bit",
+  "machine": "arm64",
+  "lib_versions": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "sklearn": "1.9.0",
+    "pandas": "3.0.3",
+    "pennylane": "0.45.0",
+    "torch": "2.12.0",
+    "xgboost": "3.2.0"
+  },
+  "config_path": "configs/quantum.yaml + configs/baselines.yaml (in-script features cfg)",
+  "hyperparams": {
+    "window_s": 0.25,
+    "min_msgs": 15,
+    "seed": 7,
+    "max_windows": 2400,
+    "n_bootstrap": 300,
+    "max_attack_win_per_capture": 700,
+    "max_benign_win_per_capture": 600,
+    "models": [
+      "qsvm_crosslayer",
+      "qsvm_zz",
+      "rbf_svm",
+      "random_forest",
+      "xgboost",
+      "mlp"
+    ],
+    "n_qubits": 8,
+    "reduction": "per_block_pca 4+4",
+    "split": "family_aware_split (leakage-safe; benign by capture)"
+  },
+  "splits": {
+    "tr": {
+      "n": 1464,
+      "n_pos": 807,
+      "prevalence": 0.5512295081967213
+    },
+    "va": {
+      "n": 97,
+      "n_pos": 0,
+      "prevalence": 0.0
+    },
+    "te": {
+      "n": 839,
+      "n_pos": 393,
+      "prevalence": 0.4684147794994041
+    }
+  },
+  "complexity": {},
+  "results_summary": {
+    "detection_rows": [
+      {
+        "model": "qsvm_crosslayer",
+        "pr_auc": 0.6890204694477458,
+        "roc_auc": 0.754161959858054,
+        "f1": 0.620384047267356,
+        "mcc": 0.38852165006421424,
+        "precision": 0.7394366197183099,
+        "recall": 0.5343511450381679,
+        "fpr_at_tpr95": 0.7443946188340808,
+        "pr_auc_lo": 0.13505790205799806,
+        "pr_auc_hi": 0.9397801094673558,
+        "roc_auc_lo": 0.4536619523230582,
+        "roc_auc_hi": 0.8699399060234241,
+        "n_test": 839,
+        "n_pos": 393
+      },
+      {
+        "model": "qsvm_zz",
+        "pr_auc": 0.5039826024478281,
+        "roc_auc": 0.5293704857426488,
+        "f1": 0.5193889541715628,
+        "mcc": 0.031019929835237166,
+        "precision": 0.48253275109170307,
+        "recall": 0.5623409669211196,
+        "fpr_at_tpr95": 0.9304932735426009,
+        "pr_auc_lo": 0.11921028171959538,
+        "pr_auc_hi": 0.8920723226574856,
+        "roc_auc_lo": 0.4733117120728233,
+        "roc_auc_hi": 0.5576505659971922,
+        "n_test": 839,
+        "n_pos": 393
+      },
+      {
+        "model": "rbf_svm",
+        "pr_auc": 0.685867750051926,
+        "roc_auc": 0.6987642487933454,
+        "f1": 0.6235632183908046,
+        "mcc": 0.3733041558567406,
+        "precision": 0.7161716171617162,
+        "recall": 0.5521628498727735,
+        "fpr_at_tpr95": 0.9641255605381166,
+        "pr_auc_lo": 0.11678645422908408,
+        "pr_auc_hi": 0.9297522371952333,
+        "roc_auc_lo": 0.4757790314011506,
+        "roc_auc_hi": 0.7915761082102886,
+        "n_test": 839,
+        "n_pos": 393
+      },
+      {
+        "model": "random_forest",
+        "pr_auc": 0.7224143890254403,
+        "roc_auc": 0.7881051814831296,
+        "f1": 0.6542056074766355,
+        "mcc": 0.3781399959065658,
+        "precision": 0.6882022471910112,
+        "recall": 0.6234096692111959,
+        "fpr_at_tpr95": 0.5538116591928252,
+        "pr_auc_lo": 0.13265958169057998,
+        "pr_auc_hi": 0.9336097950079119,
+        "roc_auc_lo": 0.5662921323309584,
+        "roc_auc_hi": 0.8767808234430773,
+        "n_test": 839,
+        "n_pos": 393
+      },
+      {
+        "model": "xgboost",
+        "pr_auc": 0.677176676339081,
+        "roc_auc": 0.7551090268031355,
+        "f1": 0.6761904761904762,
+        "mcc": 0.3572304907988794,
+        "precision": 0.6353467561521253,
+        "recall": 0.72264631043257,
+        "fpr_at_tpr95": 0.5448430493273543,
+        "pr_auc_lo": 0.12814224192783943,
+        "pr_auc_hi": 0.9128062278534322,
+        "roc_auc_lo": 0.5569751941009662,
+        "roc_auc_hi": 0.8719249561352874,
+        "n_test": 839,
+        "n_pos": 393
+      },
+      {
+        "model": "mlp",
+        "pr_auc": 0.6359434965918032,
+        "roc_auc": 0.7477492896997912,
+        "f1": 0.5584045584045584,
+        "mcc": 0.25383895422323377,
+        "precision": 0.6343042071197411,
+        "recall": 0.49872773536895676,
+        "fpr_at_tpr95": 0.49327354260089684,
+        "pr_auc_lo": 0.13211219317392286,
+        "pr_auc_hi": 0.9194101804483659,
+        "roc_auc_lo": 0.5686780611186804,
+        "roc_auc_hi": 0.8398092426856094,
+        "n_test": 839,
+        "n_pos": 393
+      }
+    ],
+    "headline_checks": {
+      "crosslayer_vs_zz": {
+        "qsvm_crosslayer_roc": 0.754161959858054,
+        "qsvm_zz_roc": 0.5293704857426488,
+        "qsvm_crosslayer_pr": 0.6890204694477458,
+        "qsvm_zz_pr": 0.5039826024478281,
+        "crosslayer_beats_zz": true,
+        "roc_gap_cl_minus_zz": 0.22479147411540523,
+        "verdict": "cross-layer >> ZZ holds (trained cross-layer kernel beats untrained ZZ ablation)"
+      },
+      "no_advantage_check": {
+        "best_quantum_model": "qsvm_crosslayer",
+        "best_quantum_roc": 0.754161959858054,
+        "best_classical_model": "random_forest",
+        "best_classical_roc": 0.7881051814831296,
+        "quantum_minus_classical_roc": -0.03394322162507557,
+        "verdict": "NO quantum advantage: best classical (random_forest) >= best quantum (qsvm_crosslayer) on ROC"
+      }
+    }
+  },
+  "notes": "ROAD CAN-IDS detection study (the repurpose). Benign-vs-attack window detection with the full model zoo on a leakage-safe family-aware split; grouped-by-capture bootstrap CIs. PRINCIPLED CAN two-view (WHEN x WHAT; the in-vehicle analog of V2X mobility x network) \u2014 same trained machine, NOT a literal cross-layer deployment (CAN has no PHY/RSSI to invert). Headline verdicts (cross-layer-vs-ZZ, quantum-vs-best-classical) computed from the numbers and reported verbatim. accelerator_attack_* captures excluded (no labeled injection).",
+  "captures": [
+    {
+      "capture": "correlated_signal_attack_1_masquerade.csv",
+      "kind": "attack",
+      "family": "correlated_signal_attack",
+      "group_id": 0,
+      "n_win": 133,
+      "n_pos": 85,
+      "used": true
+    },
+    {
+      "capture": "correlated_signal_attack_2_masquerade.csv",
+      "kind": "attack",
+      "family": "correlated_signal_attack",
+      "group_id": 1,
+      "n_win": 113,
+      "n_pos": 86,
+      "used": true
+    },
+    {
+      "capture": "correlated_signal_attack_3_masquerade.csv",
+      "kind": "attack",
+      "family": "correlated_signal_attack",
+      "group_id": 2,
+      "n_win": 68,
+      "n_pos": 51,
+      "used": true
+    },
+    {
+      "capture": "max_engine_coolant_temp_attack_masquerade.csv",
+      "kind": "attack",
+      "family": "max_engine_coolant_temp_attack",
+      "group_id": 3,
+      "n_win": 104,
+      "n_pos": 18,
+      "used": true
+    },
+    {
+      "capture": "max_speedometer_attack_1_masquerade.csv",
+      "kind": "attack",
+      "family": "max_speedometer_attack",
+      "group_id": 4,
+      "n_win": 353,
+      "n_pos": 98,
+      "used": true
+    },
+    {
+      "capture": "max_speedometer_attack_2_masquerade.csv",
+      "kind": "attack",
+      "family": "max_speedometer_attack",
+      "group_id": 5,
+      "n_win": 239,
+      "n_pos": 126,
+      "used": true
+    },
+    {
+      "capture": "max_speedometer_attack_3_masquerade.csv",
+      "kind": "attack",
+      "family": "max_speedometer_attack",
+      "group_id": 6,
+      "n_win": 348,
+      "n_pos": 245,
+      "used": true
+    },
+    {
+      "capture": "reverse_light_off_attack_1_masquerade.csv",
+      "kind": "attack",
+      "family": "reverse_light_off_attack",
+      "group_id": 7,
+      "n_win": 113,
+      "n_pos": 28,
+      "used": true
+    },
+    {
+      "capture": "reverse_light_off_attack_2_masquerade.csv",
+      "kind": "attack",
+      "family": "reverse_light_off_attack",
+      "group_id": 8,
+      "n_win": 163,
+      "n_pos": 96,
+      "used": true
+    },
+    {
+      "capture": "reverse_light_off_attack_3_masquerade.csv",
+      "kind": "attack",
+      "family": "reverse_light_off_attack",
+      "group_id": 9,
+      "n_win": 232,
+      "n_pos": 98,
+      "used": true
+    },
+    {
+      "capture": "reverse_light_on_attack_1_masquerade.csv",
+      "kind": "attack",
+      "family": "reverse_light_on_attack",
+      "group_id": 10,
+      "n_win": 220,
+      "n_pos": 81,
+      "used": true
+    },
+    {
+      "capture": "reverse_light_on_attack_2_masquerade.csv",
+      "kind": "attack",
+      "family": "reverse_light_on_attack",
+      "group_id": 11,
+      "n_win": 289,
+      "n_pos": 149,
+      "used": true
+    },
+    {
+      "capture": "reverse_light_on_attack_3_masquerade.csv",
+      "kind": "attack",
+      "family": "reverse_light_on_attack",
+      "group_id": 12,
+      "n_win": 258,
+      "n_pos": 95,
+      "used": true
+    },
+    {
+      "capture": "ambient_dyno_drive_basic_short.csv",
+      "kind": "ambient",
+      "group_id": 13,
+      "n_win": 600,
+      "n_pos": 0,
+      "used": true
+    },
+    {
+      "capture": "ambient_dyno_drive_extended_short.csv",
+      "kind": "ambient",
+      "group_id": 14,
+      "n_win": 600,
+      "n_pos": 0,
+      "used": true
+    },
+    {
+      "capture": "ambient_dyno_drive_radio_infotainment.csv",
+      "kind": "ambient",
+      "group_id": 15,
+      "n_win": 600,
+      "n_pos": 0,
+      "used": true
+    },
+    {
+      "capture": "ambient_dyno_reverse.csv",
+      "kind": "ambient",
+      "group_id": 16,
+      "n_win": 206,
+      "n_pos": 0,
+      "used": true
+    },
+    {
+      "capture": "ambient_highway_street_driving_diagnostics.csv",
+      "kind": "ambient",
+      "group_id": 17,
+      "n_win": 600,
+      "n_pos": 0,
+      "used": true
+    },
+    {
+      "capture": "ambient_dyno_drive_winter.csv",
+      "kind": "ambient",
+      "group_id": 18,
+      "n_win": 191,
+      "n_pos": 0,
+      "used": true
+    }
+  ],
+  "attack_families": [
+    "correlated_signal_attack",
+    "max_engine_coolant_temp_attack",
+    "max_speedometer_attack",
+    "reverse_light_off_attack",
+    "reverse_light_on_attack"
+  ],
+  "command": "python scripts/road_ids.py"
+}

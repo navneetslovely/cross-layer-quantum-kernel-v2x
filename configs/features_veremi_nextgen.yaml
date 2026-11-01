@@ -1,0 +1,54 @@
+# Cross-layer feature extraction for VeReMi NextGen.
+# Identical to configs/features_veremi.yaml EXCEPT:
+#   * network_mode: timing — NextGen logs NO RSSI; the network-layer observable is
+#  the ns-resolution one-way delay (delay_us). e_xl = |observed delay − benign
+#  delay model at the claimed distance|; F3 Sybil signatures correlate per-identity
+#  delay series; rssi_std -> delay_std (see features/crosslayer.py::feature_spec).
+#   * group_by: txnode — NextGen pseudonyms (sender_alias) change periodically, so
+#  CV folds/bootstrap group by the PHYSICAL sender (sender_id) for leakage safety.
+#   * splits: the OFFICIAL NextGen Train/Validation/Test sets are used by the
+#  experiment driver; the fractions below are ignored there (kept for the quick
+#  CLI paths only).
+window:
+  size: 10
+  stride: 10
+  min_messages: 5
+
+label_rule: any
+receiver_set: all     # NextGen is pure V2V (per-receiver vehicle logs, no RSUs)
+network_mode: timing  # NextGen logs no RSSI — delay-anchored network features
+
+# UNUSED in timing mode (kept so generic loaders don't fail on missing keys);
+# the delay model is calibrated per (scenario, subset) on benign train data.
+propagation:
+  tx_power_dbm: 20.0
+  path_loss_exponent: 2.75
+  ref_loss_db: 47.86
+  ref_distance: 1.0
+
+sybil:
+  radius: 50.0
+  min_overlap: 6
+
+# cross-sender physical-overlap plausibility (timing mode): # of OTHER identities
+# claiming a position within a vehicle footprint at the same instant (benign
+# traffic is collision-free; stale/delayed/replayed/offset claims land on live
+# traffic). 3 m ~ a car's footprint, below adjacent-lane spacing (~3.2 m).
+overlap:
+  radius: 3.0
+
+aoi:
+  kappa: 0.5
+
+reduction:
+  method: per_block_pca
+  n_mobility: 4
+  n_network: 4
+  scale_range: [0.0, 3.141592653589793]
+  clip_quantiles: [0.005, 0.995]
+
+splits:
+  test_frac: 0.30   # unused with official NextGen splits (driver overrides)
+  val_frac: 0.15
+  group_by: txnode  # physical sender (pseudonyms rotate in NextGen)
+  seed: 7

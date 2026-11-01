@@ -1,0 +1,9 @@
+dataset,model,pr_auc,roc_auc,kind
+dev_grid,qsvm_crosslayer,0.885560879191919,0.9274425318909391,quantum_nystrom
+dev_grid,qsvm_zz,0.616627539816031,0.8118943356890098,quantum_nystrom
+dev_grid,random_forest,0.8969275758127526,0.937546941500459,classical_fullN
+dev_grid,xgboost,0.8961363451958951,0.9334067560623163,classical_fullN
+veremi,qsvm_crosslayer,0.8398983105100155,0.9168292069875581,quantum_nystrom
+veremi,qsvm_zz,0.5974991303418954,0.8064077751246281,quantum_nystrom
+veremi,random_forest,0.9420756234140957,0.9728163880859622,classical_fullN
+veremi,xgboost,0.9415517894631769,0.9720464161534917,classical_fullN

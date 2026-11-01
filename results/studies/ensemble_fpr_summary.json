@@ -1,0 +1,186 @@
+{
+  "target_fpr": 0.01,
+  "per_dataset": {
+    "dev_grid": {
+      "models": [
+        "qsvm_crosslayer",
+        "qsvm_zz",
+        "random_forest",
+        "rbf_svm",
+        "xgboost"
+      ],
+      "n_va": 13920,
+      "n_te": 6000,
+      "alpha_matched": 0.002505102987567398
+    },
+    "nextgen": {
+      "models": [
+        "qsvm_crosslayer",
+        "qsvm_zz",
+        "random_forest",
+        "rbf_svm",
+        "xgboost"
+      ],
+      "n_va": 600,
+      "n_te": 2398,
+      "alpha_matched": 1e-05
+    }
+  },
+  "fusion_cost_accounting": {
+    "setting": "A5 cross-receiver fusion (scripts/crossreceiver_fusion.py): windows of one claimed sender pooled across receivers per 20 s time bin",
+    "communication_overhead": "each receiver reports one 19-float window feature vector (+ ids) per observed sender per 20 s bin ~= 19*4 B + 16 B ids ~= 92 B; at 50 senders/receiver that is ~4.6 kB per receiver per bin (~0.23 kB/s) -- negligible vs 10 Hz BSM traffic (~300 B/beacon ~= 3 kB/s per sender)",
+    "latency": "decision latency is bounded by the bin close: up to 20 s + backhaul; unsuitable for pre-crash reaction, aimed at revocation/misbehaviour-authority reporting timescales",
+    "trust_assumptions": "the aggregator (RSU/edge) is honest; receiver reports are authenticated; a compromised reporting receiver can poison fused features (not modelled)",
+    "coordination_cost": "receivers need ~1 s-level time sync for bin alignment (GNSS time suffices); no inter-receiver channel needed (star topology to the aggregator)"
+  },
+  "table": [
+    {
+      "dataset": "dev_grid",
+      "ensemble": "naive_union_1pc",
+      "split": "va",
+      "n_models": 5,
+      "fpr": 0.03645978291121625,
+      "recall": 0.8204393505253104,
+      "precision": 0.8676767676767677
+    },
+    {
+      "dataset": "dev_grid",
+      "ensemble": "naive_union_1pc",
+      "split": "te",
+      "n_models": 5,
+      "fpr": 0.03527148353997435,
+      "recall": 0.7692889561270801,
+      "precision": 0.8604060913705583
+    },
+    {
+      "dataset": "dev_grid",
+      "ensemble": "union_matched_1pc",
+      "split": "va",
+      "n_models": 5,
+      "per_model_alpha": 0.002505102987567398,
+      "fpr": 0.00992670934223954,
+      "recall": 0.7621776504297995,
+      "precision": 0.9572171131547381
+    },
+    {
+      "dataset": "dev_grid",
+      "ensemble": "union_matched_1pc",
+      "split": "te",
+      "n_models": 5,
+      "per_model_alpha": 0.002505102987567398,
+      "fpr": 0.00940572894399316,
+      "recall": 0.6989409984871406,
+      "precision": 0.9545454545454546
+    },
+    {
+      "dataset": "dev_grid",
+      "ensemble": "rank_mean_1pc",
+      "split": "va",
+      "n_models": 5,
+      "fpr": 0.01001948232674645,
+      "recall": 0.7322508755173511,
+      "precision": 0.9551495016611296
+    },
+    {
+      "dataset": "dev_grid",
+      "ensemble": "rank_mean_1pc",
+      "split": "te",
+      "n_models": 5,
+      "fpr": 0.010047028644719966,
+      "recall": 0.7072617246596067,
+      "precision": 0.9521384928716904
+    },
+    {
+      "dataset": "dev_grid",
+      "ensemble": "single_qsvm_1pc",
+      "split": "va",
+      "n_models": 1,
+      "fpr": 0.01001948232674645,
+      "recall": 0.7418019738936644,
+      "precision": 0.955701394585726
+    },
+    {
+      "dataset": "dev_grid",
+      "ensemble": "single_qsvm_1pc",
+      "split": "te",
+      "n_models": 1,
+      "fpr": 0.00983326207781103,
+      "recall": 0.6611195158850227,
+      "precision": 0.95
+    },
+    {
+      "dataset": "nextgen",
+      "ensemble": "naive_union_1pc",
+      "split": "va",
+      "n_models": 5,
+      "fpr": 0.033402922755741124,
+      "recall": 0.8677685950413223,
+      "precision": 0.8677685950413223
+    },
+    {
+      "dataset": "nextgen",
+      "ensemble": "naive_union_1pc",
+      "split": "te",
+      "n_models": 5,
+      "fpr": 0.02497343251859724,
+      "recall": 0.8468992248062015,
+      "precision": 0.9028925619834711
+    },
+    {
+      "dataset": "nextgen",
+      "ensemble": "union_matched_1pc",
+      "split": "va",
+      "n_models": 5,
+      "per_model_alpha": 1e-05,
+      "fpr": 0.010438413361169102,
+      "recall": 0.8099173553719008,
+      "precision": 0.9514563106796117
+    },
+    {
+      "dataset": "nextgen",
+      "ensemble": "union_matched_1pc",
+      "split": "te",
+      "n_models": 5,
+      "per_model_alpha": 1e-05,
+      "fpr": 0.010626992561105207,
+      "recall": 0.812015503875969,
+      "precision": 0.9544419134396356
+    },
+    {
+      "dataset": "nextgen",
+      "ensemble": "rank_mean_1pc",
+      "split": "va",
+      "n_models": 5,
+      "fpr": 0.010438413361169102,
+      "recall": 0.743801652892562,
+      "precision": 0.9473684210526315
+    },
+    {
+      "dataset": "nextgen",
+      "ensemble": "rank_mean_1pc",
+      "split": "te",
+      "n_models": 5,
+      "fpr": 0.009032943676939426,
+      "recall": 0.7868217054263565,
+      "precision": 0.9598108747044918
+    },
+    {
+      "dataset": "nextgen",
+      "ensemble": "single_qsvm_1pc",
+      "split": "va",
+      "n_models": 1,
+      "fpr": 0.010438413361169102,
+      "recall": 0.5371900826446281,
+      "precision": 0.9285714285714286
+    },
+    {
+      "dataset": "nextgen",
+      "ensemble": "single_qsvm_1pc",
+      "split": "te",
+      "n_models": 1,
+      "fpr": 0.004782146652497344,
+      "recall": 0.6453488372093024,
+      "precision": 0.9736842105263158
+    }
+  ]
+}

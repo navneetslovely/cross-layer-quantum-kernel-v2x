@@ -1,0 +1,330 @@
+{
+  "item": "baseline_fairness",
+  "protocol": {
+    "dataset": "runs/dev_grid/features.parquet (90,553 windows, 19 raw features; identical loader to scripts/dev_multiseed.py)",
+    "table_I_source": "results/packetloss_dev/packetloss_results.csv, packet_loss==0.0 slice (matched rows n_train=3023; __full rows n_train=15048)",
+    "split": {
+      "test_frac": 0.3,
+      "val_frac": 0.15,
+      "group_by": "sender",
+      "seed": 7
+    },
+    "matched_cap": {
+      "max_train": 3000,
+      "cap_seed": 7,
+      "group_wise": true
+    },
+    "full_cap": 15000,
+    "comparison_ii": {
+      "models": [
+        "rbf_svm",
+        "random_forest",
+        "xgboost"
+      ],
+      "train_windows": "the identical 3,023-window tr_match subset",
+      "features": "19 raw window features, StandardScaler fit on train only",
+      "tuning": "build_baseline grids, GridSearchCV 5-fold stratified (seed 17), scoring average_precision -- identical to the published run_model classical path",
+      "test": "identical 26,392-window test split",
+      "bootstrap": {
+        "n_boot": 200,
+        "seed": 7,
+        "grouped_by": "sender group"
+      },
+      "preexisting": "none found anywhere in results/ (searched all CSVs for __full/matched rows with n_train<10k)"
+    },
+    "seeds": {
+      "split_and_cap": 7,
+      "baselines": 17,
+      "bootstrap": 7
+    }
+  },
+  "invariants_check": {
+    "n_windows": 90553,
+    "n_windows_expected": 90553,
+    "n_test": 26392,
+    "n_test_expected": 26392,
+    "n_test_pos": 5752,
+    "n_test_pos_expected": 5752,
+    "n_train_matched": 3023,
+    "n_train_matched_expected": 3023,
+    "reconstruction_matches_published": true
+  },
+  "reconstruction_check_rbf_matched_8dim": {
+    "model": "rbf_svm",
+    "reconstructed_pr_auc": 0.850224035325883,
+    "published_pr_auc": 0.850224035325883,
+    "delta_pr_auc": 0.0,
+    "reconstructed_roc_auc": 0.8915970919451003,
+    "published_roc_auc": 0.8915970919451003,
+    "delta_roc_auc": 0.0
+  },
+  "fairness_facts": [
+    {
+      "fact": "same_train_val_test_groups",
+      "answer": "YES",
+      "evidence": "One group-aware split (grouped by claimed sender, test_frac 0.30, val_frac 0.15, seed 7) is computed once per packet-loss level and the SAME idx dict {tr_match, va, te} is passed to run_model for every model, matched and __full alike. Verified empirically: test=26,392 windows / 5,752 positives for every published row, and the reconstructed split reproduces those counts exactly; train/val/test groups are pairwise disjoint.",
+      "file_line": "src/qkv2x/experiments/packetloss.py:71,81,102; src/qkv2x/experiments/common.py:159-177; configs/features.yaml::splits"
+    },
+    {
+      "fact": "same_3023_train_windows_classical",
+      "answer": "YES",
+      "evidence": "Matched-N classical models are fitted on exactly Xr[tr_match] where tr_match = matched_train_idx(...) = group-wise cap of the train split at quantum max_train=3000 with seed 7, giving 3,023 windows (whole sender groups are kept, so the cap overshoots 3000 by part of one group). Reconstructed: 3,023 windows, 104 sender groups.",
+      "file_line": "src/qkv2x/experiments/packetloss.py:75,81; src/qkv2x/experiments/common.py:266-274,346-354"
+    },
+    {
+      "fact": "same_3023_train_windows_quantum",
+      "answer": "ALMOST -- run_model re-caps internally to 3000 windows",
+      "evidence": "run_model's quantum branch re-applies _cap_train_groupwise to the already-capped tr_match (3,023 > max_train=3,000, so the cap re-runs with the same seed over the SUBSET's groups). Empirically the re-cap returns 3000 of 3,023 windows (23 windows from dropped groups differ).",
+      "file_line": "src/qkv2x/experiments/common.py:286-295 (re-cap), 243-263 (_cap_train_groupwise)"
+    },
+    {
+      "fact": "same_eight_pca_coordinates",
+      "answer": "YES",
+      "evidence": "A single BlockReducer (per-block PCA: 4 mobility + 4 network components, clip [0.5%,99.5%] -> StandardScaler -> PCA -> [0,pi] scaling) is fitted once on the UNCAPPED train split and the same transformed matrix Xr serves the quantum kernels AND the matched classical baselines (quantum: Xr[tr]/Xr[te] at common.py:296-343; classical: Xr[tr]/Xr[te] at 346-354). Verified: Xr has exactly 8 columns.",
+      "file_line": "src/qkv2x/experiments/packetloss.py:73-74,81; src/qkv2x/features/reduce.py; src/qkv2x/experiments/common.py:296-354"
+    },
+    {
+      "fact": "who_sees_the_19_raw_features",
+      "answer": "ONLY the '(full N)' classical rows",
+      "evidence": "The __full variants fit on data.X (the 19 raw window features, scaled inside each model's own pipeline) with the train split capped at full_cap=15,000 -> 15,048 windows. The published Table-I '(full N)' rows therefore change BOTH the sample count (3,023 -> 15,048) AND the input representation (8-dim PCA -> 19 raw features) at once; baseline_fairness comparison (ii) disentangles this. The quantum models never see the 19 raw features (the 8 qubits encode the 8 reduced angles).",
+      "file_line": "src/qkv2x/experiments/common.py:356-365; src/qkv2x/experiments/packetloss.py:97-109; configs/experiments/packetloss.yaml::full_cap"
+    },
+    {
+      "fact": "same_test_set_everywhere",
+      "answer": "YES",
+      "evidence": "Matched rows and __full rows are scored on the identical te indices (the same idx['te'] object); every published p=0 row has n_test=26,392, n_pos=5,752.",
+      "file_line": "src/qkv2x/experiments/packetloss.py:81,102"
+    },
+    {
+      "fact": "validation_split_usage",
+      "answer": "Shared but unused by Table-I models",
+      "evidence": "va (15% of groups) is carved out identically for all models; the matched classical and quantum SVMs tune by internal CV on the train subset instead (GridSearchCV / group-aware C-grid CV). va is consumed only by the one-class detectors (nu selection) and the LSTM (early model selection), which are not Table-I rows.",
+      "file_line": "src/qkv2x/experiments/common.py:303-313,367-389; src/qkv2x/models/qsvm.py:36-60"
+    },
+    {
+      "fact": "comparable_tuning_budgets",
+      "answer": "Classical tuned at least as hard as quantum on the SVM axis; quantum has an extra feature-map-training axis, reported openly",
+      "evidence": "Classical: GridSearchCV, 5-fold stratified (seed 17), scoring average_precision -- rbf_svm 16 configs/80 fits, random_forest 4/20, mlp 4/20, xgboost 36/180. Quantum: C-grid {0.1,1,10,100} over 5 group-aware folds (20 fits, same AP scoring) PLUS KTA feature-map training (Adam lr 0.05, 200 epochs, batch 512, 1 restart, best-alignment snapshot). qsvm_zz deliberately gets NO map training (fixed-parameter ablation).",
+      "file_line": "src/qkv2x/models/baselines.py:36-116; src/qkv2x/models/qsvm.py:36-60; src/qkv2x/quantum/train.py:72-121; src/qkv2x/experiments/common.py:224-228"
+    }
+  ],
+  "quantum_inner_recap": {
+    "identical_to_classical_matched_set": false,
+    "n_matched": 3023,
+    "n_after_recap": 3000,
+    "n_dropped": 23
+  },
+  "comparisons": {
+    "i_sameN_8dim_published": [
+      {
+        "model": "qsvm_crosslayer",
+        "n_train": 3023,
+        "n_features": 8,
+        "pr_auc": 0.8554400475,
+        "roc_auc": 0.9050474439,
+        "f1": 0.7976867653,
+        "mcc": 0.7525016483,
+        "pr_auc_lo": 0.8281957233,
+        "pr_auc_hi": 0.8810416124,
+        "roc_auc_lo": 0.8869275043,
+        "roc_auc_hi": 0.9215624936,
+        "source": "results/packetloss_dev/packetloss_results.csv (p=0.0, published)"
+      },
+      {
+        "model": "qsvm_zz",
+        "n_train": 3023,
+        "n_features": 8,
+        "pr_auc": 0.5189147892,
+        "roc_auc": 0.7545128725,
+        "f1": 0.5118244762,
+        "mcc": 0.3820763901,
+        "pr_auc_lo": 0.4457427188,
+        "pr_auc_hi": 0.5926157119,
+        "roc_auc_lo": 0.7265453808,
+        "roc_auc_hi": 0.7813563443,
+        "source": "results/packetloss_dev/packetloss_results.csv (p=0.0, published)"
+      },
+      {
+        "model": "rbf_svm",
+        "n_train": 3023,
+        "n_features": 8,
+        "pr_auc": 0.8502240353,
+        "roc_auc": 0.8915970919,
+        "f1": 0.7833577713,
+        "mcc": 0.7288131175,
+        "pr_auc_lo": 0.8164071529,
+        "pr_auc_hi": 0.8818343567,
+        "roc_auc_lo": 0.8608480086,
+        "roc_auc_hi": 0.9149200965,
+        "source": "results/packetloss_dev/packetloss_results.csv (p=0.0, published)"
+      },
+      {
+        "model": "random_forest",
+        "n_train": 3023,
+        "n_features": 8,
+        "pr_auc": 0.8490367923,
+        "roc_auc": 0.9083192078,
+        "f1": 0.7735632184,
+        "mcc": 0.724294532,
+        "pr_auc_lo": 0.8123859416,
+        "pr_auc_hi": 0.8774228272,
+        "roc_auc_lo": 0.8847795721,
+        "roc_auc_hi": 0.9285351109,
+        "source": "results/packetloss_dev/packetloss_results.csv (p=0.0, published)"
+      },
+      {
+        "model": "mlp",
+        "n_train": 3023,
+        "n_features": 8,
+        "pr_auc": 0.8519493054,
+        "roc_auc": 0.8878181991,
+        "f1": 0.7962148729,
+        "mcc": 0.7522587316,
+        "pr_auc_lo": 0.8149636262,
+        "pr_auc_hi": 0.8861716073,
+        "roc_auc_lo": 0.85755536,
+        "roc_auc_hi": 0.9130401156,
+        "source": "results/packetloss_dev/packetloss_results.csv (p=0.0, published)"
+      }
+    ],
+    "i_multiseed_context_dev_grid_multiseed": [
+      {
+        "model": "qsvm_crosslayer",
+        "n_seeds": 3,
+        "pr_auc_mean": 0.8467472052704661,
+        "pr_auc_std": 0.0309491284104037,
+        "roc_auc_mean": 0.8985563911547189,
+        "roc_auc_std": 0.0266091920351002
+      },
+      {
+        "model": "qsvm_zz",
+        "n_seeds": 3,
+        "pr_auc_mean": 0.5703043668130466,
+        "pr_auc_std": 0.0578832743852165,
+        "roc_auc_mean": 0.7527951927753375,
+        "roc_auc_std": 0.0259458386048788
+      },
+      {
+        "model": "random_forest",
+        "n_seeds": 3,
+        "pr_auc_mean": 0.8926869713959055,
+        "pr_auc_std": 0.0127391260720953,
+        "roc_auc_mean": 0.932221415602978,
+        "roc_auc_std": 0.0101030847753334
+      },
+      {
+        "model": "rbf_svm",
+        "n_seeds": 3,
+        "pr_auc_mean": 0.8954288910103331,
+        "pr_auc_std": 0.0098483712698488,
+        "roc_auc_mean": 0.9280385939661984,
+        "roc_auc_std": 0.0052104187179884
+      },
+      {
+        "model": "xgboost",
+        "n_seeds": 3,
+        "pr_auc_mean": 0.8980243501780287,
+        "pr_auc_std": 0.011305108281029,
+        "roc_auc_mean": 0.9314911848609914,
+        "roc_auc_std": 0.0076708076573024
+      }
+    ],
+    "ii_sameN_19feat_computed_here": [
+      {
+        "model": "rbf_svm",
+        "n_train": 3023,
+        "n_features": 19,
+        "pr_auc": 0.8691560452,
+        "roc_auc": 0.9091912082,
+        "f1": 0.8103448276,
+        "mcc": 0.7682488136,
+        "pr_auc_lo": 0.8376943869,
+        "pr_auc_hi": 0.90049589,
+        "roc_auc_lo": 0.8803895083,
+        "roc_auc_hi": 0.9309026333,
+        "source": "computed by baseline_fairness (this script)"
+      },
+      {
+        "model": "random_forest",
+        "n_train": 3023,
+        "n_features": 19,
+        "pr_auc": 0.8913612966,
+        "roc_auc": 0.9277342023,
+        "f1": 0.8434916362,
+        "mcc": 0.8126804033,
+        "pr_auc_lo": 0.8588189176,
+        "pr_auc_hi": 0.9197439523,
+        "roc_auc_lo": 0.9049059092,
+        "roc_auc_hi": 0.9465552803,
+        "source": "computed by baseline_fairness (this script)"
+      },
+      {
+        "model": "xgboost",
+        "n_train": 3023,
+        "n_features": 19,
+        "pr_auc": 0.8785607511,
+        "roc_auc": 0.9138316568,
+        "f1": 0.8227684347,
+        "mcc": 0.7948545712,
+        "pr_auc_lo": 0.8457973949,
+        "pr_auc_hi": 0.9084954077,
+        "roc_auc_lo": 0.8887558218,
+        "roc_auc_hi": 0.9335423829,
+        "source": "computed by baseline_fairness (this script)"
+      }
+    ],
+    "iii_fullN_19feat_published": [
+      {
+        "model": "rbf_svm",
+        "n_train": 15048,
+        "n_features": 19,
+        "pr_auc": 0.8815090104,
+        "roc_auc": 0.9144268997,
+        "f1": 0.8238663484,
+        "mcc": 0.7866842473,
+        "pr_auc_lo": null,
+        "pr_auc_hi": null,
+        "roc_auc_lo": null,
+        "roc_auc_hi": null,
+        "source": "results/packetloss_dev/packetloss_results.csv (p=0.0, __full rows, published; CSV carries no CIs for these rows)"
+      },
+      {
+        "model": "random_forest",
+        "n_train": 15048,
+        "n_features": 19,
+        "pr_auc": 0.8868746199,
+        "roc_auc": 0.9282848323,
+        "f1": 0.8239766082,
+        "mcc": 0.791227035,
+        "pr_auc_lo": null,
+        "pr_auc_hi": null,
+        "roc_auc_lo": null,
+        "roc_auc_hi": null,
+        "source": "results/packetloss_dev/packetloss_results.csv (p=0.0, __full rows, published; CSV carries no CIs for these rows)"
+      },
+      {
+        "model": "mlp",
+        "n_train": 15048,
+        "n_features": 19,
+        "pr_auc": 0.8760598905,
+        "roc_auc": 0.912411945,
+        "f1": 0.822605364,
+        "mcc": 0.7857675154,
+        "pr_auc_lo": null,
+        "pr_auc_hi": null,
+        "roc_auc_lo": null,
+        "roc_auc_hi": null,
+        "source": "results/packetloss_dev/packetloss_results.csv (p=0.0, __full rows, published; CSV carries no CIs for these rows)"
+      }
+    ]
+  },
+  "hyperparam_inventory_rows": 72,
+  "wall_time_s": 24.8,
+  "outputs": [
+    "baseline_fairness.csv",
+    "baseline_comparisons.csv",
+    "hyperparams.csv",
+    "baseline_fairness_summary.json",
+    "baseline_fairness_run.log"
+  ]
+}

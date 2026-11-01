@@ -1,0 +1,24 @@
+# Attack-intensity sweep.
+# Measures detectability as the constant position-offset magnitude grows.
+# Requires the matching co-sim sweep first:
+#  python -m qkv2x.cli cosim      --config configs/sim/intensity_offset.yaml
+#  python -m qkv2x.cli features   --runs runs/intensity_offset --config configs/features.yaml
+#  python -m qkv2x.cli experiment --config configs/experiments/intensity.yaml
+kind: intensity
+name: intensity_offset
+runs_root: runs/intensity_offset
+features_config: configs/features.yaml
+quantum_config: configs/quantum.yaml
+baselines_config: configs/baselines.yaml
+out_dir: results/intensity_offset
+
+# The sweep column to use as the intensity axis (matches the cosim sweep key).
+# Swap to random_offset_radius / drift_speed / flooding_factor / sybil_ghosts with the
+# corresponding single-attack cosim sweep to characterise other attacks.
+axis: const_offset_m
+models: [qsvm_crosslayer, qsvm_zz, rbf_svm, random_forest, rules]
+bootstrap: 200
+
+# READOUT: intensity_results.csv has metric ± 95% CI per (intensity, model);
+# pr_auc_vs_intensity.png / roc_auc_vs_intensity.png are the headline curves;
+# significance.csv tests each quantum model vs rbf_svm at each intensity level.

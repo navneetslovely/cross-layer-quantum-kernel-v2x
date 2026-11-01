@@ -1,0 +1,21 @@
+# Attack-intensity sweep — DRIFT family.
+# Measures detectability as the claimed-position DRIFT RATE grows.
+# Requires the matching co-sim sweep first:
+#  python -m qkv2x.cli cosim      --config configs/sim/intensity_drift.yaml
+#  python -m qkv2x.cli features   --runs runs/intensity_drift --config configs/features.yaml
+#  python -m qkv2x.cli experiment --config configs/experiments/intensity_drift.yaml
+kind: intensity
+name: intensity_drift
+runs_root: runs/intensity_drift
+features_config: configs/features.yaml
+quantum_config: configs/quantum.yaml
+baselines_config: configs/baselines.yaml
+out_dir: results/intensity_drift
+
+axis: drift_speed
+models: [qsvm_crosslayer, qsvm_zz, rbf_svm, random_forest, rules]
+bootstrap: 200
+
+# READOUT: intensity_results.csv has metric ± 95% CI per (intensity, model);
+# pr_auc_vs_intensity.png / roc_auc_vs_intensity.png are the headline curves;
+# significance.csv tests each quantum model vs rbf_svm at each intensity level.

@@ -1,0 +1,518 @@
+{
+  "generated": "2026-08-07T02:33:36",
+  "wall_time_s": 0.067,
+  "protocol": {
+    "item": "three_splits",
+    "seed_set_for_record": 7,
+    "stochastic_computation": "none -- deterministic aggregation of shipped per-seed CSVs",
+    "sources": {
+      "dev_grid_per_seed": "results/dev_grid_multiseed/binary_results.csv",
+      "dev_grid_shipped_summary": "results/dev_grid_multiseed/multiseed.csv",
+      "nextgen_full_per_seed": "results/veremi_nextgen/veremi_nextgen_binary_results.csv (variant=='full' only; other variants excluded: netblind, scale, sybil_receiver)",
+      "nextgen_full_shipped_summary": "results/veremi_nextgen/veremi_nextgen_multiseed.csv",
+      "nextgen_baselines_per_seed": "results/nextgen_multiseed/per_seed.csv",
+      "nextgen_baselines_shipped_summary": "results/nextgen_multiseed/seed_summary.csv"
+    },
+    "nextgen_two_source_note": "NextGen per-seed rows live in two shipped files produced by two runs on the SAME official-split assembly (n_test=2399, n_pos=517 in both): the main experiment run (qsvm_crosslayer/qsvm_zz/rbf_svm/random_forest, variant 'full') and the A4 multi-seed baseline run (knn_bagging/mlp/xgboost). Both are aggregated per source; no rows are pooled across sources for any single model.",
+    "metrics": [
+      "roc_auc",
+      "pr_auc",
+      "f1",
+      "mcc"
+    ],
+    "split_seeds_expected": [
+      7,
+      17,
+      27
+    ],
+    "ci_method": "two-sided 95% Student t CI with n-1 dof on the per-seed values: mean +/- t_{0.975,n-1} * sd/sqrt(n), sd with ddof=1. n=3 seeds -> t_{0.975,2}=4.30265; intervals are WIDE by construction -- that is the honest consequence of three splits.",
+    "no_pooling": "each (dataset, source, model, metric) aggregated over its own 3 seeds only",
+    "exclusions": [
+      {
+        "dataset": "nextgen",
+        "model": "knn_bagging",
+        "seeds": [
+          7
+        ],
+        "reason": "only 1 split seed on record; CI needs >= 2"
+      },
+      {
+        "dataset": "nextgen",
+        "model": "lstm_seq",
+        "seeds": [
+          7
+        ],
+        "reason": "only 1 split seed on record; CI needs >= 2"
+      },
+      {
+        "dataset": "nextgen",
+        "model": "mlp",
+        "seeds": [
+          7
+        ],
+        "reason": "only 1 split seed on record; CI needs >= 2"
+      },
+      {
+        "dataset": "nextgen",
+        "model": "rules",
+        "seeds": [
+          7
+        ],
+        "reason": "only 1 split seed on record; CI needs >= 2"
+      },
+      {
+        "dataset": "nextgen",
+        "model": "xgboost",
+        "seeds": [
+          7
+        ],
+        "reason": "only 1 split seed on record; CI needs >= 2"
+      }
+    ],
+    "libraries": {
+      "numpy": "2.4.6",
+      "pandas": "3.0.3",
+      "scipy": "1.17.1"
+    }
+  },
+  "seed_confirmation": {
+    "dev_grid": {
+      "per_model": {
+        "qsvm_crosslayer": [
+          7,
+          17,
+          27
+        ],
+        "qsvm_zz": [
+          7,
+          17,
+          27
+        ],
+        "random_forest": [
+          7,
+          17,
+          27
+        ],
+        "rbf_svm": [
+          7,
+          17,
+          27
+        ],
+        "xgboost": [
+          7,
+          17,
+          27
+        ]
+      },
+      "all_models_have_seeds_7_17_27": true
+    },
+    "nextgen_full_variant": {
+      "per_model": {
+        "qsvm_crosslayer": [
+          7,
+          17,
+          27
+        ],
+        "qsvm_zz": [
+          7,
+          17,
+          27
+        ],
+        "random_forest": [
+          7,
+          17,
+          27
+        ],
+        "rbf_svm": [
+          7,
+          17,
+          27
+        ]
+      },
+      "all_models_have_seeds_7_17_27": true
+    },
+    "nextgen_baselines": {
+      "per_model": {
+        "knn_bagging": [
+          7,
+          17,
+          27
+        ],
+        "mlp": [
+          7,
+          17,
+          27
+        ],
+        "xgboost": [
+          7,
+          17,
+          27
+        ]
+      },
+      "all_models_have_seeds_7_17_27": true
+    }
+  },
+  "summary_crosschecks": [
+    {
+      "dataset": "dev_grid",
+      "source": "results/dev_grid_multiseed/multiseed.csv",
+      "n_compared": 20,
+      "max_abs_diff_mean": 2.220446049250313e-16,
+      "max_abs_diff_std": 1.734723475976807e-16,
+      "agrees_1e-9": true
+    },
+    {
+      "dataset": "nextgen",
+      "source": "results/veremi_nextgen/veremi_nextgen_multiseed.csv",
+      "n_compared": 16,
+      "max_abs_diff_mean": 1.1102230246251565e-16,
+      "max_abs_diff_std": 9.71445146547012e-17,
+      "agrees_1e-9": true
+    },
+    {
+      "dataset": "nextgen",
+      "source": "results/nextgen_multiseed/seed_summary.csv",
+      "n_compared": 12,
+      "max_abs_diff_mean": 2.220446049250313e-16,
+      "max_abs_diff_std": 7.632783294297951e-17,
+      "agrees_1e-9": true
+    }
+  ],
+  "n_tidy_rows": 48,
+  "headline": {
+    "dev_grid": {
+      "qsvm_crosslayer": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/dev_grid_multiseed/binary_results.csv",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.925439,
+            "seed17": 0.898001,
+            "seed27": 0.872229
+          },
+          "mean": 0.898556,
+          "sd": 0.026609,
+          "ci95": [
+            0.832455,
+            0.964657
+          ],
+          "ci95_halfwidth": 0.066101
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.875026,
+            "seed17": 0.851531,
+            "seed27": 0.813685
+          },
+          "mean": 0.846747,
+          "sd": 0.030949,
+          "ci95": [
+            0.769865,
+            0.923629
+          ],
+          "ci95_halfwidth": 0.076882
+        }
+      },
+      "qsvm_zz": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/dev_grid_multiseed/binary_results.csv",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.753068,
+            "seed17": 0.778604,
+            "seed27": 0.726714
+          },
+          "mean": 0.752795,
+          "sd": 0.025946,
+          "ci95": [
+            0.688342,
+            0.817248
+          ],
+          "ci95_halfwidth": 0.064453
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.546027,
+            "seed17": 0.636373,
+            "seed27": 0.528513
+          },
+          "mean": 0.570304,
+          "sd": 0.057883,
+          "ci95": [
+            0.426514,
+            0.714094
+          ],
+          "ci95_halfwidth": 0.14379
+        }
+      },
+      "rbf_svm": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/dev_grid_multiseed/binary_results.csv",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.933485,
+            "seed17": 0.927529,
+            "seed27": 0.923102
+          },
+          "mean": 0.928039,
+          "sd": 0.00521,
+          "ci95": [
+            0.915095,
+            0.940982
+          ],
+          "ci95_halfwidth": 0.012943
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.8925,
+            "seed17": 0.90641,
+            "seed27": 0.887377
+          },
+          "mean": 0.895429,
+          "sd": 0.009848,
+          "ci95": [
+            0.870964,
+            0.919894
+          ],
+          "ci95_halfwidth": 0.024465
+        }
+      },
+      "random_forest": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/dev_grid_multiseed/binary_results.csv",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.93947,
+            "seed17": 0.936514,
+            "seed27": 0.920681
+          },
+          "mean": 0.932221,
+          "sd": 0.010103,
+          "ci95": [
+            0.907124,
+            0.957319
+          ],
+          "ci95_halfwidth": 0.025097
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.892177,
+            "seed17": 0.905673,
+            "seed27": 0.88021
+          },
+          "mean": 0.892687,
+          "sd": 0.012739,
+          "ci95": [
+            0.861041,
+            0.924333
+          ],
+          "ci95_halfwidth": 0.031646
+        }
+      },
+      "xgboost": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/dev_grid_multiseed/binary_results.csv",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.936191,
+            "seed17": 0.935643,
+            "seed27": 0.922639
+          },
+          "mean": 0.931491,
+          "sd": 0.007671,
+          "ci95": [
+            0.912436,
+            0.950547
+          ],
+          "ci95_halfwidth": 0.019055
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.892983,
+            "seed17": 0.910973,
+            "seed27": 0.890117
+          },
+          "mean": 0.898024,
+          "sd": 0.011305,
+          "ci95": [
+            0.869941,
+            0.926108
+          ],
+          "ci95_halfwidth": 0.028083
+        }
+      }
+    },
+    "nextgen": {
+      "qsvm_crosslayer": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/veremi_nextgen/veremi_nextgen_binary_results.csv[variant==full]",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.928714,
+            "seed17": 0.929137,
+            "seed27": 0.920921
+          },
+          "mean": 0.926258,
+          "sd": 0.004626,
+          "ci95": [
+            0.914766,
+            0.937749
+          ],
+          "ci95_halfwidth": 0.011492
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.886383,
+            "seed17": 0.857333,
+            "seed27": 0.86074
+          },
+          "mean": 0.868152,
+          "sd": 0.01588,
+          "ci95": [
+            0.828703,
+            0.907601
+          ],
+          "ci95_halfwidth": 0.039449
+        }
+      },
+      "qsvm_zz": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/veremi_nextgen/veremi_nextgen_binary_results.csv[variant==full]",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.825178,
+            "seed17": 0.817677,
+            "seed27": 0.811233
+          },
+          "mean": 0.818029,
+          "sd": 0.006979,
+          "ci95": [
+            0.800693,
+            0.835366
+          ],
+          "ci95_halfwidth": 0.017337
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.618426,
+            "seed17": 0.644677,
+            "seed27": 0.624727
+          },
+          "mean": 0.629277,
+          "sd": 0.013704,
+          "ci95": [
+            0.595234,
+            0.663319
+          ],
+          "ci95_halfwidth": 0.034043
+        }
+      },
+      "rbf_svm": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/veremi_nextgen/veremi_nextgen_binary_results.csv[variant==full]",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.946862,
+            "seed17": 0.936623,
+            "seed27": 0.926799
+          },
+          "mean": 0.936762,
+          "sd": 0.010032,
+          "ci95": [
+            0.91184,
+            0.961683
+          ],
+          "ci95_halfwidth": 0.024921
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.921192,
+            "seed17": 0.91547,
+            "seed27": 0.902355
+          },
+          "mean": 0.913005,
+          "sd": 0.009657,
+          "ci95": [
+            0.889015,
+            0.936996
+          ],
+          "ci95_halfwidth": 0.02399
+        }
+      },
+      "random_forest": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/veremi_nextgen/veremi_nextgen_binary_results.csv[variant==full]",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.946621,
+            "seed17": 0.950624,
+            "seed27": 0.936242
+          },
+          "mean": 0.944496,
+          "sd": 0.007423,
+          "ci95": [
+            0.926056,
+            0.962935
+          ],
+          "ci95_halfwidth": 0.018439
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.928144,
+            "seed17": 0.930397,
+            "seed27": 0.917239
+          },
+          "mean": 0.92526,
+          "sd": 0.007037,
+          "ci95": [
+            0.907779,
+            0.942741
+          ],
+          "ci95_halfwidth": 0.017481
+        }
+      },
+      "xgboost": {
+        "seeds": "7;17;27",
+        "n_seeds": 3,
+        "source": "results/nextgen_multiseed/per_seed.csv",
+        "roc_auc": {
+          "per_seed": {
+            "seed7": 0.946886,
+            "seed17": 0.946204,
+            "seed27": 0.933913
+          },
+          "mean": 0.942334,
+          "sd": 0.007301,
+          "ci95": [
+            0.924198,
+            0.960471
+          ],
+          "ci95_halfwidth": 0.018136
+        },
+        "pr_auc": {
+          "per_seed": {
+            "seed7": 0.929062,
+            "seed17": 0.927855,
+            "seed27": 0.912592
+          },
+          "mean": 0.92317,
+          "sd": 0.00918,
+          "ci95": [
+            0.900365,
+            0.945975
+          ],
+          "ci95_halfwidth": 0.022805
+        }
+      }
+    }
+  }
+}

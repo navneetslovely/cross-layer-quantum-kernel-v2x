@@ -1,0 +1,97 @@
+{
+  "study": "magnitude_axis_generality",
+  "method": "per-family Spearman(intensity, best-over-models detectability); best-over-models ROC/PR per intensity level; grouped-bootstrap CIs per point already saved.",
+  "families": {
+    "const_offset": {
+      "intensity_col": "const_offset_m",
+      "n_levels": 5,
+      "levels": [
+        10.0,
+        25.0,
+        50.0,
+        100.0,
+        200.0
+      ],
+      "roc_best": [
+        0.5636237595736306,
+        0.6566798833290968,
+        0.8162446183351324,
+        0.8928551394180678,
+        0.9871399245774762
+      ],
+      "pr_best": [
+        0.2466939670445627,
+        0.3359444506213833,
+        0.6133558088204883,
+        0.7844246775040644,
+        0.9610728889772688
+      ],
+      "spearman_intensity_roc": 0.9999999999999999,
+      "spearman_intensity_pr": 0.9999999999999999,
+      "monotone_increasing": true
+    },
+    "drift_speed": {
+      "intensity_col": "drift_speed",
+      "n_levels": 5,
+      "levels": [
+        0.5,
+        1.0,
+        2.0,
+        4.0,
+        8.0
+      ],
+      "roc_best": [
+        0.965847332175262,
+        0.976761464709446,
+        0.9912522640957194,
+        0.997025957562567,
+        0.9993822953054444
+      ],
+      "pr_best": [
+        0.9097102034890638,
+        0.9348324102562844,
+        0.9732607795323116,
+        0.9891695795189496,
+        0.9977578510533166
+      ],
+      "spearman_intensity_roc": 0.9999999999999999,
+      "spearman_intensity_pr": 0.9999999999999999,
+      "monotone_increasing": true
+    },
+    "data_falsification": {
+      "intensity_col": "data_fals_heading_jitter",
+      "n_levels": 5,
+      "levels": [
+        5.0,
+        15.0,
+        30.0,
+        60.0,
+        120.0
+      ],
+      "roc_best": [
+        0.958087912046644,
+        0.9591802054720407,
+        0.9618663143162204,
+        0.9651618542383568,
+        0.9678971940352036
+      ],
+      "pr_best": [
+        0.8702579876913038,
+        0.875790381161329,
+        0.8843630297880132,
+        0.8938024803606851,
+        0.9020751681457316
+      ],
+      "spearman_intensity_roc": 0.9999999999999999,
+      "spearman_intensity_pr": 0.9999999999999999,
+      "monotone_increasing": true
+    }
+  },
+  "summary": {
+    "n_families": 3,
+    "all_monotone_increasing": true,
+    "min_spearman_roc": 0.9999999999999999,
+    "mean_spearman_roc": 0.9999999999999999,
+    "verdict": "The intensity->detectability (magnitude) axis is GENERAL: a positive monotone relationship holds across all three attack families (const-offset, drift, data-falsification), not just the constant-offset sweep. Each point already carries a grouped-bootstrap CI (pr/roc _lo/_hi in the source CSVs)."
+  }
+}

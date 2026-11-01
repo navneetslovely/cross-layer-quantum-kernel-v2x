@@ -1,0 +1,258 @@
+{
+  "protocol": {
+    "dataset": "dev_grid seed 7 (published detector protocol)",
+    "train_windows": 3023,
+    "test_windows": 6000,
+    "kta": "200 epochs x 512 balanced batch, Adam lr 0.05, init (w,u,gamma)=(1,1,0.5), 1 restart, best-alignment snapshot, identical batch stream (default_rng(11)) for every trained variant",
+    "engine": "gram_gpu on a GPU host, parity-checked vs PennyLane to |dGram|<1.5e-6 (gram_engine_check.json)",
+    "svm": "precomputed-kernel SVC, C grid [0.1, 1.0, 10.0, 100.0], 5-fold grouped CV, class_weight balanced"
+  },
+  "roc_ordering_desc": [
+    "zz_trained",
+    "cross",
+    "sparse",
+    "none",
+    "cross_fixed",
+    "zz"
+  ],
+  "factorial_2x2_topology_x_training": {
+    "cells": {
+      "cross_layer/fixed": 0.8407924174637906,
+      "cross_layer/trained": 0.9254460800515368,
+      "zz_full/fixed": 0.7816891957008665,
+      "zz_full/trained": 0.9296643315121672
+    },
+    "main_effect_training": 0.11631439919952347,
+    "main_effect_topology_bipartite_minus_allpairs": 0.027442485151147,
+    "interaction": -0.06332147322355453,
+    "alignment_cells": {
+      "cross_layer/trained": 0.6300531625747681,
+      "zz_full/trained": 0.6340664029121399
+    },
+    "reading": "positive main_effect_training = training helps; positive topology effect = the bipartite cross-layer placement helps at matched training state. Compare magnitudes: this is the honest decomposition of the published cross-layer >> ZZ gap."
+  },
+  "paired_contrasts": {
+    "cross_minus_cross_fixed": {
+      "why": "training effect, bipartite topology",
+      "metric": "roc_auc",
+      "delta": 0.0846536625877462,
+      "lo": 0.06297481833060678,
+      "hi": 0.10841167510325592,
+      "p_two_sided": 0.0,
+      "n_boot": 200
+    },
+    "zz_trained_minus_zz": {
+      "why": "training effect, all-pairs topology",
+      "metric": "roc_auc",
+      "delta": 0.14797513581130073,
+      "lo": 0.11709454664761135,
+      "hi": 0.18404771984217325,
+      "p_two_sided": 0.0,
+      "n_boot": 200
+    },
+    "cross_minus_sparse": {
+      "why": "topology at MATCHED training AND matched 16 edges (the design prior, cleanly isolated)",
+      "metric": "roc_auc",
+      "delta": 0.015258275935447041,
+      "lo": 0.0019517561995305189,
+      "hi": 0.028841264001810484,
+      "p_two_sided": 0.01,
+      "n_boot": 200
+    },
+    "cross_minus_zz_trained": {
+      "why": "bipartite 16 edges vs all-pairs 28 edges, both trained",
+      "metric": "roc_auc",
+      "delta": -0.004218251460630373,
+      "lo": -0.014269779907695582,
+      "hi": 0.004262227917275511,
+      "p_two_sided": 0.3,
+      "n_boot": 200
+    },
+    "cross_fixed_minus_zz": {
+      "why": "topology WITHOUT training (untrained regime)",
+      "metric": "roc_auc",
+      "delta": 0.05910322176292415,
+      "lo": 0.038174611607720114,
+      "hi": 0.08764120170900122,
+      "p_two_sided": 0.0,
+      "n_boot": 200
+    }
+  },
+  "entangling_gate_efficiency": {
+    "note": "two-qubit (IsingZZ) gate count at L=2 = 2 x |E|",
+    "gates": {
+      "none": 0,
+      "sparse": 32,
+      "cross_fixed": 32,
+      "cross": 32,
+      "zz": 56,
+      "zz_trained": 56
+    },
+    "cross_vs_zz_trained_gate_ratio": 0.5714285714285714,
+    "cross_vs_zz_trained_droc": -0.004218251460630373
+  },
+  "anchor_deltas_vs_published": {
+    "cross": {
+      "engine_roc": 0.9254460800515368,
+      "published_roc": 0.9254389652792644,
+      "delta": 7.1147722724429485e-06
+    },
+    "zz": {
+      "engine_roc": 0.7816891957008665,
+      "published_roc": 0.7530680838430637,
+      "delta": 0.028621111857802806
+    }
+  },
+  "zz_anchor_resolution": {
+    "gram_parity_engine_vs_cached_zz": 7.3909759521484375e-06,
+    "cv_fold_seed_fragility": {
+      "zz": {
+        "chosen_C_by_fold_seed": [
+          1.0,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ],
+        "roc_by_fold_seed": [
+          0.7816911360933043,
+          0.7530680838430637,
+          0.7530680838430637,
+          0.7530680838430637,
+          0.7530680838430637
+        ],
+        "roc_spread": 0.028623052250240644
+      },
+      "cross": {
+        "chosen_C_by_fold_seed": [
+          0.1,
+          0.1,
+          0.1,
+          0.1,
+          0.1
+        ],
+        "roc_by_fold_seed": [
+          0.9254389652792645,
+          0.9254389652792645,
+          0.9254389652792645,
+          0.9254389652792645,
+          0.9254389652792645
+        ],
+        "roc_spread": 0.0
+      }
+    },
+    "explanation": "engine and cached zz Grams agree to <1e-5; the ROC delta vs the published row is CV C-selection flipping (1.0 vs 0.1) on the untrained-ZZ kernel's near-degenerate CV landscape across sklearn fold realisations; the trained cross-layer map is fold-seed invariant (spread 0.000). Both zz values keep zz last in the ordering."
+  },
+  "rows": [
+    {
+      "variant": "none",
+      "label": "no entanglement (trained)",
+      "trained": true,
+      "n_couples": 0,
+      "n_trainable_params": 32,
+      "best_alignment": 0.48510780930519104,
+      "roc_auc": 0.8842631909494922,
+      "pr_auc": 0.8273357158239404,
+      "f1": 0.7734089987839481,
+      "mcc": 0.718076769038715,
+      "pr_auc_lo": 0.7311362637080318,
+      "pr_auc_hi": 0.9071715983216498,
+      "roc_auc_lo": 0.8029721923677118,
+      "roc_auc_hi": 0.9469645554383597,
+      "t_train_s_gpu": 19.860002756118774
+    },
+    {
+      "variant": "sparse",
+      "label": "random sparse, 16 edges (trained)",
+      "trained": true,
+      "n_couples": 16,
+      "n_trainable_params": 64,
+      "best_alignment": 0.610694408416748,
+      "roc_auc": 0.9101878041160898,
+      "pr_auc": 0.8593655021752521,
+      "f1": 0.8014981273408239,
+      "mcc": 0.7583752034093738,
+      "pr_auc_lo": 0.7970705802475684,
+      "pr_auc_hi": 0.9169855457894098,
+      "roc_auc_lo": 0.8623080212382576,
+      "roc_auc_hi": 0.9506081156897053,
+      "t_train_s_gpu": 27.63445806503296
+    },
+    {
+      "variant": "cross_fixed",
+      "label": "cross-layer bipartite, 16 edges (FIXED/untrained)",
+      "trained": false,
+      "n_couples": 16,
+      "n_trainable_params": 64,
+      "best_alignment": NaN,
+      "roc_auc": 0.8407924174637906,
+      "pr_auc": 0.6890109420143871,
+      "f1": 0.6126878130217028,
+      "mcc": 0.5217094103511657,
+      "pr_auc_lo": 0.6090890912678372,
+      "pr_auc_hi": 0.7655416574099388,
+      "roc_auc_lo": 0.7924902056034479,
+      "roc_auc_hi": 0.8821667596397675,
+      "t_train_s_gpu": 0.5171656608581543
+    },
+    {
+      "variant": "cross",
+      "label": "cross-layer bipartite, 16 edges (trained)",
+      "trained": true,
+      "n_couples": 16,
+      "n_trainable_params": 64,
+      "best_alignment": 0.6300531625747681,
+      "roc_auc": 0.9254460800515368,
+      "pr_auc": 0.8750170517281093,
+      "f1": 0.801449859041482,
+      "mcc": 0.7524356061617912,
+      "pr_auc_lo": 0.8273279128263104,
+      "pr_auc_hi": 0.9184328762595114,
+      "roc_auc_lo": 0.8947432478367565,
+      "roc_auc_hi": 0.9576057130458259,
+      "t_train_s_gpu": 39.8330352306366,
+      "published_roc_auc": 0.9254389652792644,
+      "published_pr_auc": 0.8750256616668065,
+      "anchor_droc": 7.1147722724429485e-06,
+      "anchor_dpr": -8.609938697223818e-06
+    },
+    {
+      "variant": "zz",
+      "label": "full ZZ, 28 edges (FIXED/untrained reference)",
+      "trained": false,
+      "n_couples": 28,
+      "n_trainable_params": 88,
+      "best_alignment": NaN,
+      "roc_auc": 0.7816891957008665,
+      "pr_auc": 0.5713659103186215,
+      "f1": 0.5128644939965694,
+      "mcc": 0.40351713913518045,
+      "pr_auc_lo": 0.47114638550544263,
+      "pr_auc_hi": 0.6651945193580623,
+      "roc_auc_lo": 0.7378634746779763,
+      "roc_auc_hi": 0.8247453931788928,
+      "t_train_s_gpu": 0.7621843814849854,
+      "published_roc_auc": 0.7530680838430637,
+      "published_pr_auc": 0.5460269060202725,
+      "anchor_droc": 0.028621111857802806,
+      "anchor_dpr": 0.02533900429834901
+    },
+    {
+      "variant": "zz_trained",
+      "label": "full ZZ, 28 edges (trained)",
+      "trained": true,
+      "n_couples": 28,
+      "n_trainable_params": 88,
+      "best_alignment": 0.6340664029121399,
+      "roc_auc": 0.9296643315121672,
+      "pr_auc": 0.8649672240555852,
+      "f1": 0.814873417721519,
+      "mcc": 0.766891817089335,
+      "pr_auc_lo": 0.8140619857835156,
+      "pr_auc_hi": 0.9143263178531467,
+      "roc_auc_lo": 0.8956273364640344,
+      "roc_auc_hi": 0.9612653682536373,
+      "t_train_s_gpu": 52.46886396408081
+    }
+  ]
+}

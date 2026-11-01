@@ -1,0 +1,17 @@
+# H2: robustness vs packet loss (controlled injection, earlier).
+# At each level, a fraction of receptions is dropped at random BEFORE windowing (faithful
+# message-level loss), and every model is trained + evaluated on that thinned data. Output:
+# detection metric vs packet loss (degradation curve) with CIs + quantum-vs-classical
+# significance. Replaces the native-density H2, which is flat post-BUG-4 (jitter fix).
+kind: packetloss
+name: packetloss_dev
+runs_root: runs/dev_grid
+features_config: configs/features.yaml
+quantum_config: configs/quantum.yaml
+baselines_config: configs/baselines.yaml
+out_dir: results/packetloss_dev
+
+packet_loss_grid: [0.0, 0.2, 0.4, 0.6, 0.8]   # fraction of receptions dropped before windowing
+models: [qsvm_crosslayer, qsvm_zz, rbf_svm, random_forest, mlp]
+bootstrap: 200
+full_cap: 15000        # cap for the classical@full (<model>__full) ceiling rows

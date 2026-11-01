@@ -1,0 +1,208 @@
+{
+  "item": "kta_equivalence",
+  "equations": {
+    "fully_centred_textbook": "A_c(K, y) = <H K H, H T H>_F / (||H K H||_F ||H T H||_F),  T = y y^T,  y in {-1,+1}^n,  H = I_n - (1/n) 1 1^T",
+    "implemented_train_objective": "A_impl(K, y) = <H K H, y y^T>_F / (||H K H||_F ||y y^T||_F)   (target uncentred; src/qkv2x/quantum/train.py L22-34)",
+    "identity": "A_impl = 4 pi (1 - pi) * A_c  with pi = positive fraction (numerators identical since H is idempotent; ||y y^T||_F = n while ||H T H||_F = 4 n pi (1 - pi)); every optimisation batch has pi = 1/2 exactly, where 4 pi (1 - pi) = 1, so A_impl == A_c on all batches"
+  },
+  "batch_protocol": {
+    "how_minibatches_are_formed": "src/qkv2x/quantum/train.py::_balanced_batch: draw batch//2 = 256 indices uniformly from the positive class and 256 from the negative class (numpy default_rng, without replacement whenever the class pool >= 256, which holds for every production label vector audited here), concatenate and shuffle. One such batch is drawn per epoch (200 epochs).",
+    "batch_size": 512,
+    "per_class_counts": {
+      "positives": 256,
+      "negatives": 256
+    },
+    "labels_are_pm1": "yes: train.py L90 maps y -> ypm = where(y > 0, +1.0, -1.0) before the target Gram T = outer(ypm, ypm) is formed",
+    "batches_exactly_balanced": "yes: pi = 1/2 exactly in every batch by construction; empirically confirmed on 4000/4000 audited draws (2 real label vectors x 2 rngs x 1000 draws), all exactly 256+256",
+    "alignment_averaged_across_batches": "no: the objective each epoch is the centred KTA of that single balanced batch (train.py L98-110); history records the per-batch value and the retained parameters are those of the best SINGLE batch (max over epochs, train.py L112-116). No cross-batch averaging anywhere.",
+    "same_code_path_in_checkpointed_runs": "veremi_nextgen_exp.py::_qtrain_checkpointed L456-457 imports and uses the same _balanced_batch/_centered_kta_torch"
+  },
+  "batch_audit": {
+    "dev_grid_s7_train_labels": {
+      "pool_n": 3023,
+      "pool_n_pos": 683,
+      "pool_n_neg": 2340,
+      "pool_positive_rate": 0.22593450215018193,
+      "batch_size": 512,
+      "per_class_target": 256,
+      "replacement_fallback_possible": false,
+      "production_seed_draws": {
+        "seed": 11,
+        "n_draws": 1000,
+        "n_batches_exactly_balanced": 1000,
+        "n_pos_min": 256,
+        "n_pos_max": 256,
+        "n_neg_min": 256,
+        "n_neg_max": 256,
+        "batch_len_min": 512,
+        "batch_len_max": 512,
+        "batch_positive_fraction_min": 0.5,
+        "batch_positive_fraction_max": 0.5,
+        "n_batches_with_duplicate_indices": 0
+      },
+      "independent_seed_draws": {
+        "seed": 20260807,
+        "n_draws": 1000,
+        "n_batches_exactly_balanced": 1000,
+        "n_pos_min": 256,
+        "n_pos_max": 256,
+        "n_neg_min": 256,
+        "n_neg_max": 256,
+        "batch_len_min": 512,
+        "batch_len_max": 512,
+        "batch_positive_fraction_min": 0.5,
+        "batch_positive_fraction_max": 0.5,
+        "n_batches_with_duplicate_indices": 0
+      }
+    },
+    "nextgen_official_train_labels": {
+      "pool_n": 3000,
+      "pool_n_pos": 672,
+      "pool_n_neg": 2328,
+      "pool_positive_rate": 0.224,
+      "batch_size": 512,
+      "per_class_target": 256,
+      "replacement_fallback_possible": false,
+      "production_seed_draws": {
+        "seed": 11,
+        "n_draws": 1000,
+        "n_batches_exactly_balanced": 1000,
+        "n_pos_min": 256,
+        "n_pos_max": 256,
+        "n_neg_min": 256,
+        "n_neg_max": 256,
+        "batch_len_min": 512,
+        "batch_len_max": 512,
+        "batch_positive_fraction_min": 0.5,
+        "batch_positive_fraction_max": 0.5,
+        "n_batches_with_duplicate_indices": 0
+      },
+      "independent_seed_draws": {
+        "seed": 20260807,
+        "n_draws": 1000,
+        "n_batches_exactly_balanced": 1000,
+        "n_pos_min": 256,
+        "n_pos_max": 256,
+        "n_neg_min": 256,
+        "n_neg_max": 256,
+        "batch_len_min": 512,
+        "batch_len_max": 512,
+        "batch_positive_fraction_min": 0.5,
+        "batch_positive_fraction_max": 0.5,
+        "n_batches_with_duplicate_indices": 0
+      }
+    }
+  },
+  "equivalence_on_real_grams": {
+    "dev_grid_s7_crosslayer": {
+      "n_balanced_subsets": 200,
+      "balanced_max_abs_diff_implemented_vs_fully_centred": 5.218048215738236e-15,
+      "balanced_all_pi_exactly_half": true,
+      "n_imbalanced_subsets": 200,
+      "imbalanced_pi_min": 0.105,
+      "imbalanced_pi_max": 0.8975,
+      "imbalanced_max_abs_diff": 0.2678378013049678,
+      "imbalanced_identity_max_abs_err": 1.0769163338864018e-14,
+      "factor_law_fit": {
+        "model": "A_impl/A_c regressed through origin on 4*pi*(1-pi)",
+        "n_points_used": 200,
+        "n_points_excluded_small_Ac": 0,
+        "slope": 0.9999999999999987,
+        "r_squared": 1.0,
+        "max_abs_ratio_minus_factor": 1.942890293094024e-14
+      }
+    },
+    "nextgen_binary_full_crosslayer": {
+      "n_balanced_subsets": 200,
+      "balanced_max_abs_diff_implemented_vs_fully_centred": 5.662137425588298e-15,
+      "balanced_all_pi_exactly_half": true,
+      "n_imbalanced_subsets": 200,
+      "imbalanced_pi_min": 0.1025,
+      "imbalanced_pi_max": 0.9,
+      "imbalanced_max_abs_diff": 0.318721938490893,
+      "imbalanced_identity_max_abs_err": 1.0880185641326534e-14,
+      "factor_law_fit": {
+        "model": "A_impl/A_c regressed through origin on 4*pi*(1-pi)",
+        "n_points_used": 200,
+        "n_points_excluded_small_Ac": 0,
+        "slope": 0.999999999999999,
+        "r_squared": 1.0,
+        "max_abs_ratio_minus_factor": 1.8762769116165146e-14
+      }
+    }
+  },
+  "equivalence_pooled_both_grams": {
+    "n_balanced_subsets": 400,
+    "balanced_max_abs_diff_implemented_vs_fully_centred": 5.662137425588298e-15,
+    "balanced_all_pi_exactly_half": true,
+    "n_imbalanced_subsets": 400,
+    "imbalanced_pi_min": 0.1025,
+    "imbalanced_pi_max": 0.9,
+    "imbalanced_max_abs_diff": 0.318721938490893,
+    "imbalanced_identity_max_abs_err": 1.0880185641326534e-14,
+    "factor_law_fit": {
+      "model": "A_impl/A_c regressed through origin on 4*pi*(1-pi)",
+      "n_points_used": 400,
+      "n_points_excluded_small_Ac": 0,
+      "slope": 0.9999999999999988,
+      "r_squared": 1.0,
+      "max_abs_ratio_minus_factor": 1.942890293094024e-14
+    }
+  },
+  "full_vector_at_natural_imbalance": {
+    "dev_grid_s7_crosslayer": {
+      "n": 3023,
+      "pi": 0.22593450215018193,
+      "factor_4pi1mpi": 0.6995524115533255,
+      "kta_implemented": 0.3723005343223243,
+      "kta_fully_centred": 0.5321982001256345,
+      "identity_abs_err": 9.736655925962623e-14
+    },
+    "nextgen_binary_full_crosslayer": {
+      "n": 3000,
+      "pi": 0.224,
+      "factor_4pi1mpi": 0.695296,
+      "kta_implemented": 0.3924989755297096,
+      "kta_fully_centred": 0.5645063045516332,
+      "identity_abs_err": 1.7719159473017498e-13
+    }
+  },
+  "label_provenance": {
+    "dev_grid_s7": {
+      "source": "runs/dev_grid/features.parquet",
+      "split": "group_split(test_frac=0.3, val_frac=0.15, seed=7) then _cap_train_groupwise(max_train=3000, seed=7) -- the exact scripts/dev_multiseed.py recipe that built the cached Gram",
+      "n_windows_total": 90553,
+      "natural_positive_rate_full_dataset": 0.23841286318509602
+    },
+    "nextgen": {
+      "source": "results/veremi_nextgen/checkpoints/assembled.npz",
+      "split": "official NextGen split field == \"Train\" (veremi_nextgen_exp.py L368 index rule; stored row order)",
+      "n_windows_total": 5999,
+      "natural_positive_rate_full_dataset": 0.21836972828804802
+    }
+  },
+  "gram_provenance": {
+    "dev_grid_s7_crosslayer": "results/dev_grid_multiseed/checkpoints/gram_qsvm_crosslayer_s7.npz::K_tr (trained cross-layer map, seed 7, built by scripts/dev_multiseed.py)",
+    "nextgen_binary_full_crosslayer": "results/veremi_nextgen/checkpoints/gram_binary_full_qsvm_crosslayer.npz::K_tr (trained cross-layer map, official NextGen Train rows, built by src/qkv2x/experiments/veremi_nextgen_exp.py)"
+  },
+  "protocol": {
+    "interpreter": "python",
+    "seed_production_batch_rng": 11,
+    "seed_independent": 20260807,
+    "n_draws_per_rng": 1000,
+    "n_balanced_subsets_per_gram": 200,
+    "n_imbalanced_subsets_per_gram": 200,
+    "imbalanced_subset_size": 400,
+    "imbalanced_pi_range": [
+      0.1,
+      0.9
+    ],
+    "ratio_fit_guard_abs_Ac_min": 0.001,
+    "implemented_alignment": "torch train.py::_centered_kta_torch, float64, cpu",
+    "textbook_alignment": "independent numpy H K H / H T H implementation (+1e-12 denominator guard, matching train.py)",
+    "balanced_subsets_drawn_by": "the production _balanced_batch itself (batch=512)",
+    "no_training_performed": true,
+    "grams_read_only": true
+  },
+  "headline": "The implemented objective centres K but not T; this is EXACTLY equivalent to the fully centred textbook alignment on every optimisation batch because batches are exactly class-balanced by construction. Batch protocol: _balanced_batch draws 256 positives + 256 negatives (batch = 512, configs/quantum.yaml::train.batch) each epoch; labels are exactly {-1,+1}; alignment is per-batch, NOT averaged across batches (best single-batch parameters retained). Audit: 4000/4000 draws from the two real trained-run label vectors (dev_grid s7 pi=0.2259, NextGen Train pi=0.2240) were exactly 256+256. On the real cached cross-layer Grams, implemented vs fully centred agree to max|diff| = 5.66e-15 over 400 balanced subsets (machine precision), while over 400 imbalanced subsets (pi in [0.10, 0.90]) the discrepancy follows A_impl = 4pi(1-pi)*A_c with max identity error 1.09e-14 and ratio-vs-factor fit slope 1.000000/1.000000, R^2 1.000000/1.000000 (dev_grid/nextgen)."
+}

@@ -1,0 +1,692 @@
+{
+  "generated": "2026-08-07T13:24:25",
+  "runtime_s": 308.2,
+  "item": "tuning_budget",
+  "protocol": {
+    "item": "tuning_budget -- 'comparable tuning budgets' quantified",
+    "what_baseline_fairness_did": "baseline_fairness listed the grids (hyperparams.csv, 72 rows) and asserted 'classical tuned at least as hard as quantum on the SVM axis' in prose, quoting CV-only fit counts (rbf_svm 16/80, random_forest 4/20, mlp 4/20, xgboost 36/180, quantum 20); it never gave a per-model budget table, never counted the refit, never counted the representation axis, and never measured time.",
+    "reconciliation_with_baseline_fairness": "tuning_budget's n_fits_cv_only column reproduces baseline_fairness's quoted numbers exactly (80/20/20/180 and quantum 20); n_fits adds the single refit sklearn performs after the search (refit=True default).",
+    "n_configs_source": "INTROSPECTED: build_baseline(name, configs/baselines.yaml, seed=17, folds=5, tune=True).param_grid expanded with sklearn.model_selection.ParameterGrid -- so the two code-truths baseline_fairness documented are picked up automatically (XGBoost's grid is a code default; MLP early_stopping is hard-coded False in the binary path).",
+    "n_fits_definition": "n_configs * cv_folds + 1 refit",
+    "n_gradient_steps_definition": "parameter-update steps spent learning a REPRESENTATION; 0 for kernel/tree/neighbour models; per-model basis in the gradient_steps_basis column",
+    "n_trainable_params_definition": "quantum feature-map parameters actually optimised, counted from the live CrossLayerFeatureMap object (fm.init_params() element counts), with the inert (L,1) gamma tensor of the zero-coupling map excluded",
+    "matched_n_protocol": {
+      "dataset": "runs/dev_grid/features.parquet (90,553 windows, 19 raw features)",
+      "split": {
+        "test_frac": 0.3,
+        "val_frac": 0.15,
+        "group_by": "sender",
+        "seed": 7
+      },
+      "n_train_matched": 3023,
+      "n_train_quantum_after_internal_recap": 3000,
+      "n_val": 13920,
+      "n_test": 26392,
+      "n_features": 8,
+      "input": "per-block PCA 4 mobility + 4 network, [0,pi]-scaled",
+      "n_fold_train_used_for_mlp_step_bound": 2418
+    },
+    "seeds": {
+      "split_and_cap": 7,
+      "classical_cv_and_model": 17,
+      "kta": 11,
+      "quantum_cv_folds": "QuantumKernelSVM default seed 0 (src/qkv2x/models/qsvm.py:27)"
+    },
+    "kta_schedule": {
+      "optimiser": "Adam",
+      "lr": 0.05,
+      "epochs": 200,
+      "batch": 512,
+      "objective": "centered_kta_weighted",
+      "init": [
+        1.0,
+        1.0,
+        0.5
+      ],
+      "restarts": 1,
+      "snapshot_rule": "best centered-KTA alignment over epochs",
+      "window_evaluations": 102400,
+      "alignment_evaluations": 200
+    },
+    "feature_map_facts": {
+      "qsvm_crosslayer": {
+        "entangler": "cross_layer",
+        "n_qubits": 8,
+        "n_layers": 2,
+        "n_edges": 16,
+        "n_params_allocated": 64,
+        "n_params_inert": 0,
+        "n_params_effective": 64,
+        "formula_2Ln_plus_LE": 64,
+        "formula_matches_effective": true
+      },
+      "qsvm_zz": {
+        "entangler": "zz_full",
+        "n_qubits": 8,
+        "n_layers": 2,
+        "n_edges": 28,
+        "n_params_allocated": 88,
+        "n_params_inert": 0,
+        "n_params_effective": 88,
+        "formula_2Ln_plus_LE": 88,
+        "formula_matches_effective": true
+      },
+      "qsvm_none": {
+        "entangler": "none",
+        "n_qubits": 8,
+        "n_layers": 2,
+        "n_edges": 0,
+        "n_params_allocated": 34,
+        "n_params_inert": 2,
+        "n_params_effective": 32,
+        "formula_2Ln_plus_LE": 32,
+        "formula_matches_effective": true
+      },
+      "qsvm_sparse": {
+        "entangler": "sparse_random",
+        "n_qubits": 8,
+        "n_layers": 2,
+        "n_edges": 16,
+        "n_params_allocated": 64,
+        "n_params_inert": 0,
+        "n_params_effective": 64,
+        "formula_2Ln_plus_LE": 64,
+        "formula_matches_effective": true
+      }
+    },
+    "wall_clock_provenance": {
+      "published_per_model_timing": "IRRECOVERABLE",
+      "reason": "results/packetloss_dev/{summary,provenance}.json record only one aggregate wall_time_s = 858.5 s for the entire packet-loss sweep (11 loss levels x 8 model rows + 200-replicate grouped bootstraps); no per-model timer is written anywhere in the Table-I pipeline, and no other artefact under results/ carries per-model timing for these models.",
+      "published_aggregate_wall_time_s": 858.5,
+      "tuning_budget_measurement": "re-measured here on the matched-N protocol in three flavours: measured_tuning_wall_s (as-shipped, parallelism on), measured_tuning_cpu_s (process-tree CPU via psutil -- getrusage under-counts because loky workers are kept alive, not reaped), and measured_tuning_core_s (SERIAL re-run: joblib n_jobs=1, estimator n_jobs=1, threadpoolctl limit 1, torch.set_num_threads(1)) -- the last is the only timing comparable across models. Machine-dependent; quote as an order of magnitude only.",
+      "cpu_s_caveat": "measured_tuning_cpu_s is a process-TREE total and still carries loky overhead (worker poll/teardown) even after the pool warm-up, so it can exceed the serial core-seconds for the same search; cite measured_tuning_core_s, not cpu_s.",
+      "machine": "macOS-26.6-arm64-arm-64bit",
+      "processor": "arm64"
+    },
+    "invariants": {
+      "n_windows": 90553,
+      "n_windows_expected": 90553,
+      "n_train_matched": 3023,
+      "n_train_matched_expected": 3023,
+      "n_train_quantum": 3000,
+      "n_train_quantum_expected": 3000,
+      "n_dim": 8,
+      "n_dim_expected": 8
+    },
+    "measured": true,
+    "joblib_pool_warmup_s": 2.81,
+    "interpreter": "python",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3"
+  },
+  "fairness_verdict": {
+    "question": "Is any model advantaged by tuning budget?",
+    "axis_1_enumerated_classifier_search": {
+      "unit": "model fits = n_configs x cv_folds + 1 refit",
+      "n_fits_by_model": {
+        "rbf_svm": 81,
+        "random_forest": 21,
+        "knn_bagging": 16,
+        "mlp": 21,
+        "xgboost": 181,
+        "ocsvm_classical": 4,
+        "lstm_seq": 1,
+        "qsvm_crosslayer": 21,
+        "qsvm_zz": 21,
+        "qsvm_none": 21,
+        "qsvm_sparse": 21
+      },
+      "n_configs_by_model": {
+        "rbf_svm": 16,
+        "random_forest": 4,
+        "knn_bagging": 3,
+        "mlp": 4,
+        "xgboost": 36,
+        "ocsvm_classical": 3,
+        "lstm_seq": 1,
+        "qsvm_crosslayer": 4,
+        "qsvm_zz": 4,
+        "qsvm_none": 4,
+        "qsvm_sparse": 4
+      },
+      "quantum_reference": {
+        "model": "qsvm_crosslayer",
+        "n_fits": 21,
+        "n_configs": 4
+      },
+      "classical_larger_than_quantum": [
+        "rbf_svm",
+        "xgboost"
+      ],
+      "classical_equal_to_quantum": [
+        "random_forest",
+        "mlp"
+      ],
+      "classical_smaller_than_quantum": [
+        "knn_bagging",
+        "ocsvm_classical",
+        "lstm_seq"
+      ],
+      "ratio_vs_quantum": {
+        "rbf_svm": 3.86,
+        "random_forest": 1.0,
+        "knn_bagging": 0.76,
+        "mlp": 1.0,
+        "xgboost": 8.62,
+        "ocsvm_classical": 0.19,
+        "lstm_seq": 0.05,
+        "qsvm_crosslayer": 1.0,
+        "qsvm_zz": 1.0,
+        "qsvm_none": 1.0,
+        "qsvm_sparse": 1.0
+      },
+      "classical_that_beat_qsvm_over_3_splits": [
+        "rbf_svm",
+        "random_forest",
+        "xgboost"
+      ],
+      "min_n_fits_among_models_that_beat_qsvm": 21,
+      "qsvm_C_grid_identical_to_rbf_svm_C_grid": true,
+      "why_rbf_has_more_configs": "the QSVM and the RBF-SVM search the SAME 4-value C grid ([0.1, 1.0, 10.0, 100.0]); the RBF-SVM additionally searches 4 kernel bandwidths (['scale', 0.01, 0.1, 1.0]), which the QSVM has no analogue of because its kernel geometry is set by the trained feature map -- hence 16 configs vs 4",
+      "low_label_counterexample": {
+        "model": "ocsvm_classical",
+        "n_fits": 4,
+        "ratio_vs_quantum": 0.19,
+        "evidence": "results/lowlabel_dev/lowlabel_results.csv, mean PR-AUC over repeats: ocsvm_classical 0.685 / 0.679 / 0.700 at n_train 50 / 100 / 200 vs qsvm_crosslayer 0.514 / 0.545 / 0.521 (and qsvm_zz 0.279 / 0.332 / 0.319)",
+        "reading": "this is the ONE classical model that beats the QSVM on a SMALLER tuning budget, and it strengthens rather than weakens the honest finding: the low-label winner is the least-tuned model in the whole zoo, so the low-label advantage belongs to the one-class/anomaly-detection PARADIGM, not to tuning effort and not to quantum kernels (H3 refuted)."
+      },
+      "verdict": "CLASSICAL >= QUANTUM on the main binary comparison. Each of the three classical comparators that beat the cross-layer QSVM over the three leakage-safe splits was searched at least as hard as it: random_forest 21 fits (1.0x the QSVM's 21), rbf_svm 81 (3.9x), xgboost 181 (8.6x); the MLP matched-N row is also 21 (1.0x), and knn_bagging (16), which was tuned LESS than the QSVM, does not beat it on either dataset (NextGen ROC-AUC 0.880 vs 0.929). So within the headline detection comparison no model that outperforms the QSVM was tuned more weakly than it, and the no-advantage finding is NOT an artefact of an under-tuned classical side -- on this axis the comparison is conservative in the quantum models' favour. The single exception sits OUTSIDE that comparison and cuts the same way: in the low-label regime the classical one-class SVM (4 fits, 0.19x the QSVM budget) beats the cross-layer QSVM by +0.13 to +0.18 PR-AUC at n_train 50-200 -- the least-tuned model in the zoo wins there, which is a paradigm effect, not a budget effect."
+    },
+    "axis_2_structural_hyperparameters": {
+      "unit": "number of structural hyperparameters with >1 searched value",
+      "by_model": {
+        "rbf_svm": 2,
+        "random_forest": 2,
+        "knn_bagging": 1,
+        "mlp": 2,
+        "xgboost": 4,
+        "ocsvm_classical": 1,
+        "lstm_seq": 0,
+        "qsvm_crosslayer": 0,
+        "qsvm_zz": 0,
+        "qsvm_none": 0,
+        "qsvm_sparse": 0
+      },
+      "verdict": "The quantum models searched ZERO structural hyperparameters: n_layers=2, entangler, coupling=full_bipartite, AoI kappa=0.5, and the whole KTA schedule (Adam, lr 0.05, 200 epochs, batch 512, init (1,1,0.5), seed 11) were fixed a priori in configs/quantum.yaml and never tuned, whereas every classical baseline searched 1-4 structural hyperparameters (kernel bandwidth, tree depth/count, hidden-layer sizes, boosting rounds/depth/learning rate/class weight)."
+    },
+    "axis_3_gradient_trained_representation": {
+      "unit": "parameter-update steps x parameters",
+      "by_model": {
+        "rbf_svm": {
+          "n_gradient_steps": "0",
+          "n_trainable_params": 0
+        },
+        "random_forest": {
+          "n_gradient_steps": "0",
+          "n_trainable_params": 0
+        },
+        "knn_bagging": {
+          "n_gradient_steps": "0",
+          "n_trainable_params": 0
+        },
+        "mlp": {
+          "n_gradient_steps": "109200",
+          "n_trainable_params": 0
+        },
+        "xgboost": {
+          "n_gradient_steps": "0",
+          "n_trainable_params": 0
+        },
+        "ocsvm_classical": {
+          "n_gradient_steps": "0",
+          "n_trainable_params": 0
+        },
+        "lstm_seq": {
+          "n_gradient_steps": "480",
+          "n_trainable_params": 0
+        },
+        "qsvm_crosslayer": {
+          "n_gradient_steps": "200",
+          "n_trainable_params": 64
+        },
+        "qsvm_zz": {
+          "n_gradient_steps": "0",
+          "n_trainable_params": 0
+        },
+        "qsvm_none": {
+          "n_gradient_steps": "200",
+          "n_trainable_params": 32
+        },
+        "qsvm_sparse": {
+          "n_gradient_steps": "200",
+          "n_trainable_params": 64
+        }
+      },
+      "verdict": "This is the one axis the quantum models get and the kernel/tree/neighbour baselines do not: 200 Adam steps over 64 cross-layer map parameters. It is NOT a quantum-only axis though -- the MLP baseline gradient-trains 2,689-9,473 weights (measured: {'(64, 32)': 2689, '(128, 64)': 9473}) inside every one of its 21 fits, 42x-148x the quantum map's 64 parameters, over 109,200 update steps against the map's 200; the LSTM sequence baseline likewise takes 480 Adam steps. qsvm_zz receives ZERO representation budget by design (fixed_params ablation), so the cross-layer >> ZZ gap is a trained-vs-untrained gap, not a topology gap."
+    },
+    "paradigm_caveat": "KTA tunes the REPRESENTATION by gradient descent on a detector-free alignment objective; classical grids tune the CLASSIFIER by enumeration against cross-validated average precision. No exchange rate between a gradient step and a grid fit is claimed. The comparison above is a comparison of BUDGET in each currency, not a claim of equivalence between the two search paradigms.",
+    "unit_cost_caveat": "One 'fit' is not one learner: a random-forest fit trains 200-500 trees and an XGBoost fit up to 400 boosting rounds, so n_base_learners_total (measured) is the harsher and more honest cost measure -- and it is larger for the classical side by three to four orders of magnitude.",
+    "models_beating_qsvm_over_3_splits": [
+      "rbf_svm",
+      "random_forest",
+      "xgboost"
+    ],
+    "axis_4_measured_wall_clock": {
+      "unit": "seconds of tuning on this machine, matched-N protocol",
+      "provenance": "RE-MEASURED by tuning_budget; the published run's per-model timing is IRRECOVERABLE (see protocol.wall_clock_provenance)",
+      "wall_s_by_model": {
+        "rbf_svm": 2.57,
+        "random_forest": 2.97,
+        "knn_bagging": 0.19,
+        "mlp": 7.99,
+        "xgboost": 3.04,
+        "ocsvm_classical": 0.2,
+        "qsvm_crosslayer": 44.1,
+        "qsvm_zz": 1.89,
+        "qsvm_none": 20.34,
+        "qsvm_sparse": 52.73
+      },
+      "process_tree_cpu_s_by_model_UNRELIABLE": {
+        "rbf_svm": 19.0,
+        "random_forest": 22.96,
+        "knn_bagging": 1.17,
+        "mlp": 42.85,
+        "xgboost": 24.48,
+        "ocsvm_classical": 0.2,
+        "qsvm_crosslayer": 47.09,
+        "qsvm_zz": 1.97,
+        "qsvm_none": 21.8,
+        "qsvm_sparse": 54.35
+      },
+      "core_s_by_model_serial": {
+        "rbf_svm": 5.33,
+        "random_forest": 12.96,
+        "knn_bagging": 0.73,
+        "mlp": 25.4,
+        "xgboost": 15.64,
+        "ocsvm_classical": 0.19,
+        "qsvm_crosslayer": 41.75,
+        "qsvm_zz": 1.84,
+        "qsvm_none": 17.49,
+        "qsvm_sparse": 47.4
+      },
+      "timing_noise_note": "this machine ran other jobs concurrently; repeat runs of tuning_budget moved the quantum KTA timing by up to ~40% wall / ~13% serial-core, so quote these as approximate orders of magnitude",
+      "quantum_breakdown": {
+        "qsvm_crosslayer": {
+          "t_kta_wall_s": 42.81,
+          "t_kta_cpu_s": 45.73,
+          "t_gram_wall_s": 0.49,
+          "t_gram_cpu_s": 0.55,
+          "t_cgrid_wall_s": 0.81,
+          "t_cgrid_cpu_s": 0.81
+        },
+        "qsvm_zz": {
+          "t_kta_wall_s": 0.0,
+          "t_kta_cpu_s": 0.0,
+          "t_gram_wall_s": 0.77,
+          "t_gram_cpu_s": 0.84,
+          "t_cgrid_wall_s": 1.12,
+          "t_cgrid_cpu_s": 1.12
+        },
+        "qsvm_none": {
+          "t_kta_wall_s": 19.4,
+          "t_kta_cpu_s": 20.82,
+          "t_gram_wall_s": 0.21,
+          "t_gram_cpu_s": 0.24,
+          "t_cgrid_wall_s": 0.73,
+          "t_cgrid_cpu_s": 0.74
+        },
+        "qsvm_sparse": {
+          "t_kta_wall_s": 51.34,
+          "t_kta_cpu_s": 52.9,
+          "t_gram_wall_s": 0.55,
+          "t_gram_cpu_s": 0.61,
+          "t_cgrid_wall_s": 0.83,
+          "t_cgrid_cpu_s": 0.84
+        }
+      },
+      "verdict": "Time is the axis on which the quantum models cost more, and essentially all of it is KTA feature-map training plus the O(N^2) Gram, NOT hyperparameter search: the cross-layer QSVM's C-grid CV takes 0.81s of its 44.1s. On the parallelism-free comparison (serial, one thread everywhere) the QSVM's whole tuning costs 41.75 core-seconds against 25.4 for the most expensive classical search (mlp), a factor of 1.6. Timings are machine- and load-dependent and should be quoted as orders of magnitude, not as metrics."
+    }
+  },
+  "headline": {
+    "n_fits": {
+      "rbf_svm": 81,
+      "random_forest": 21,
+      "knn_bagging": 16,
+      "mlp": 21,
+      "xgboost": 181,
+      "ocsvm_classical": 4,
+      "lstm_seq": 1,
+      "qsvm_crosslayer": 21,
+      "qsvm_zz": 21,
+      "qsvm_none": 21,
+      "qsvm_sparse": 21
+    },
+    "n_configs": {
+      "rbf_svm": 16,
+      "random_forest": 4,
+      "knn_bagging": 3,
+      "mlp": 4,
+      "xgboost": 36,
+      "ocsvm_classical": 3,
+      "lstm_seq": 1,
+      "qsvm_crosslayer": 4,
+      "qsvm_zz": 4,
+      "qsvm_none": 4,
+      "qsvm_sparse": 4
+    },
+    "n_fits_cv_only": {
+      "rbf_svm": 80,
+      "random_forest": 20,
+      "knn_bagging": 15,
+      "mlp": 20,
+      "xgboost": 180,
+      "ocsvm_classical": 3,
+      "lstm_seq": 0,
+      "qsvm_crosslayer": 20,
+      "qsvm_zz": 20,
+      "qsvm_none": 20,
+      "qsvm_sparse": 20
+    },
+    "quantum_n_fits": 21,
+    "quantum_n_configs": 4,
+    "ratio_rbf_over_quantum": 3.86,
+    "ratio_xgboost_over_quantum": 8.62,
+    "n_gradient_steps": {
+      "rbf_svm": 0,
+      "random_forest": 0,
+      "knn_bagging": 0,
+      "mlp": 109200,
+      "xgboost": 0,
+      "ocsvm_classical": 0,
+      "lstm_seq": 480,
+      "qsvm_crosslayer": 200,
+      "qsvm_zz": 0,
+      "qsvm_none": 200,
+      "qsvm_sparse": 200
+    },
+    "n_trainable_params": {
+      "rbf_svm": 0,
+      "random_forest": 0,
+      "knn_bagging": 0,
+      "mlp": 0,
+      "xgboost": 0,
+      "ocsvm_classical": 0,
+      "lstm_seq": 0,
+      "qsvm_crosslayer": 64,
+      "qsvm_zz": 0,
+      "qsvm_none": 32,
+      "qsvm_sparse": 64
+    },
+    "n_structural_hparams_searched": {
+      "rbf_svm": 2,
+      "random_forest": 2,
+      "knn_bagging": 1,
+      "mlp": 2,
+      "xgboost": 4,
+      "ocsvm_classical": 1,
+      "lstm_seq": 0,
+      "qsvm_crosslayer": 0,
+      "qsvm_zz": 0,
+      "qsvm_none": 0,
+      "qsvm_sparse": 0
+    },
+    "fairness_verdict_one_line": "On the enumerated-search axis the classical baselines were tuned at least as hard as the quantum models (81 vs 21 fits for RBF-SVM, 181 vs 21 for XGBoost, 21 vs 21 for the random forest, 21 vs 21 for the MLP) and searched 1-4 structural hyperparameters against the quantum models' zero; the quantum models' only extra budget is 200 Adam steps over 64 feature-map parameters, which is itself smaller than the MLP's gradient-trained weight budget; and the one classical model that beats the QSVM on a SMALLER budget (the one-class SVM, 4 fits, in the low-label regime) makes the no-advantage finding stronger, not weaker.",
+    "low_label_ocsvm_vs_qsvm_pr_auc": {
+      "n_train_50": {
+        "ocsvm_classical": 0.685,
+        "qsvm_crosslayer": 0.514
+      },
+      "n_train_100": {
+        "ocsvm_classical": 0.679,
+        "qsvm_crosslayer": 0.545
+      },
+      "n_train_200": {
+        "ocsvm_classical": 0.7,
+        "qsvm_crosslayer": 0.521
+      },
+      "source": "results/lowlabel_dev/lowlabel_results.csv (mean over repeats)"
+    },
+    "measured_tuning_wall_s": {
+      "rbf_svm": 2.57,
+      "random_forest": 2.97,
+      "knn_bagging": 0.19,
+      "mlp": 7.99,
+      "xgboost": 3.04,
+      "ocsvm_classical": 0.2,
+      "qsvm_crosslayer": 44.1,
+      "qsvm_zz": 1.89,
+      "qsvm_none": 20.34,
+      "qsvm_sparse": 52.73
+    },
+    "measured_tuning_core_s_serial": {
+      "rbf_svm": 5.33,
+      "random_forest": 12.96,
+      "knn_bagging": 0.73,
+      "mlp": 25.4,
+      "xgboost": 15.64,
+      "ocsvm_classical": 0.19,
+      "qsvm_crosslayer": 41.75,
+      "qsvm_zz": 1.84,
+      "qsvm_none": 17.49,
+      "qsvm_sparse": 47.4
+    },
+    "mlp_weights_by_hidden_config": {
+      "(64, 32)": 2689,
+      "(128, 64)": 9473
+    },
+    "n_base_learners_total": {
+      "rbf_svm": 81,
+      "random_forest": 7500,
+      "knn_bagging": 160,
+      "mlp": 21,
+      "xgboost": 54200,
+      "ocsvm_classical": 4,
+      "qsvm_crosslayer": 21,
+      "qsvm_zz": 21,
+      "qsvm_none": 21,
+      "qsvm_sparse": 21
+    },
+    "n_learned_params": {
+      "rbf_svm": "629",
+      "random_forest": "179170",
+      "knn_bagging": "IRRECOVERABLE",
+      "mlp": "2689",
+      "xgboost": "4586",
+      "ocsvm_classical": "28",
+      "qsvm_crosslayer": "957",
+      "qsvm_zz": "2860",
+      "qsvm_none": "864",
+      "qsvm_sparse": "949"
+    },
+    "qsvm_crosslayer_time_breakdown_s": {
+      "t_kta_wall_s": 42.81,
+      "t_kta_cpu_s": 45.73,
+      "t_gram_wall_s": 0.49,
+      "t_gram_cpu_s": 0.55,
+      "t_cgrid_wall_s": 0.81,
+      "t_cgrid_cpu_s": 0.81
+    }
+  },
+  "measured_detail": {
+    "rbf_svm": {
+      "wall_s": 2.57,
+      "cpu_s": 19.0,
+      "core_s": 5.33,
+      "best_params": {
+        "svc__C": "100.0",
+        "svc__gamma": "0.1"
+      },
+      "best_cv_score_ap": 0.9257545847138833,
+      "n_learned_params": "629",
+      "n_learned_params_basis": "dual coefficients (= n support vectors)",
+      "n_base_learners_total": 81,
+      "n_base_learners_per_fit_min": 1,
+      "n_base_learners_per_fit_max": 1
+    },
+    "random_forest": {
+      "wall_s": 2.97,
+      "cpu_s": 22.96,
+      "core_s": 12.96,
+      "best_params": {
+        "max_depth": "20",
+        "n_estimators": "500"
+      },
+      "best_cv_score_ap": 0.9541087383717036,
+      "n_learned_params": "179170",
+      "n_learned_params_basis": "total decision-tree nodes over 500 trees",
+      "n_base_learners_total": 7500,
+      "n_base_learners_per_fit_min": 200,
+      "n_base_learners_per_fit_max": 500
+    },
+    "knn_bagging": {
+      "wall_s": 0.19,
+      "cpu_s": 1.17,
+      "core_s": 0.73,
+      "best_params": {
+        "bag__estimator__n_neighbors": "15"
+      },
+      "best_cv_score_ap": 0.892679283696447,
+      "n_learned_params": "IRRECOVERABLE",
+      "n_learned_params_basis": "non-parametric: kNN stores training points, it has no fitted parameter vector",
+      "n_base_learners_total": 160,
+      "n_base_learners_per_fit_min": 10,
+      "n_base_learners_per_fit_max": 10
+    },
+    "mlp": {
+      "wall_s": 7.99,
+      "cpu_s": 42.85,
+      "core_s": 25.4,
+      "best_params": {
+        "mlp__alpha": "0.0001",
+        "mlp__hidden_layer_sizes": "(64, 32)"
+      },
+      "best_cv_score_ap": 0.9371601016624066,
+      "n_learned_params": "2689",
+      "n_learned_params_basis": "weights+biases of hidden layers (64, 32)",
+      "n_base_learners_total": 21,
+      "n_base_learners_per_fit_min": 1,
+      "n_base_learners_per_fit_max": 1,
+      "measured_n_iter_best_refit": 400,
+      "mlp_weights_by_hidden_config": {
+        "(64, 32)": 2689,
+        "(128, 64)": 9473
+      }
+    },
+    "xgboost": {
+      "wall_s": 3.04,
+      "cpu_s": 24.48,
+      "core_s": 15.64,
+      "best_params": {
+        "learning_rate": "0.1",
+        "max_depth": "4",
+        "n_estimators": "200",
+        "scale_pos_weight": "1.0"
+      },
+      "best_cv_score_ap": 0.9557341316443904,
+      "n_learned_params": "4586",
+      "n_learned_params_basis": "total booster tree nodes",
+      "n_base_learners_total": 54200,
+      "n_base_learners_per_fit_min": 200,
+      "n_base_learners_per_fit_max": 400
+    },
+    "ocsvm_classical": {
+      "wall_s": 0.2,
+      "cpu_s": 0.2,
+      "core_s": 0.19,
+      "best_params": {
+        "nu": "0.01"
+      },
+      "best_val_roc_auc": 0.8209271397131905,
+      "n_learned_params": "28",
+      "n_learned_params_basis": "dual coefficients (= n support vectors)",
+      "n_base_learners_total": 4,
+      "n_base_learners_per_fit_min": 1,
+      "n_base_learners_per_fit_max": 1
+    },
+    "qsvm_crosslayer": {
+      "wall_s": 44.1,
+      "cpu_s": 47.09,
+      "core_s": 41.75,
+      "t_kta_wall_s": 42.81,
+      "t_kta_cpu_s": 45.73,
+      "t_gram_wall_s": 0.49,
+      "t_gram_cpu_s": 0.55,
+      "t_cgrid_wall_s": 0.81,
+      "t_cgrid_cpu_s": 0.81,
+      "best_params": {
+        "C": "1.0"
+      },
+      "best_cv_score_ap": 0.8803664860523028,
+      "best_kta_alignment": 0.5607962012290955,
+      "n_learned_params": "957",
+      "n_learned_params_basis": "SVM dual coefficients (support vectors) + KTA-trained map parameters",
+      "n_base_learners_total": 21,
+      "n_base_learners_per_fit_min": 1,
+      "n_base_learners_per_fit_max": 1
+    },
+    "qsvm_zz": {
+      "wall_s": 1.89,
+      "cpu_s": 1.97,
+      "core_s": 1.84,
+      "t_kta_wall_s": 0.0,
+      "t_kta_cpu_s": 0.0,
+      "t_gram_wall_s": 0.77,
+      "t_gram_cpu_s": 0.84,
+      "t_cgrid_wall_s": 1.12,
+      "t_cgrid_cpu_s": 1.12,
+      "best_params": {
+        "C": "0.1"
+      },
+      "best_cv_score_ap": 0.6104595327846226,
+      "best_kta_alignment": NaN,
+      "n_learned_params": "2860",
+      "n_learned_params_basis": "SVM dual coefficients (support vectors) + KTA-trained map parameters",
+      "n_base_learners_total": 21,
+      "n_base_learners_per_fit_min": 1,
+      "n_base_learners_per_fit_max": 1
+    },
+    "qsvm_none": {
+      "wall_s": 20.34,
+      "cpu_s": 21.8,
+      "core_s": 17.49,
+      "t_kta_wall_s": 19.4,
+      "t_kta_cpu_s": 20.82,
+      "t_gram_wall_s": 0.21,
+      "t_gram_cpu_s": 0.24,
+      "t_cgrid_wall_s": 0.73,
+      "t_cgrid_cpu_s": 0.74,
+      "best_params": {
+        "C": "10.0"
+      },
+      "best_cv_score_ap": 0.8841748957481901,
+      "best_kta_alignment": 0.4538959264755249,
+      "n_learned_params": "864",
+      "n_learned_params_basis": "SVM dual coefficients (support vectors) + KTA-trained map parameters",
+      "n_base_learners_total": 21,
+      "n_base_learners_per_fit_min": 1,
+      "n_base_learners_per_fit_max": 1
+    },
+    "qsvm_sparse": {
+      "wall_s": 52.73,
+      "cpu_s": 54.35,
+      "core_s": 47.4,
+      "t_kta_wall_s": 51.34,
+      "t_kta_cpu_s": 52.9,
+      "t_gram_wall_s": 0.55,
+      "t_gram_cpu_s": 0.61,
+      "t_cgrid_wall_s": 0.83,
+      "t_cgrid_cpu_s": 0.84,
+      "best_params": {
+        "C": "1.0"
+      },
+      "best_cv_score_ap": 0.8697862894656208,
+      "best_kta_alignment": 0.569453239440918,
+      "n_learned_params": "949",
+      "n_learned_params_basis": "SVM dual coefficients (support vectors) + KTA-trained map parameters",
+      "n_base_learners_total": 21,
+      "n_base_learners_per_fit_min": 1,
+      "n_base_learners_per_fit_max": 1
+    }
+  }
+}

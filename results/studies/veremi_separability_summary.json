@@ -1,0 +1,1486 @@
+{
+  "generated": "2026-08-07T14:00:28",
+  "runtime_s": 354.3,
+  "item": "veremi_separability_veremi_third_dataset_separability",
+  "PROTOCOL_DIFFERENCE_DISCLOSURE": {
+    "READ_FIRST": "THREE DISCLOSED DIFFERENCES between the VeReMi arm and the two datasets already in the published analysis. None is hidden; each is quantified below and each has an explicit sensitivity check. (1) Y PROTOCOL: VeReMi realised detectability is scored per attack family from jointly-trained detectors, matching the NextGen convention, NOT dev_grid's leave-one-attack-out convention. (2) CAP DRAW: veremi_separability's regenerated 4,000-window draw is NOT bit-identical to the published June-2026 draw (filesystem-order dependence in the loader); this affects only the SECONDARY held-out-attack Y, never the PRIMARY Y or the divergence. (3) SMALLEST ATTAINABLE p: with n=5 attack families the exact one-sided permutation p cannot go below 1/120 = 0.00833, a hard floor on how much evidence the VeReMi block can contribute.",
+    "difference_1_Y_protocol": {
+      "dev_grid": "leave-one-attack-out (crossattack) refit per attack family",
+      "nextgen": "jointly-trained detectors scored per attack family (eval set = all test benign + that attack's positives)",
+      "veremi_PRIMARY": "SAME AS NEXTGEN, recomputed from the PUBLISHED results/veremi/predictions.parquet -- no retraining and no new modelling choice was made for this item",
+      "is_this_asymmetry_new_with_veremi": "NO. The published two-dataset analysis ALREADY mixes the two conventions (dev_grid leave-one-attack-out vs NextGen per-attack scoring). VeReMi is aligned to the NextGen arm, so veremi_separability adds a third block under an existing convention rather than introducing a new one.",
+      "why_it_cannot_bias_the_combined_test": "the divergence D is computed WITHOUT any detector, so the Y protocol cannot leak into D; inference is rank-based WITHIN each dataset and combined only at the p-value level, so no cross-protocol scale comparison is ever made; and no test-set quantity enters any selection step",
+      "sensitivity_check": "the VeReMi arm was ALSO recomputed under a full leave-one-attack-out refit (protocol='heldout' rows of veremi_Y.csv), mirroring dev_grid; per-dataset rho under both protocols is given below and the three-dataset blocked combination under the held-out protocol is in correlations.protocol_sensitivity_heldout_veremi_Y",
+      "veremi_rho_under_BOTH_protocols": {
+        "energy/rbf_svm": {
+          "PRIMARY_pubsplit": {
+            "rho": 0.9746794344808964,
+            "exact_one_sided_perm_p": 0.016666666666666666
+          },
+          "SECONDARY_heldout": {
+            "rho": 0.9999999999999998,
+            "exact_one_sided_perm_p": 0.008333333333333333
+          }
+        },
+        "energy/qsvm_crosslayer": {
+          "PRIMARY_pubsplit": {
+            "rho": 0.9999999999999998,
+            "exact_one_sided_perm_p": 0.008333333333333333
+          },
+          "SECONDARY_heldout": {
+            "rho": 0.7999999999999998,
+            "exact_one_sided_perm_p": 0.06666666666666667
+          }
+        },
+        "energy/best_over_models": {
+          "PRIMARY_pubsplit": {
+            "rho": 0.872081599272381,
+            "exact_one_sided_perm_p": 0.05
+          },
+          "SECONDARY_heldout": {
+            "rho": 0.872081599272381,
+            "exact_one_sided_perm_p": 0.05
+          }
+        },
+        "mmd_u/rbf_svm": {
+          "PRIMARY_pubsplit": {
+            "rho": 0.9746794344808964,
+            "exact_one_sided_perm_p": 0.016666666666666666
+          },
+          "SECONDARY_heldout": {
+            "rho": 0.9999999999999998,
+            "exact_one_sided_perm_p": 0.008333333333333333
+          }
+        },
+        "mmd_u/qsvm_crosslayer": {
+          "PRIMARY_pubsplit": {
+            "rho": 0.9999999999999998,
+            "exact_one_sided_perm_p": 0.008333333333333333
+          },
+          "SECONDARY_heldout": {
+            "rho": 0.7999999999999998,
+            "exact_one_sided_perm_p": 0.06666666666666667
+          }
+        },
+        "mmd_u/best_over_models": {
+          "PRIMARY_pubsplit": {
+            "rho": 0.872081599272381,
+            "exact_one_sided_perm_p": 0.05
+          },
+          "SECONDARY_heldout": {
+            "rho": 0.872081599272381,
+            "exact_one_sided_perm_p": 0.05
+          }
+        }
+      }
+    },
+    "difference_2_cap_draw_not_bit_identical": {
+      "published_test_windows": 1182,
+      "recurring_in_cap_draw": 32,
+      "VERDICT": "NOT bit-identical",
+      "reason": "qkv2x.data.veremi.load_veremi enumerates the per-receiver JSON files with Path.iterdir(), whose order is filesystem-dependent, so the integer index -> window mapping of the assembled table is not stable across machines/runs. veremi_exp.run's cap draw rng.choice(580408, 4000) therefore selects a DIFFERENT 4,000 windows than the published June-2026 run, even though the window POPULATION (580,408) and the benign-calibrated propagation fit reproduce exactly. veremi_separability restores determinism by canonically sorting the window table by (group, t_end, attack_name) before the draw.",
+      "consequence": "the DIVERGENCE is a population quantity and is unaffected (it is re-estimated from the window pool); the PRIMARY Y is taken from the PUBLISHED predictions.parquet and is therefore also unaffected; only the SECONDARY held-out-attack Y protocol, which must refit, runs on the regenerated draw -- which is why it is reported as a disclosed sensitivity analysis, not as the primary Y"
+    },
+    "difference_3_permutation_p_floor": {
+      "veremi_n_attack_families": 5,
+      "n_permutations": 120,
+      "smallest_attainable_one_sided_p": 0.008333333333333333,
+      "consequence": "even a PERFECT rho=1 ordering on VeReMi can contribute at most p=0.00833 to the blocked combination; the VeReMi block is therefore evidence-limited by design, and this caps how much the three-study p can improve"
+    },
+    "what_reproduces_EXACTLY": {
+      "window_population": {
+        "veremi_separability": 580408,
+        "published_summary_json": 580408,
+        "match": true
+      },
+      "benign_calibrated_propagation_max_abs_diff": 0.0,
+      "whole_test_AUC_reproduction_max_abs_diff": 1.1102230246251565e-16,
+      "two_dataset_blocked_p_reproduced": true
+    },
+    "network_register_note": "qkv2x.data.veremi parses the Veins-logged RSSI field of type-3 receptions into rssi_dbm; veremi_exp.estimate_propagation fits RSSI = (Ptx-PL0) - 10*eta*log10(d) on BENIGN receptions only (eta=1.4762, intercept=-47.4300, n=5566599), so the network register is re-anchored EXACTLY as the published VeReMi run. The mobility-only, RSSI-free VeReMi EXTENSION / F2MD processed CSV is a different artifact and is not used here.",
+    "no_test_set_quantity_enters_any_selection_step": true,
+    "honesty": "no quantum-advantage claim is made or implied. The strengthen/weaken verdict is read off the data whichever way it falls; a weak or negative VeReMi block would have been reported as such."
+  },
+  "protocol": {
+    "item": "veremi_separability -- VeReMi as a third dataset in the separability analysis",
+    "datasets": {
+      "dev_grid": "n=9 attack families; D and Y READ from divergence.csv / correlations_attack_table.csv (unmodified)",
+      "nextgen": "n=6; same source",
+      "veremi": "n=5; D computed here with the imported divergence protocol, Y from the published predictions.parquet"
+    },
+    "veremi_assembly": {
+      "load_path": "qkv2x.data.veremi.load_veremi(data/veremi) -> veremi_exp.estimate_propagation(benign receptions) -> qkv2x.features.dataset.build_dataset with configs/features_veremi.yaml (receiver_set: all -- VeReMi is V2V, no RSUs) and configs/experiments/veremi.yaml (nominal_rate_hz=1.0, estimate_propagation=true); this is byte-for-byte the path veremi_exp.run and b2_gcq_generalization._load_veremi use",
+      "no_cached_artifact_existed": "results/veremi/ ships predictions.parquet + summary.json but NO checkpoints/*.npz, so the window matrix had to be re-assembled; veremi_separability caches it to veremi_windows.npz",
+      "canonical_sort": "windows sorted by (group, t_end, attack_name) via np.lexsort BEFORE any draw -- veremi_separability's addition, needed because load_veremi enumerates receiver files with Path.iterdir() (filesystem order); the sort changes no window, only their order, and makes every draw reproducible",
+      "capped_pool_rule": "rng = np.random.default_rng(features_veremi.yaml splits.seed = 7); sel = rng.choice(N_total, 4000, replace=False) -- the IDENTICAL cap rule veremi_exp.run applies (max_windows: 4000), taken on the canonically sorted table",
+      "network_register": "qkv2x.data.veremi parses the Veins-logged RSSI field of type-3 receptions into rssi_dbm; veremi_exp.estimate_propagation fits RSSI = (Ptx-PL0) - 10*eta*log10(d) on BENIGN receptions only (eta=1.4762, intercept=-47.4300, n=5566599), so the network register is re-anchored EXACTLY as the published VeReMi run. The mobility-only, RSSI-free VeReMi EXTENSION / F2MD processed CSV is a different artifact and is not used here."
+    },
+    "divergence": {
+      "source": "IMPORTED from scripts/studies/divergence.py (module objects reused: eval_crossfit, _group_rows, _xfit_standardizer, _energy_v, _mmd2_u, _median_bandwidth, _draw)",
+      "estimators": "energy distance (V-statistic) and UNBIASED U-statistic RBF-MMD^2, reported SEPARATELY, never combined",
+      "cross_fitting": "transmitter-grouped 2-fold; scaler + median-heuristic bandwidth fit on benign fold A only; scored on fold-B benign + attack; roles swapped; mean over fold-orders",
+      "n_per_class": 300,
+      "n_fit": 1000,
+      "n_bw": 512,
+      "n_seeds": 3,
+      "b_boot": 200,
+      "n_folds": 2,
+      "subsampling": "whole transmitter groups accumulated until the target is reached (divergence's _draw)",
+      "ci_method": "grouped percentile bootstrap, B=200, [0.025,0.975] percentiles of the replicate RAW statistic",
+      "seed_sequence": "divergence's convention extended: point [20260807, ds_idx, atk_idx, s], boot [913, ds_idx, atk_idx, b] with ds_idx 0=dev_grid, 1=nextgen (divergence) and, added by veremi_separability, 2=veremi capped4000, 3=veremi capped4000_s17, 4=veremi capped12000; attacks indexed by their alphabetical order, as in divergence",
+      "cap_draw_seeds": {
+        "capped4000": 7,
+        "capped4000_s17": 17,
+        "capped12000": 7
+      },
+      "pools": {
+        "capped4000": "PRIMARY -- max_windows=4000, cap seed 7: the artifact the published VeReMi run used. This mirrors divergence's NextGen point, which is likewise computed on the CAPPED 5,999-window assembled.npz that the published NextGen run used (its full population is 603,083 messages).",
+        "capped4000_s17": "SENSITIVITY (draw) -- identical rule, cap seed 17: shows the attack ordering does not depend on which 4,000 windows the cap happens to select.",
+        "capped12000": "SENSITIVITY (scale) -- max_windows=12000, cap seed 7: 3x more windows per attack family.",
+        "why_not_the_full_580408_window_population": "REPORTED AND REJECTED, not overlooked. divergence draws WHOLE transmitter groups until it reaches N_PER_CLASS=300. In the uncapped VeReMi population each transmitter carries ~1,200 windows, so a single group already overshoots the target and the estimator would compare ONE attacker against ONE benign transmitter -- a different estimand with no between-transmitter variation, and a standardiser fit on one vehicle. Uniform capping thins every group proportionally (~8 windows/group at cap 4,000, ~25 at cap 12,000), which is what keeps the grouped cross-fit well posed. The full population census is still reported under feasibility.census.fullpool_reference."
+      },
+      "phys_scope": "controllability == 'phys' rows of results/frontier/feature_controllability.csv for network_mode='rssi'; VeReMi's 19 features are an EXACT name match to that register, so the dev_grid phys/ctrl split applies unchanged"
+    },
+    "Y_protocols": {
+      "dev_grid": "held-out attack (leave-one-attack-out) -- published results/crossattack_dev, read via correlations_attack_table.csv",
+      "nextgen": "jointly-trained models scored per attack family (eval set = all test benign + that attack's positives) -- published results/veremi_nextgen, read via correlations_attack_table.csv",
+      "veremi_PRIMARY_pubsplit": "IDENTICAL to the NextGen convention, recomputed from the PUBLISHED results/veremi/predictions.parquet; no retraining",
+      "veremi_SECONDARY_heldout": "leave-one-attack-out replication computed here, mirroring dev_grid's crossattack; runs on the REGENERATED 4,000-window draw",
+      "PROMINENT_PROTOCOL_DIFFERENCE": "the three datasets do NOT share one Y protocol: dev_grid is leave-one-attack-out, NextGen and VeReMi score jointly-trained models per attack family. This asymmetry ALREADY exists in the published two-dataset analysis (dev_grid vs NextGen); VeReMi is aligned to the NextGen arm. Because the divergence is computed WITHOUT any detector, the protocol affects only Y, and the analysis is rank-based WITHIN each dataset, so no cross-protocol scale comparison is made. The held-out-attack VeReMi replication is reported as a disclosed sensitivity check on exactly this point.",
+      "n_pos_caveat": "VeReMi per-attack positive counts in the published test split are small (24-55 windows), so the per-attack Y CIs are wide; this is reported per attack in veremi_Y.csv"
+    },
+    "inference": {
+      "spearman": "tie-aware (Pearson of average ranks), correlations._rho / scipy-verified",
+      "kendall": "tau-b (tie-corrected), correlations._tau_b",
+      "permutation_test": "EXACT full enumeration of all n! pairings via correlations.exact_perm_test: 9! = 362,880 (dev_grid), 6! = 720 (nextgen), 5! = 120 (veremi); one-sided in the pre-specified POSITIVE direction. NOTE: with n=5 the SMALLEST attainable one-sided p is 1/120 = 0.00833, a hard floor on VeReMi's evidence",
+      "bootstrap_ci": "correlations.boot_ci -- attack-level pairs bootstrap, B=3000, percentile [0.025,0.975]; rng default_rng([20260807, ds_idx, met_idx, ydef_idx, target_idx])",
+      "blocked_combination": "per-dataset EXACT one-sided permutation p combined by Stouffer sqrt(n)-weighted Z AND Fisher chi^2 (meta_stats._stouffer / ._fisher) over THREE p-values; combined ONLY when all per-dataset directions are positive (consistency rule)",
+      "descriptive_pooling": "within-dataset mid-quantile ranks (rank-0.5)/n pooled over 9+6+5 = 20 points; DESCRIPTIVE ONLY, no p-value",
+      "reference_model": "rbf_svm (pre-specified, present in all three datasets)",
+      "envelope_policy": "best-over-models kept but labelled 'exploratory_upper_envelope'",
+      "models_common_to_all_three": [
+        "best_over_models",
+        "mlp",
+        "qsvm_crosslayer",
+        "qsvm_zz",
+        "random_forest",
+        "rbf_svm"
+      ]
+    },
+    "determinism": {
+      "canonical_sort": "np.lexsort((attack_name, round(t_end,9), group))",
+      "all_seeds": {
+        "divergence_point": 20260807,
+        "divergence_boot": 913,
+        "correlation_boot": 20260807,
+        "Y_ci_seed": 7,
+        "cap_draw_seed": 7,
+        "permutation": "deterministic (exhaustive, no RNG)"
+      }
+    },
+    "honesty": "no quantum-advantage claim is made or implied anywhere in this analysis; the divergence is detector-free and the strengthen/weaken verdict is reported from the data whichever way it falls",
+    "interpreter": "python",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3"
+  },
+  "feasibility": {
+    "FEASIBLE": true,
+    "attack_families_used": [
+      "const_offset",
+      "const_pos",
+      "eventual_stop",
+      "random_offset",
+      "random_pos"
+    ],
+    "census": {
+      "fullpool_reference": {
+        "n_windows": 580408,
+        "n_benign": 476948,
+        "n_benign_groups": 504,
+        "n_transmitter_groups": 504,
+        "families": {
+          "const_offset": {
+            "windows": 13111,
+            "transmitter_groups": 162,
+            "passes_min30": true
+          },
+          "const_pos": {
+            "windows": 25374,
+            "transmitter_groups": 267,
+            "passes_min30": true
+          },
+          "eventual_stop": {
+            "windows": 27918,
+            "transmitter_groups": 274,
+            "passes_min30": true
+          },
+          "random_offset": {
+            "windows": 13896,
+            "transmitter_groups": 161,
+            "passes_min30": true
+          },
+          "random_pos": {
+            "windows": 23161,
+            "transmitter_groups": 253,
+            "passes_min30": true
+          }
+        },
+        "n_families_passing_min30": 5
+      },
+      "capped4000": {
+        "n_windows": 4000,
+        "n_benign": 3278,
+        "n_benign_groups": 466,
+        "n_transmitter_groups": 473,
+        "families": {
+          "const_offset": {
+            "windows": 89,
+            "transmitter_groups": 59,
+            "passes_min30": true
+          },
+          "const_pos": {
+            "windows": 176,
+            "transmitter_groups": 102,
+            "passes_min30": true
+          },
+          "eventual_stop": {
+            "windows": 220,
+            "transmitter_groups": 121,
+            "passes_min30": true
+          },
+          "random_offset": {
+            "windows": 98,
+            "transmitter_groups": 60,
+            "passes_min30": true
+          },
+          "random_pos": {
+            "windows": 139,
+            "transmitter_groups": 88,
+            "passes_min30": true
+          }
+        },
+        "n_families_passing_min30": 5
+      },
+      "capped4000_s17": {
+        "n_windows": 4000,
+        "n_benign": 3230,
+        "n_benign_groups": 473,
+        "n_transmitter_groups": 481,
+        "families": {
+          "const_offset": {
+            "windows": 91,
+            "transmitter_groups": 64,
+            "passes_min30": true
+          },
+          "const_pos": {
+            "windows": 170,
+            "transmitter_groups": 117,
+            "passes_min30": true
+          },
+          "eventual_stop": {
+            "windows": 218,
+            "transmitter_groups": 121,
+            "passes_min30": true
+          },
+          "random_offset": {
+            "windows": 98,
+            "transmitter_groups": 55,
+            "passes_min30": true
+          },
+          "random_pos": {
+            "windows": 193,
+            "transmitter_groups": 113,
+            "passes_min30": true
+          }
+        },
+        "n_families_passing_min30": 5
+      },
+      "capped12000": {
+        "n_windows": 12000,
+        "n_benign": 9911,
+        "n_benign_groups": 492,
+        "n_transmitter_groups": 493,
+        "families": {
+          "const_offset": {
+            "windows": 262,
+            "transmitter_groups": 100,
+            "passes_min30": true
+          },
+          "const_pos": {
+            "windows": 522,
+            "transmitter_groups": 181,
+            "passes_min30": true
+          },
+          "eventual_stop": {
+            "windows": 569,
+            "transmitter_groups": 179,
+            "passes_min30": true
+          },
+          "random_offset": {
+            "windows": 281,
+            "transmitter_groups": 109,
+            "passes_min30": true
+          },
+          "random_pos": {
+            "windows": 455,
+            "transmitter_groups": 164,
+            "passes_min30": true
+          }
+        },
+        "n_families_passing_min30": 5
+      }
+    },
+    "min_windows_rule": 30,
+    "feature_register_check": {
+      "assumed_network_mode": "rssi",
+      "n_features": 19,
+      "features": [
+        "e_kin_mean",
+        "e_kin_max",
+        "e_kin_std",
+        "speed_consistency_mean",
+        "speed_consistency_max",
+        "heading_consistency_mean",
+        "accel_abs_mean",
+        "e_xl_mean",
+        "e_xl_max",
+        "e_xl_std",
+        "rate_ratio",
+        "interarrival_std",
+        "pdr_proxy",
+        "sybil_neighbors_mean",
+        "sybil_neighbors_max",
+        "sybil_rssi_absdiff_min",
+        "sybil_rssi_corr_max",
+        "rssi_std",
+        "aoi_mean"
+      ],
+      "controllability_table_rows": 19,
+      "exact_name_match": true,
+      "features_not_in_table": [],
+      "table_features_not_in_data": [],
+      "n_phys": 15,
+      "rssi_evidence": "qkv2x.data.veremi parses the Veins-logged RSSI field of type-3 receptions into rssi_dbm; veremi_exp.estimate_propagation fits RSSI = (Ptx-PL0) - 10*eta*log10(d) on BENIGN receptions only (eta=1.4762, intercept=-47.4300, n=5566599), so the network register is re-anchored EXACTLY as the published VeReMi run. The mobility-only, RSSI-free VeReMi EXTENSION / F2MD processed CSV is a different artifact and is not used here."
+    },
+    "published_artifact_reproduction": {
+      "window_population_size": {
+        "veremi_separability": 580408,
+        "published_summary_json": 580408,
+        "match": true
+      },
+      "benign_calibrated_propagation_max_abs_diff": 0.0,
+      "propagation_match": true,
+      "cap_draw_window_identity": {
+        "published_test_windows": 1182,
+        "recurring_in_cap_draw": 32,
+        "VERDICT": "NOT bit-identical",
+        "reason": "qkv2x.data.veremi.load_veremi enumerates the per-receiver JSON files with Path.iterdir(), whose order is filesystem-dependent, so the integer index -> window mapping of the assembled table is not stable across machines/runs. veremi_exp.run's cap draw rng.choice(580408, 4000) therefore selects a DIFFERENT 4,000 windows than the published June-2026 run, even though the window POPULATION (580,408) and the benign-calibrated propagation fit reproduce exactly. veremi_separability restores determinism by canonically sorting the window table by (group, t_end, attack_name) before the draw.",
+        "consequence": "the DIVERGENCE is a population quantity and is unaffected (it is re-estimated from the window pool); the PRIMARY Y is taken from the PUBLISHED predictions.parquet and is therefore also unaffected; only the SECONDARY held-out-attack Y protocol, which must refit, runs on the regenerated draw -- which is why it is reported as a disclosed sensitivity analysis, not as the primary Y"
+      }
+    },
+    "veremi_Y_checks": {
+      "veremi_whole_test_reproduction_max_abs_diff": 1.1102230246251565e-16,
+      "veremi_reproduction_note": "whole-test roc/pr recomputed from results/veremi/predictions.parquet vs the published veremi_binary_results.csv",
+      "n_models": 7,
+      "models": [
+        "knn_bagging",
+        "mlp",
+        "qsvm_crosslayer",
+        "qsvm_zz",
+        "random_forest",
+        "rbf_svm",
+        "rules"
+      ],
+      "attacks": [
+        "const_offset",
+        "const_pos",
+        "eventual_stop",
+        "random_offset",
+        "random_pos"
+      ]
+    },
+    "heldout_protocol": {
+      "n_train_pool": 2212,
+      "n_val_pool": 583,
+      "n_test_pool": 1205,
+      "models": [
+        "qsvm_crosslayer",
+        "qsvm_zz",
+        "rbf_svm",
+        "random_forest",
+        "knn_bagging",
+        "mlp",
+        "rules"
+      ],
+      "skipped": [],
+      "quantum_max_train": 3000,
+      "note": "mirrors qkv2x.experiments.crossattack.run: same group_split (test_frac 0.30, val_frac 0.15, seed 7), same per-block-PCA reducer fit on train only, same matched_train_idx cap, same run_model; classical@full rows are NOT added because the VeReMi training split is already below the quantum max_train cap, so matched-N == full-N here",
+      "run": true
+    }
+  },
+  "divergence_agreement": {
+    "pool_agreement": {
+      "energy/full/capped4000_vs_capped4000_s17": {
+        "spearman_rho": 0.9999999999999999,
+        "n": 5
+      },
+      "energy/full/capped4000_vs_capped12000": {
+        "spearman_rho": 0.9999999999999999,
+        "n": 5
+      },
+      "energy/phys/capped4000_vs_capped4000_s17": {
+        "spearman_rho": 0.9999999999999999,
+        "n": 5
+      },
+      "energy/phys/capped4000_vs_capped12000": {
+        "spearman_rho": 0.9999999999999999,
+        "n": 5
+      },
+      "mmd_u/full/capped4000_vs_capped4000_s17": {
+        "spearman_rho": 0.9999999999999999,
+        "n": 5
+      },
+      "mmd_u/full/capped4000_vs_capped12000": {
+        "spearman_rho": 0.9999999999999999,
+        "n": 5
+      },
+      "mmd_u/phys/capped4000_vs_capped4000_s17": {
+        "spearman_rho": 0.9999999999999999,
+        "n": 5
+      },
+      "mmd_u/phys/capped4000_vs_capped12000": {
+        "spearman_rho": 0.9999999999999999,
+        "n": 5
+      }
+    },
+    "energy_vs_mmdu_rank_agreement": {
+      "capped4000": 0.9999999999999999,
+      "capped4000_s17": 0.9999999999999999,
+      "capped12000": 0.9999999999999999
+    }
+  },
+  "headline": {
+    "energy/rbf_svm/Y_roc": {
+      "per_dataset": {
+        "dev_grid": {
+          "n": 9,
+          "rho": 0.49999999999999994,
+          "tau": 0.3333333333333333,
+          "exact_one_sided_perm_p": 0.08883101851851852,
+          "rho_ci": [
+            -0.36872380065207255,
+            0.944954128440367
+          ]
+        },
+        "nextgen": {
+          "n": 6,
+          "rho": 0.8857142857142857,
+          "tau": 0.7333333333333333,
+          "exact_one_sided_perm_p": 0.016666666666666666,
+          "rho_ci": [
+            0.2,
+            1.0
+          ]
+        },
+        "veremi": {
+          "n": 5,
+          "rho": 0.9746794344808964,
+          "tau": 0.9486832980505138,
+          "exact_one_sided_perm_p": 0.016666666666666666,
+          "rho_ci": [
+            0.7453559924999299,
+            1.0
+          ]
+        }
+      },
+      "stouffer_p_3ds": 0.0008626179004316374,
+      "stouffer_Z_3ds": 3.1338592634730773,
+      "fisher_p_3ds": 0.0016752707370841977,
+      "stouffer_p_2ds_reference": 0.008423234777267497,
+      "fisher_p_2ds_reference": 0.011126623895541896,
+      "descriptive_pooled_rho_3ds": 0.7245013685879705,
+      "descriptive_pooled_n_3ds": 20,
+      "descriptive_pooled_rho_2ds": 0.6285714285714286,
+      "supported_phrase": "moderately associated",
+      "verdict": "STRENGTHENS: VeReMi's per-dataset ordering is at least as strong as the weakest existing dataset and the blocked combined p improves",
+      "mechanical_caveat": "A drop in the Stouffer/Fisher p is PARTLY MECHANICAL: combining an extra study whose direction agrees can only lower the combined p, so the p-drop on its own is not evidence. The substantive content is that VeReMi REPLICATES independently -- its own per-dataset exact one-sided permutation p is 0.0167 (significant at alpha=0.05 on its own n=5) and its rho (+0.975) is not the weakest of the three -- so the third dataset raises, rather than dilutes, the pooled association. The descriptive pooled rho, which has no such mechanical direction, moves +0.629 -> +0.725.",
+      "small_n_caveats": "n=5 attack families is the smallest of the three blocks: the exact one-sided permutation p cannot go below 1/5! = 0.00833 no matter how perfect the ordering, and two of the five VeReMi families sit at the ROC ceiling (1.000), so their relative order is fixed by ties rather than by resolved detectability. Both limits push the VeReMi block toward, not away from, conservatism."
+    },
+    "mmd_u/rbf_svm/Y_roc": {
+      "per_dataset": {
+        "dev_grid": {
+          "n": 9,
+          "rho": 0.49999999999999994,
+          "tau": 0.3333333333333333,
+          "exact_one_sided_perm_p": 0.08883101851851852,
+          "rho_ci": [
+            -0.3805309734513274,
+            0.9449666388657215
+          ]
+        },
+        "nextgen": {
+          "n": 6,
+          "rho": 0.8285714285714286,
+          "tau": 0.7333333333333333,
+          "exact_one_sided_perm_p": 0.029166666666666667,
+          "rho_ci": [
+            0.0,
+            1.0
+          ]
+        },
+        "veremi": {
+          "n": 5,
+          "rho": 0.9746794344808964,
+          "tau": 0.9486832980505138,
+          "exact_one_sided_perm_p": 0.016666666666666666,
+          "rho_ci": [
+            0.7453559924999299,
+            1.0
+          ]
+        }
+      },
+      "stouffer_p_3ds": 0.0013269407681440965,
+      "stouffer_Z_3ds": 3.005220760479285,
+      "fisher_p_3ds": 0.00265793463064772,
+      "stouffer_p_2ds_reference": 0.012496770550769186,
+      "fisher_p_2ds_reference": 0.01802168063824236,
+      "descriptive_pooled_rho_3ds": 0.7109522520845072,
+      "descriptive_pooled_n_3ds": 20,
+      "descriptive_pooled_rho_2ds": 0.625,
+      "supported_phrase": "moderately associated",
+      "verdict": "STRENGTHENS: VeReMi's per-dataset ordering is at least as strong as the weakest existing dataset and the blocked combined p improves",
+      "mechanical_caveat": "A drop in the Stouffer/Fisher p is PARTLY MECHANICAL: combining an extra study whose direction agrees can only lower the combined p, so the p-drop on its own is not evidence. The substantive content is that VeReMi REPLICATES independently -- its own per-dataset exact one-sided permutation p is 0.0167 (significant at alpha=0.05 on its own n=5) and its rho (+0.975) is not the weakest of the three -- so the third dataset raises, rather than dilutes, the pooled association. The descriptive pooled rho, which has no such mechanical direction, moves +0.625 -> +0.711.",
+      "small_n_caveats": "n=5 attack families is the smallest of the three blocks: the exact one-sided permutation p cannot go below 1/5! = 0.00833 no matter how perfect the ordering, and two of the five VeReMi families sit at the ROC ceiling (1.000), so their relative order is fixed by ties rather than by resolved detectability. Both limits push the VeReMi block toward, not away from, conservatism."
+    },
+    "energy/qsvm_crosslayer/Y_roc": {
+      "per_dataset": {
+        "dev_grid": {
+          "n": 9,
+          "rho": 0.6833333333333332,
+          "tau": 0.5555555555555556,
+          "exact_one_sided_perm_p": 0.02515983245149912,
+          "rho_ci": [
+            -0.1454901960784313,
+            1.0
+          ]
+        },
+        "nextgen": {
+          "n": 6,
+          "rho": 0.8857142857142857,
+          "tau": 0.7333333333333333,
+          "exact_one_sided_perm_p": 0.016666666666666666,
+          "rho_ci": [
+            0.0,
+            1.0
+          ]
+        },
+        "veremi": {
+          "n": 5,
+          "rho": 0.9999999999999998,
+          "tau": 1.0,
+          "exact_one_sided_perm_p": 0.008333333333333333,
+          "rho_ci": [
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "stouffer_p_3ds": 0.00011868157727403363,
+      "stouffer_Z_3ds": 3.675522461954331,
+      "fisher_p_3ds": 0.0003232189254173042,
+      "stouffer_p_2ds_reference": 0.0021051310446024134,
+      "fisher_p_2ds_reference": 0.003680401705676987,
+      "descriptive_pooled_rho_3ds": 0.8085026335590669,
+      "descriptive_pooled_n_3ds": 20,
+      "descriptive_pooled_rho_2ds": 0.7535714285714286,
+      "supported_phrase": "moderately associated",
+      "verdict": "STRENGTHENS: VeReMi's per-dataset ordering is at least as strong as the weakest existing dataset and the blocked combined p improves",
+      "mechanical_caveat": "A drop in the Stouffer/Fisher p is PARTLY MECHANICAL: combining an extra study whose direction agrees can only lower the combined p, so the p-drop on its own is not evidence. The substantive content is that VeReMi REPLICATES independently -- its own per-dataset exact one-sided permutation p is 0.0083 (significant at alpha=0.05 on its own n=5) and its rho (+1.000) is not the weakest of the three -- so the third dataset raises, rather than dilutes, the pooled association. The descriptive pooled rho, which has no such mechanical direction, moves +0.754 -> +0.809.",
+      "small_n_caveats": "n=5 attack families is the smallest of the three blocks: the exact one-sided permutation p cannot go below 1/5! = 0.00833 no matter how perfect the ordering, and two of the five VeReMi families sit at the ROC ceiling (1.000), so their relative order is fixed by ties rather than by resolved detectability. Both limits push the VeReMi block toward, not away from, conservatism."
+    },
+    "mmd_u/qsvm_crosslayer/Y_roc": {
+      "per_dataset": {
+        "dev_grid": {
+          "n": 9,
+          "rho": 0.6833333333333332,
+          "tau": 0.5555555555555556,
+          "exact_one_sided_perm_p": 0.02515983245149912,
+          "rho_ci": [
+            -0.1559633027522936,
+            1.0
+          ]
+        },
+        "nextgen": {
+          "n": 6,
+          "rho": 0.8285714285714286,
+          "tau": 0.7333333333333333,
+          "exact_one_sided_perm_p": 0.029166666666666667,
+          "rho_ci": [
+            0.0,
+            1.0
+          ]
+        },
+        "veremi": {
+          "n": 5,
+          "rho": 0.9999999999999998,
+          "tau": 1.0,
+          "exact_one_sided_perm_p": 0.008333333333333333,
+          "rho_ci": [
+            1.0,
+            1.0
+          ]
+        }
+      },
+      "stouffer_p_3ds": 0.00019490812508034358,
+      "stouffer_Z_3ds": 3.546883958960539,
+      "fisher_p_3ds": 0.000520171007232636,
+      "stouffer_p_2ds_reference": 0.003329592715608874,
+      "fisher_p_2ds_reference": 0.006030041000636048,
+      "descriptive_pooled_rho_3ds": 0.8009781790820165,
+      "descriptive_pooled_n_3ds": 20,
+      "descriptive_pooled_rho_2ds": 0.75,
+      "supported_phrase": "moderately associated",
+      "verdict": "STRENGTHENS: VeReMi's per-dataset ordering is at least as strong as the weakest existing dataset and the blocked combined p improves",
+      "mechanical_caveat": "A drop in the Stouffer/Fisher p is PARTLY MECHANICAL: combining an extra study whose direction agrees can only lower the combined p, so the p-drop on its own is not evidence. The substantive content is that VeReMi REPLICATES independently -- its own per-dataset exact one-sided permutation p is 0.0083 (significant at alpha=0.05 on its own n=5) and its rho (+1.000) is not the weakest of the three -- so the third dataset raises, rather than dilutes, the pooled association. The descriptive pooled rho, which has no such mechanical direction, moves +0.750 -> +0.801.",
+      "small_n_caveats": "n=5 attack families is the smallest of the three blocks: the exact one-sided permutation p cannot go below 1/5! = 0.00833 no matter how perfect the ordering, and two of the five VeReMi families sit at the ROC ceiling (1.000), so their relative order is fixed by ties rather than by resolved detectability. Both limits push the VeReMi block toward, not away from, conservatism."
+    },
+    "energy/best_over_models/Y_roc": {
+      "per_dataset": {
+        "dev_grid": {
+          "n": 9,
+          "rho": 0.7,
+          "tau": 0.5555555555555556,
+          "exact_one_sided_perm_p": 0.021626984126984126,
+          "rho_ci": [
+            -0.22807017543859648,
+            1.0
+          ]
+        },
+        "nextgen": {
+          "n": 6,
+          "rho": 0.9428571428571428,
+          "tau": 0.8666666666666667,
+          "exact_one_sided_perm_p": 0.008333333333333333,
+          "rho_ci": [
+            0.5151515151515151,
+            1.0
+          ]
+        },
+        "veremi": {
+          "n": 5,
+          "rho": 0.872081599272381,
+          "tau": 0.7378647873726218,
+          "exact_one_sided_perm_p": 0.05,
+          "rho_ci": [
+            0.1111111111111111,
+            1.0
+          ]
+        }
+      },
+      "stouffer_p_3ds": 0.00024190932220139401,
+      "stouffer_Z_3ds": 3.4895587787039006,
+      "fisher_p_3ds": 0.0007217538951657438,
+      "stouffer_p_2ds_reference": 0.0010359113217423453,
+      "fisher_p_2ds_reference": 0.0017339984609067416,
+      "descriptive_pooled_rho_3ds": 0.8174633623756218,
+      "descriptive_pooled_n_3ds": 20,
+      "descriptive_pooled_rho_2ds": 0.7821428571428571,
+      "supported_phrase": "strongly associated",
+      "verdict": "STRENGTHENS: VeReMi's per-dataset ordering is at least as strong as the weakest existing dataset and the blocked combined p improves",
+      "mechanical_caveat": "A drop in the Stouffer/Fisher p is PARTLY MECHANICAL: combining an extra study whose direction agrees can only lower the combined p, so the p-drop on its own is not evidence. The substantive content is that VeReMi REPLICATES independently -- its own per-dataset exact one-sided permutation p is 0.0500 (significant at alpha=0.05 on its own n=5) and its rho (+0.872) is not the weakest of the three -- so the third dataset raises, rather than dilutes, the pooled association. The descriptive pooled rho, which has no such mechanical direction, moves +0.782 -> +0.817.",
+      "small_n_caveats": "n=5 attack families is the smallest of the three blocks: the exact one-sided permutation p cannot go below 1/5! = 0.00833 no matter how perfect the ordering, and two of the five VeReMi families sit at the ROC ceiling (1.000), so their relative order is fixed by ties rather than by resolved detectability. Both limits push the VeReMi block toward, not away from, conservatism."
+    },
+    "mmd_u/best_over_models/Y_roc": {
+      "per_dataset": {
+        "dev_grid": {
+          "n": 9,
+          "rho": 0.7,
+          "tau": 0.5555555555555556,
+          "exact_one_sided_perm_p": 0.021626984126984126,
+          "rho_ci": [
+            -0.19658119658119658,
+            1.0
+          ]
+        },
+        "nextgen": {
+          "n": 6,
+          "rho": 0.9428571428571428,
+          "tau": 0.8666666666666667,
+          "exact_one_sided_perm_p": 0.008333333333333333,
+          "rho_ci": [
+            0.5151515151515151,
+            1.0
+          ]
+        },
+        "veremi": {
+          "n": 5,
+          "rho": 0.872081599272381,
+          "tau": 0.7378647873726218,
+          "exact_one_sided_perm_p": 0.05,
+          "rho_ci": [
+            0.1111111111111111,
+            1.0
+          ]
+        }
+      },
+      "stouffer_p_3ds": 0.00024190932220139401,
+      "stouffer_Z_3ds": 3.4895587787039006,
+      "fisher_p_3ds": 0.0007217538951657438,
+      "stouffer_p_2ds_reference": 0.0010359113217423453,
+      "fisher_p_2ds_reference": 0.0017339984609067416,
+      "descriptive_pooled_rho_3ds": 0.821979734543443,
+      "descriptive_pooled_n_3ds": 20,
+      "descriptive_pooled_rho_2ds": 0.8,
+      "supported_phrase": "strongly associated",
+      "verdict": "STRENGTHENS: VeReMi's per-dataset ordering is at least as strong as the weakest existing dataset and the blocked combined p improves",
+      "mechanical_caveat": "A drop in the Stouffer/Fisher p is PARTLY MECHANICAL: combining an extra study whose direction agrees can only lower the combined p, so the p-drop on its own is not evidence. The substantive content is that VeReMi REPLICATES independently -- its own per-dataset exact one-sided permutation p is 0.0500 (significant at alpha=0.05 on its own n=5) and its rho (+0.872) is not the weakest of the three -- so the third dataset raises, rather than dilutes, the pooled association. The descriptive pooled rho, which has no such mechanical direction, moves +0.800 -> +0.822.",
+      "small_n_caveats": "n=5 attack families is the smallest of the three blocks: the exact one-sided permutation p cannot go below 1/5! = 0.00833 no matter how perfect the ordering, and two of the five VeReMi families sit at the ROC ceiling (1.000), so their relative order is fixed by ties rather than by resolved detectability. Both limits push the VeReMi block toward, not away from, conservatism."
+    },
+    "protocol_sensitivity_heldout_veremi_Y": {
+      "energy/rbf_svm/Y_roc": {
+        "veremi_rho": 0.9999999999999998,
+        "veremi_tau": 1.0,
+        "veremi_perm_p": 0.008333333333333333,
+        "stouffer_p_3ds": 0.000543801476355239,
+        "fisher_p_3ds": 0.0009398831184394622
+      },
+      "energy/best_over_models/Y_roc": {
+        "veremi_rho": 0.872081599272381,
+        "veremi_tau": 0.7378647873726218,
+        "veremi_perm_p": 0.05,
+        "stouffer_p_3ds": 0.00024190932220139401,
+        "fisher_p_3ds": 0.0007217538951657438
+      },
+      "mmd_u/rbf_svm/Y_roc": {
+        "veremi_rho": 0.9999999999999998,
+        "veremi_tau": 1.0,
+        "veremi_perm_p": 0.008333333333333333,
+        "stouffer_p_3ds": 0.0008499789016854787,
+        "fisher_p_3ds": 0.001499525862262945
+      },
+      "mmd_u/best_over_models/Y_roc": {
+        "veremi_rho": 0.872081599272381,
+        "veremi_tau": 0.7378647873726218,
+        "veremi_perm_p": 0.05,
+        "stouffer_p_3ds": 0.00024190932220139401,
+        "fisher_p_3ds": 0.0007217538951657438
+      }
+    },
+    "divergence_pool_invariance": {
+      "energy/full/capped4000_vs_capped4000_s17": 0.9999999999999999,
+      "energy/full/capped4000_vs_capped12000": 0.9999999999999999,
+      "mmd_u/full/capped4000_vs_capped4000_s17": 0.9999999999999999,
+      "mmd_u/full/capped4000_vs_capped12000": 0.9999999999999999
+    },
+    "energy_vs_mmdu_rank_agreement_veremi": {
+      "capped4000": 0.9999999999999999,
+      "capped4000_s17": 0.9999999999999999,
+      "capped12000": 0.9999999999999999
+    }
+  },
+  "self_check_vs_two_dataset": {
+    "per_combo": {
+      "per_dataset/dev_grid/energy/best_over_models/Y_roc": {
+        "veremi_separability_rho": 0.7,
+        "correlations_rho": 0.7,
+        "veremi_separability_perm_p": 0.021626984126984126,
+        "correlations_perm_p": 0.021626984126984126,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/best_over_models/Y_pr": {
+        "veremi_separability_rho": 0.7333333333333333,
+        "correlations_rho": 0.7333333333333333,
+        "veremi_separability_perm_p": 0.015561618165784833,
+        "correlations_perm_p": 0.015561618165784833,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/mlp/Y_roc": {
+        "veremi_separability_rho": 0.4333333333333333,
+        "correlations_rho": 0.4333333333333333,
+        "veremi_separability_perm_p": 0.12495866402116403,
+        "correlations_perm_p": 0.12495866402116403,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/mlp/Y_pr": {
+        "veremi_separability_rho": 0.6499999999999999,
+        "correlations_rho": 0.6499999999999999,
+        "veremi_separability_perm_p": 0.03328097442680776,
+        "correlations_perm_p": 0.03328097442680776,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/mlp__full/Y_roc": {
+        "veremi_separability_rho": 0.49999999999999994,
+        "correlations_rho": 0.49999999999999994,
+        "veremi_separability_perm_p": 0.08883101851851852,
+        "correlations_perm_p": 0.08883101851851852,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/mlp__full/Y_pr": {
+        "veremi_separability_rho": 0.6499999999999999,
+        "correlations_rho": 0.6499999999999999,
+        "veremi_separability_perm_p": 0.03328097442680776,
+        "correlations_perm_p": 0.03328097442680776,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/qsvm_crosslayer/Y_roc": {
+        "veremi_separability_rho": 0.6833333333333332,
+        "correlations_rho": 0.6833333333333332,
+        "veremi_separability_perm_p": 0.02515983245149912,
+        "correlations_perm_p": 0.02515983245149912,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/qsvm_crosslayer/Y_pr": {
+        "veremi_separability_rho": 0.41666666666666663,
+        "correlations_rho": 0.41666666666666663,
+        "veremi_separability_perm_p": 0.1347911155202822,
+        "correlations_perm_p": 0.1347911155202822,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/qsvm_zz/Y_roc": {
+        "veremi_separability_rho": 0.9499999999999998,
+        "correlations_rho": 0.9499999999999998,
+        "veremi_separability_perm_p": 0.0001763668430335097,
+        "correlations_perm_p": 0.0001763668430335097,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/qsvm_zz/Y_pr": {
+        "veremi_separability_rho": 0.7999999999999999,
+        "correlations_rho": 0.7999999999999999,
+        "veremi_separability_perm_p": 0.00691413139329806,
+        "correlations_perm_p": 0.00691413139329806,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/random_forest/Y_roc": {
+        "veremi_separability_rho": 0.6499999999999999,
+        "correlations_rho": 0.6499999999999999,
+        "veremi_separability_perm_p": 0.03328097442680776,
+        "correlations_perm_p": 0.03328097442680776,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/random_forest/Y_pr": {
+        "veremi_separability_rho": 0.5333333333333332,
+        "correlations_rho": 0.5333333333333332,
+        "veremi_separability_perm_p": 0.07376267636684303,
+        "correlations_perm_p": 0.07376267636684303,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/random_forest__full/Y_roc": {
+        "veremi_separability_rho": 0.6666666666666666,
+        "correlations_rho": 0.6666666666666666,
+        "veremi_separability_perm_p": 0.029444995590828926,
+        "correlations_perm_p": 0.029444995590828926,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/random_forest__full/Y_pr": {
+        "veremi_separability_rho": 0.7666666666666666,
+        "correlations_rho": 0.7666666666666666,
+        "veremi_separability_perm_p": 0.010694995590828925,
+        "correlations_perm_p": 0.010694995590828925,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/rbf_svm/Y_roc": {
+        "veremi_separability_rho": 0.49999999999999994,
+        "correlations_rho": 0.49999999999999994,
+        "veremi_separability_perm_p": 0.08883101851851852,
+        "correlations_perm_p": 0.08883101851851852,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/rbf_svm/Y_pr": {
+        "veremi_separability_rho": 0.6499999999999999,
+        "correlations_rho": 0.6499999999999999,
+        "veremi_separability_perm_p": 0.03328097442680776,
+        "correlations_perm_p": 0.03328097442680776,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/rbf_svm__full/Y_roc": {
+        "veremi_separability_rho": 0.3833333333333333,
+        "correlations_rho": 0.3833333333333333,
+        "veremi_separability_perm_p": 0.15625,
+        "correlations_perm_p": 0.15625,
+        "agree": true
+      },
+      "per_dataset/dev_grid/energy/rbf_svm__full/Y_pr": {
+        "veremi_separability_rho": 0.7166666666666666,
+        "correlations_rho": 0.7166666666666666,
+        "veremi_separability_perm_p": 0.01843309082892416,
+        "correlations_perm_p": 0.01843309082892416,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/best_over_models/Y_roc": {
+        "veremi_separability_rho": 0.7,
+        "correlations_rho": 0.7,
+        "veremi_separability_perm_p": 0.021626984126984126,
+        "correlations_perm_p": 0.021626984126984126,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/best_over_models/Y_pr": {
+        "veremi_separability_rho": 0.7333333333333333,
+        "correlations_rho": 0.7333333333333333,
+        "veremi_separability_perm_p": 0.015561618165784833,
+        "correlations_perm_p": 0.015561618165784833,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/mlp/Y_roc": {
+        "veremi_separability_rho": 0.4333333333333333,
+        "correlations_rho": 0.4333333333333333,
+        "veremi_separability_perm_p": 0.12495866402116403,
+        "correlations_perm_p": 0.12495866402116403,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/mlp/Y_pr": {
+        "veremi_separability_rho": 0.6499999999999999,
+        "correlations_rho": 0.6499999999999999,
+        "veremi_separability_perm_p": 0.03328097442680776,
+        "correlations_perm_p": 0.03328097442680776,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/mlp__full/Y_roc": {
+        "veremi_separability_rho": 0.49999999999999994,
+        "correlations_rho": 0.49999999999999994,
+        "veremi_separability_perm_p": 0.08883101851851852,
+        "correlations_perm_p": 0.08883101851851852,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/mlp__full/Y_pr": {
+        "veremi_separability_rho": 0.6499999999999999,
+        "correlations_rho": 0.6499999999999999,
+        "veremi_separability_perm_p": 0.03328097442680776,
+        "correlations_perm_p": 0.03328097442680776,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/qsvm_crosslayer/Y_roc": {
+        "veremi_separability_rho": 0.6833333333333332,
+        "correlations_rho": 0.6833333333333332,
+        "veremi_separability_perm_p": 0.02515983245149912,
+        "correlations_perm_p": 0.02515983245149912,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/qsvm_crosslayer/Y_pr": {
+        "veremi_separability_rho": 0.41666666666666663,
+        "correlations_rho": 0.41666666666666663,
+        "veremi_separability_perm_p": 0.1347911155202822,
+        "correlations_perm_p": 0.1347911155202822,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/qsvm_zz/Y_roc": {
+        "veremi_separability_rho": 0.9499999999999998,
+        "correlations_rho": 0.9499999999999998,
+        "veremi_separability_perm_p": 0.0001763668430335097,
+        "correlations_perm_p": 0.0001763668430335097,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/qsvm_zz/Y_pr": {
+        "veremi_separability_rho": 0.7999999999999999,
+        "correlations_rho": 0.7999999999999999,
+        "veremi_separability_perm_p": 0.00691413139329806,
+        "correlations_perm_p": 0.00691413139329806,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/random_forest/Y_roc": {
+        "veremi_separability_rho": 0.6499999999999999,
+        "correlations_rho": 0.6499999999999999,
+        "veremi_separability_perm_p": 0.03328097442680776,
+        "correlations_perm_p": 0.03328097442680776,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/random_forest/Y_pr": {
+        "veremi_separability_rho": 0.5333333333333332,
+        "correlations_rho": 0.5333333333333332,
+        "veremi_separability_perm_p": 0.07376267636684303,
+        "correlations_perm_p": 0.07376267636684303,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/random_forest__full/Y_roc": {
+        "veremi_separability_rho": 0.6666666666666666,
+        "correlations_rho": 0.6666666666666666,
+        "veremi_separability_perm_p": 0.029444995590828926,
+        "correlations_perm_p": 0.029444995590828926,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/random_forest__full/Y_pr": {
+        "veremi_separability_rho": 0.7666666666666666,
+        "correlations_rho": 0.7666666666666666,
+        "veremi_separability_perm_p": 0.010694995590828925,
+        "correlations_perm_p": 0.010694995590828925,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/rbf_svm/Y_roc": {
+        "veremi_separability_rho": 0.49999999999999994,
+        "correlations_rho": 0.49999999999999994,
+        "veremi_separability_perm_p": 0.08883101851851852,
+        "correlations_perm_p": 0.08883101851851852,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/rbf_svm/Y_pr": {
+        "veremi_separability_rho": 0.6499999999999999,
+        "correlations_rho": 0.6499999999999999,
+        "veremi_separability_perm_p": 0.03328097442680776,
+        "correlations_perm_p": 0.03328097442680776,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/rbf_svm__full/Y_roc": {
+        "veremi_separability_rho": 0.3833333333333333,
+        "correlations_rho": 0.3833333333333333,
+        "veremi_separability_perm_p": 0.15625,
+        "correlations_perm_p": 0.15625,
+        "agree": true
+      },
+      "per_dataset/dev_grid/mmd_u/rbf_svm__full/Y_pr": {
+        "veremi_separability_rho": 0.7166666666666666,
+        "correlations_rho": 0.7166666666666666,
+        "veremi_separability_perm_p": 0.01843309082892416,
+        "correlations_perm_p": 0.01843309082892416,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/best_over_models/Y_roc": {
+        "veremi_separability_rho": 0.9428571428571428,
+        "correlations_rho": 0.9428571428571428,
+        "veremi_separability_perm_p": 0.008333333333333333,
+        "correlations_perm_p": 0.008333333333333333,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/best_over_models/Y_pr": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/knn_bagging/Y_roc": {
+        "veremi_separability_rho": 0.7142857142857143,
+        "correlations_rho": 0.7142857142857143,
+        "veremi_separability_perm_p": 0.06805555555555555,
+        "correlations_perm_p": 0.06805555555555555,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/knn_bagging/Y_pr": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/lstm_seq/Y_roc": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/lstm_seq/Y_pr": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/mlp/Y_roc": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/mlp/Y_pr": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/qsvm_crosslayer/Y_roc": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/qsvm_crosslayer/Y_pr": {
+        "veremi_separability_rho": 0.6,
+        "correlations_rho": 0.6,
+        "veremi_separability_perm_p": 0.12083333333333333,
+        "correlations_perm_p": 0.12083333333333333,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/qsvm_zz/Y_roc": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/qsvm_zz/Y_pr": {
+        "veremi_separability_rho": 0.6,
+        "correlations_rho": 0.6,
+        "veremi_separability_perm_p": 0.12083333333333333,
+        "correlations_perm_p": 0.12083333333333333,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/random_forest/Y_roc": {
+        "veremi_separability_rho": 0.7142857142857143,
+        "correlations_rho": 0.7142857142857143,
+        "veremi_separability_perm_p": 0.06805555555555555,
+        "correlations_perm_p": 0.06805555555555555,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/random_forest/Y_pr": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/rbf_svm/Y_roc": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/rbf_svm/Y_pr": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/rules/Y_roc": {
+        "veremi_separability_rho": 0.7714285714285715,
+        "correlations_rho": 0.7714285714285715,
+        "veremi_separability_perm_p": 0.05138888888888889,
+        "correlations_perm_p": 0.05138888888888889,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/rules/Y_pr": {
+        "veremi_separability_rho": 0.7714285714285715,
+        "correlations_rho": 0.7714285714285715,
+        "veremi_separability_perm_p": 0.05138888888888889,
+        "correlations_perm_p": 0.05138888888888889,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/xgboost/Y_roc": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/energy/xgboost/Y_pr": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/best_over_models/Y_roc": {
+        "veremi_separability_rho": 0.9428571428571428,
+        "correlations_rho": 0.9428571428571428,
+        "veremi_separability_perm_p": 0.008333333333333333,
+        "correlations_perm_p": 0.008333333333333333,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/best_over_models/Y_pr": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/knn_bagging/Y_roc": {
+        "veremi_separability_rho": 0.7714285714285715,
+        "correlations_rho": 0.7714285714285715,
+        "veremi_separability_perm_p": 0.05138888888888889,
+        "correlations_perm_p": 0.05138888888888889,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/knn_bagging/Y_pr": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/lstm_seq/Y_roc": {
+        "veremi_separability_rho": 1.0,
+        "correlations_rho": 1.0,
+        "veremi_separability_perm_p": 0.001388888888888889,
+        "correlations_perm_p": 0.001388888888888889,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/lstm_seq/Y_pr": {
+        "veremi_separability_rho": 0.8857142857142857,
+        "correlations_rho": 0.8857142857142857,
+        "veremi_separability_perm_p": 0.016666666666666666,
+        "correlations_perm_p": 0.016666666666666666,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/mlp/Y_roc": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/mlp/Y_pr": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/qsvm_crosslayer/Y_roc": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/qsvm_crosslayer/Y_pr": {
+        "veremi_separability_rho": 0.7142857142857143,
+        "correlations_rho": 0.7142857142857143,
+        "veremi_separability_perm_p": 0.06805555555555555,
+        "correlations_perm_p": 0.06805555555555555,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/qsvm_zz/Y_roc": {
+        "veremi_separability_rho": 0.5428571428571428,
+        "correlations_rho": 0.5428571428571428,
+        "veremi_separability_perm_p": 0.1486111111111111,
+        "correlations_perm_p": 0.1486111111111111,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/qsvm_zz/Y_pr": {
+        "veremi_separability_rho": 0.7142857142857143,
+        "correlations_rho": 0.7142857142857143,
+        "veremi_separability_perm_p": 0.06805555555555555,
+        "correlations_perm_p": 0.06805555555555555,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/random_forest/Y_roc": {
+        "veremi_separability_rho": 0.7714285714285715,
+        "correlations_rho": 0.7714285714285715,
+        "veremi_separability_perm_p": 0.05138888888888889,
+        "correlations_perm_p": 0.05138888888888889,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/random_forest/Y_pr": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/rbf_svm/Y_roc": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/rbf_svm/Y_pr": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/rules/Y_roc": {
+        "veremi_separability_rho": 0.7142857142857143,
+        "correlations_rho": 0.7142857142857143,
+        "veremi_separability_perm_p": 0.06805555555555555,
+        "correlations_perm_p": 0.06805555555555555,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/rules/Y_pr": {
+        "veremi_separability_rho": 0.5428571428571428,
+        "correlations_rho": 0.5428571428571428,
+        "veremi_separability_perm_p": 0.1486111111111111,
+        "correlations_perm_p": 0.1486111111111111,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/xgboost/Y_roc": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "per_dataset/nextgen/mmd_u/xgboost/Y_pr": {
+        "veremi_separability_rho": 0.8285714285714286,
+        "correlations_rho": 0.8285714285714286,
+        "veremi_separability_perm_p": 0.029166666666666667,
+        "correlations_perm_p": 0.029166666666666667,
+        "agree": true
+      },
+      "blocked2/energy/best_over_models/Y_roc": {
+        "veremi_separability_stouffer_p": 0.0010359113217423453,
+        "correlations_stouffer_p": 0.0010359113217423453,
+        "veremi_separability_fisher_p": 0.0017339984609067416,
+        "correlations_fisher_p": 0.0017339984609067416,
+        "agree": true
+      },
+      "blocked2/energy/best_over_models/Y_pr": {
+        "veremi_separability_stouffer_p": 0.0012826440442072016,
+        "correlations_stouffer_p": 0.0012826440442072016,
+        "veremi_separability_fisher_p": 0.0024009741421574526,
+        "correlations_fisher_p": 0.0024009741421574526,
+        "agree": true
+      },
+      "blocked2/energy/mlp/Y_roc": {
+        "veremi_separability_stouffer_p": 0.012639695399253218,
+        "correlations_stouffer_p": 0.012639695399253218,
+        "veremi_separability_fisher_p": 0.014941134277676788,
+        "correlations_fisher_p": 0.014941134277676788,
+        "agree": true
+      },
+      "blocked2/energy/mlp/Y_pr": {
+        "veremi_separability_stouffer_p": 0.002828869144773277,
+        "correlations_stouffer_p": 0.002828869144773277,
+        "veremi_separability_fisher_p": 0.004713203865657266,
+        "correlations_fisher_p": 0.004713203865657266,
+        "agree": true
+      },
+      "blocked2/energy/qsvm_crosslayer/Y_roc": {
+        "veremi_separability_stouffer_p": 0.0021051310446024134,
+        "correlations_stouffer_p": 0.0021051310446024134,
+        "veremi_separability_fisher_p": 0.003680401705676987,
+        "correlations_fisher_p": 0.003680401705676987,
+        "agree": true
+      },
+      "blocked2/energy/qsvm_crosslayer/Y_pr": {
+        "veremi_separability_stouffer_p": 0.055280930346064655,
+        "correlations_stouffer_p": 0.055280930346064655,
+        "veremi_separability_fisher_p": 0.08334796859494953,
+        "correlations_fisher_p": 0.08334796859494953,
+        "agree": true
+      },
+      "blocked2/energy/qsvm_zz/Y_roc": {
+        "veremi_separability_stouffer_p": 3.6683670192044745e-05,
+        "correlations_stouffer_p": 3.6683670192044745e-05,
+        "veremi_separability_fisher_p": 6.778638462452913e-05,
+        "correlations_fisher_p": 6.778638462452913e-05,
+        "agree": true
+      },
+      "blocked2/energy/qsvm_zz/Y_pr": {
+        "veremi_separability_stouffer_p": 0.004056644764707636,
+        "correlations_stouffer_p": 0.004056644764707636,
+        "veremi_separability_fisher_p": 0.006756788803698667,
+        "correlations_fisher_p": 0.006756788803698667,
+        "agree": true
+      },
+      "blocked2/energy/random_forest/Y_roc": {
+        "veremi_separability_stouffer_p": 0.009046196205305848,
+        "correlations_stouffer_p": 0.009046196205305848,
+        "veremi_separability_fisher_p": 0.016058986062021267,
+        "correlations_fisher_p": 0.016058986062021267,
+        "agree": true
+      },
+      "blocked2/energy/random_forest/Y_pr": {
+        "veremi_separability_stouffer_p": 0.006797996363585218,
+        "correlations_stouffer_p": 0.006797996363585218,
+        "veremi_separability_fisher_p": 0.00946774314076067,
+        "correlations_fisher_p": 0.00946774314076067,
+        "agree": true
+      },
+      "blocked2/energy/rbf_svm/Y_roc": {
+        "veremi_separability_stouffer_p": 0.008423234777267497,
+        "correlations_stouffer_p": 0.008423234777267497,
+        "veremi_separability_fisher_p": 0.011126623895541896,
+        "correlations_fisher_p": 0.011126623895541896,
+        "agree": true
+      },
+      "blocked2/energy/rbf_svm/Y_pr": {
+        "veremi_separability_stouffer_p": 0.002828869144773277,
+        "correlations_stouffer_p": 0.002828869144773277,
+        "veremi_separability_fisher_p": 0.004713203865657266,
+        "correlations_fisher_p": 0.004713203865657266,
+        "agree": true
+      },
+      "blocked2/mmd_u/best_over_models/Y_roc": {
+        "veremi_separability_stouffer_p": 0.0010359113217423453,
+        "correlations_stouffer_p": 0.0010359113217423453,
+        "veremi_separability_fisher_p": 0.0017339984609067416,
+        "correlations_fisher_p": 0.0017339984609067416,
+        "agree": true
+      },
+      "blocked2/mmd_u/best_over_models/Y_pr": {
+        "veremi_separability_stouffer_p": 0.002071960093922576,
+        "correlations_stouffer_p": 0.002071960093922576,
+        "veremi_separability_fisher_p": 0.003947706038443162,
+        "correlations_fisher_p": 0.003947706038443162,
+        "agree": true
+      },
+      "blocked2/mmd_u/mlp/Y_roc": {
+        "veremi_separability_stouffer_p": 0.018373341615989643,
+        "correlations_stouffer_p": 0.018373341615989643,
+        "veremi_separability_fisher_p": 0.02410739378352215,
+        "correlations_fisher_p": 0.02410739378352215,
+        "agree": true
+      },
+      "blocked2/mmd_u/mlp/Y_pr": {
+        "veremi_separability_stouffer_p": 0.004416564714917975,
+        "correlations_stouffer_p": 0.004416564714917975,
+        "veremi_separability_fisher_p": 0.007704890468692646,
+        "correlations_fisher_p": 0.007704890468692646,
+        "agree": true
+      },
+      "blocked2/mmd_u/qsvm_crosslayer/Y_roc": {
+        "veremi_separability_stouffer_p": 0.003329592715608874,
+        "correlations_stouffer_p": 0.003329592715608874,
+        "veremi_separability_fisher_p": 0.006030041000636048,
+        "correlations_fisher_p": 0.006030041000636048,
+        "agree": true
+      },
+      "blocked2/mmd_u/qsvm_crosslayer/Y_pr": {
+        "veremi_separability_stouffer_p": 0.036103946779154884,
+        "correlations_stouffer_p": 0.036103946779154884,
+        "veremi_separability_fisher_p": 0.052209379511586086,
+        "correlations_fisher_p": 0.052209379511586086,
+        "agree": true
+      },
+      "blocked2/mmd_u/qsvm_zz/Y_roc": {
+        "veremi_separability_stouffer_p": 0.0003051275422568672,
+        "correlations_stouffer_p": 0.0003051275422568672,
+        "veremi_separability_fisher_p": 0.00030270974055626314,
+        "correlations_fisher_p": 0.00030270974055626314,
+        "agree": true
+      },
+      "blocked2/mmd_u/qsvm_zz/Y_pr": {
+        "veremi_separability_stouffer_p": 0.0021897387144697938,
+        "correlations_stouffer_p": 0.0021897387144697938,
+        "veremi_separability_fisher_p": 0.004075681901059185,
+        "correlations_fisher_p": 0.004075681901059185,
+        "agree": true
+      },
+      "blocked2/mmd_u/random_forest/Y_roc": {
+        "veremi_separability_stouffer_p": 0.007084239203303126,
+        "correlations_stouffer_p": 0.007084239203303126,
+        "veremi_separability_fisher_p": 0.012606592716878829,
+        "correlations_fisher_p": 0.012606592716878829,
+        "agree": true
+      },
+      "blocked2/mmd_u/random_forest/Y_pr": {
+        "veremi_separability_stouffer_p": 0.010191418637797142,
+        "correlations_stouffer_p": 0.010191418637797142,
+        "veremi_separability_fisher_p": 0.01536458671388618,
+        "correlations_fisher_p": 0.01536458671388618,
+        "agree": true
+      },
+      "blocked2/mmd_u/rbf_svm/Y_roc": {
+        "veremi_separability_stouffer_p": 0.012496770550769186,
+        "correlations_stouffer_p": 0.012496770550769186,
+        "veremi_separability_fisher_p": 0.01802168063824236,
+        "correlations_fisher_p": 0.01802168063824236,
+        "agree": true
+      },
+      "blocked2/mmd_u/rbf_svm/Y_pr": {
+        "veremi_separability_stouffer_p": 0.004416564714917975,
+        "correlations_stouffer_p": 0.004416564714917975,
+        "veremi_separability_fisher_p": 0.007704890468692646,
+        "correlations_fisher_p": 0.007704890468692646,
+        "agree": true
+      }
+    },
+    "all_agree": true
+  }
+}

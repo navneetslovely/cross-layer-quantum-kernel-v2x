@@ -1,0 +1,18 @@
+<configuration>
+  <input>
+    <net-file value="dev_grid.net.xml"/>
+    <route-files value="dev_grid.rou.xml"/>
+  </input>
+  <time>
+    <begin value="0"/>
+    <end value="400"/>
+  </time>
+  <processing>
+    <time-to-teleport value="-1"/>
+    <collision.action value="warn"/>
+  </processing>
+  <report>
+    <no-step-log value="true"/>
+    <duration-log.disable value="true"/>
+  </report>
+</configuration>

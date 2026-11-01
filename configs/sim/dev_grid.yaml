@@ -1,0 +1,81 @@
+# Co-simulation run matrix: small development grid (fast iteration)
+scenario:
+  name: dev_grid
+  sumocfg: cosim/sumo/scenarios/dev_grid/dev_grid.sumocfg
+  step_length: 0.1          # s, SUMO + ns-3 sync step
+  warmup: 30.0              # s, simulated before logging starts
+  duration: 300.0           # s, logged simulation time
+
+out_root: runs/dev_grid
+seeds: [1, 2, 3]
+node_pool: 1000             # pre-allocated ns-3 nodes (max concurrent vehicles + sybil ghosts).
+                            # density_scale 2.0 peaks >400; 1000 leaves headroom for ghosts.
+
+rsu:
+  count: 9                  # static receivers placed on a grid inside net bbox (3x3; earlier: denser infra -> longer (sender,RSU) streams)
+  margin: 100.0             # m, inset from bbox edges
+  z: 6.0                    # antenna height
+
+# Cartesian sweep axes; every leaf key of `channel`, `bsm`, `attacks` (scalar) can be swept.
+sweep:
+  density_scale: [0.25, 0.5, 1.0]   # SUMO --scale (traffic multiplier). dropped 2.0 —
+                                     # with realistic ~99% reception a density-2.0 run is ~3.9 GB/seed
+                                     # (~12 GB x3 seeds, OOM risk on 16 GB). H2 congestion now uses
+                                     # feature-level packet-loss injection, not native density.
+                                     # [0.25,0.5,1.0] is benign-visible + balanced + tractable (~2.5 GB).
+  tx_power_dbm: [20.0]
+  shadowing_sigma_db: [3.0]
+
+channel:
+  path_loss_exponent: 2.75  # eta
+  ref_loss_db: 47.86        # PL0 at d0 (Friis @ 5.9 GHz, 1 m)
+  ref_distance: 1.0         # d0, m
+  shadowing_sigma_db: 3.0   # log-normal shadowing std (Gauss-Markov in time)
+  shadowing_tau_s: 1.0      # temporal correlation constant
+  nakagami: false           # optional fast fading chained after shadowing
+  rx_sensitivity_dbm: -94.0
+  cca_threshold_dbm: -84.0
+  tx_power_dbm: 20.0
+  datarate: OfdmRate6MbpsBW10MHz
+
+bsm:
+  rate_hz: 10.0
+  size_bytes: 300           # padded on-air BSM size
+
+attacks:
+  fraction: 0.30            # fraction of departing vehicles assigned an attack
+                            # (raised 0.15->0.30 for attack-type diversity; verified balance =
+                            #  ~29% positive, all 9 attacks 1.2k-5.2k windows. Adjustable 0.15-0.30.)
+  onset_uniform: [10.0, 60.0]   # s after depart, U[a,b]
+  mix:                      # relative weights (0 disables a type)
+    const_pos: 1
+    const_offset: 1
+    random_pos: 1
+    random_offset: 1
+    eventual_stop: 1
+    drift: 1
+    replay: 1
+    data_falsification: 1
+    sybil: 1
+    flooding: 0             # dropped from MAIN mix (10x rate DoS-congests channel + explodes windows).
+                            # Tamed-flooding (factor 2) studied separately as a dedicated DoS-robustness run -> see configs/sim/dev_grid_flooding.yaml.
+  params:
+    const_offset_min: 50.0
+    const_offset_max: 200.0
+    random_offset_radius: 100.0
+    drift_speed: 2.0            # m/s linear drift of claimed position
+    replay_delay: 5.0           # s, replay victim's claims delayed by this
+    data_fals_speed_min: 0.0    # claimed speed = U[min,max] * true speed
+    data_fals_speed_max: 2.5
+    data_fals_heading_jitter: 60.0  # deg, uniform +- jitter on claimed heading
+    eventual_stop_delay: 10.0   # s after onset until claimed position freezes
+    sybil_ghosts: 3
+    sybil_power_mode: same      # same | offset | random
+    sybil_power_offset_db: 3.0
+    sybil_spacing: 8.0          # m, ghost trail spacing behind true position
+    flooding_factor: 10.0       # x nominal BSM rate
+
+ns3:
+  run_via_wrapper: true     # invoke `$NS3_DIR/ns3 run qkv2x-cosim -- ...`
+n_jobs: 6                   # parallel sweep points (each ns-3 run is single-threaded)
+sumo_binary: sumo

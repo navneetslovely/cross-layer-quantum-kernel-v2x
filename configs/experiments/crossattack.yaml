@@ -1,0 +1,13 @@
+# RQ3: cross-attack generalisation — train on subset of attacks, test on held-out attack
+kind: crossattack
+name: crossattack_dev
+runs_root: runs/dev_grid
+features_config: configs/features.yaml
+quantum_config: configs/quantum.yaml
+baselines_config: configs/baselines.yaml
+out_dir: results/crossattack_dev
+
+point: {density_scale: 1.0, tx_power_dbm: 20.0, shadowing_sigma_db: 3.0}
+holdout_attacks: [const_pos, const_offset, random_pos, random_offset, eventual_stop, drift, replay, data_falsification, sybil]
+# (flooding dropped from the dev_grid mix — studied separately as a DoS run, configs/sim/dev_grid_flooding.yaml)
+models: [qsvm_crosslayer, qsvm_zz, rbf_svm, random_forest, mlp]

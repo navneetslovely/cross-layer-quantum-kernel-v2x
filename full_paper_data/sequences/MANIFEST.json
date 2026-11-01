@@ -1,0 +1,104 @@
+{
+  "dev_grid_sequences": {
+    "file": "dev_grid_sequences.csv.gz",
+    "rows": 90553,
+    "cols": [
+      "e_kin_mean",
+      "e_kin_max",
+      "e_kin_std",
+      "speed_consistency_mean",
+      "speed_consistency_max",
+      "heading_consistency_mean",
+      "accel_abs_mean",
+      "e_xl_mean",
+      "e_xl_max",
+      "e_xl_std",
+      "rate_ratio",
+      "interarrival_std",
+      "pdr_proxy",
+      "sybil_neighbors_mean",
+      "sybil_neighbors_max",
+      "sybil_rssi_absdiff_min",
+      "sybil_rssi_corr_max",
+      "rssi_std",
+      "aoi_mean",
+      "y",
+      "attack_name",
+      "group",
+      "aoi",
+      "t_end",
+      "point_density_scale",
+      "point_tx_power_dbm",
+      "point_shadowing_sigma_db",
+      "point_run",
+      "point_seed"
+    ],
+    "label_col": "y",
+    "label_dist": {
+      "0": 68964,
+      "1": 21589
+    }
+  },
+  "veremi_nextgen_sequences": {
+    "file": "veremi_nextgen_sequences.csv",
+    "rows": 5999,
+    "cols": [
+      "e_kin_mean",
+      "e_kin_max",
+      "e_kin_std",
+      "speed_consistency_mean",
+      "speed_consistency_max",
+      "heading_consistency_mean",
+      "accel_abs_mean",
+      "e_xl_mean",
+      "e_xl_max",
+      "e_xl_std",
+      "rate_ratio",
+      "interarrival_std",
+      "pdr_proxy",
+      "sybil_neighbors_mean",
+      "sybil_neighbors_max",
+      "sybil_rssi_absdiff_min",
+      "sybil_rssi_corr_max",
+      "delay_std",
+      "aoi_mean",
+      "offroad_max",
+      "offroad_mean",
+      "overlap_3m_max",
+      "overlap_3m_mean",
+      "y",
+      "attack_name",
+      "group",
+      "aoi",
+      "split"
+    ],
+    "label_col": "y",
+    "label_dist": {
+      "0": 4689,
+      "1": 1310
+    }
+  },
+  "veremi_original_windows": {
+    "file": "veremi_original_windows.csv",
+    "rows": 1182,
+    "cols": [
+      "i",
+      "y_true",
+      "attack_name",
+      "group",
+      "t_end",
+      "knn_bagging",
+      "mlp",
+      "qsvm_crosslayer",
+      "qsvm_zz",
+      "random_forest",
+      "rbf_svm",
+      "rules"
+    ],
+    "label_col": "y_true",
+    "label_dist": {
+      "0": 976,
+      "1": 206
+    }
+  }
+}

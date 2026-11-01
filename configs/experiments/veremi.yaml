@@ -1,0 +1,21 @@
+# External comparability: VeReMi reproduction
+kind: veremi
+name: veremi_baseline
+veremi_root: data/veremi
+features_config: configs/features_veremi.yaml   # receiver_set: all (VeReMi is V2V, no RSUs)
+quantum_config: configs/quantum.yaml
+baselines_config: configs/baselines.yaml
+out_dir: results/veremi
+
+# VeReMi has no controllable channel; cross-layer F2 uses RSSI logged by Veins with
+# propagation parameters estimated from benign calibration messages per receiver.
+estimate_propagation: true
+binary_and_multiclass: true
+models: [qsvm_crosslayer, qsvm_zz, rbf_svm, random_forest, knn_bagging, mlp, rules]
+# Multi-class attack-type identification (confusion matrix). The quantum cross-layer
+# kernel runs here too (one-vs-one over the fidelity Gram); RF/KNN are the VeReMi ref.
+multiclass_models: [qsvm_crosslayer, random_forest, knn_bagging, mlp, rbf_svm]
+# Stratified subsample cap. The quantum kernel builds an O(N^2) Gram, so keep this in
+# the low thousands on a CPU. Raise it only for a CLASSICAL-only run (drop the qsvm_*
+# models from both lists first), where 1e5+ windows are fine.
+max_windows: 4000

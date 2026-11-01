@@ -1,0 +1,95 @@
+{
+ "seeds": [
+  7,
+  17,
+  27
+ ],
+ "published_seed7_roc": {
+  "hcrl": {
+   "qsvm_crosslayer": 0.9984273658892578,
+   "qsvm_zz": 0.993031072372005,
+   "rbf_svm": 0.997718138741276,
+   "random_forest": 0.9984376445435764,
+   "xgboost": 0.9986329389756292,
+   "mlp": 0.993226366804058
+  },
+  "cic": {
+   "qsvm_crosslayer": 1.0,
+   "qsvm_zz": 1.0,
+   "rbf_svm": 1.0,
+   "random_forest": 1.0,
+   "xgboost": 1.0,
+   "mlp": 1.0
+  },
+  "road": {
+   "qsvm_crosslayer": 0.754161959858054,
+   "qsvm_zz": 0.5293704857426488,
+   "rbf_svm": 0.6987642487933454,
+   "random_forest": 0.7881051814831296,
+   "xgboost": 0.7551090268031355,
+   "mlp": 0.7477492896997912
+  }
+ },
+ "verdict_mean": {
+  "cic": {
+   "crosslayer": [
+    1.0,
+    0.0
+   ],
+   "zz": [
+    0.9999977656227657,
+    3.870054893224385e-06
+   ],
+   "best_classical": [
+    "mlp",
+    [
+     1.0,
+     0.0
+    ]
+   ],
+   "crosslayer_beats_zz_mean": true,
+   "no_advantage_mean": true
+  },
+  "hcrl": {
+   "crosslayer": [
+    0.9961198642121843,
+    0.0031859757968435614
+   ],
+   "zz": [
+    0.9942166192747081,
+    0.0020322612810665225
+   ],
+   "best_classical": [
+    "rbf_svm",
+    [
+     0.9966705721885586,
+     0.001024565928428294
+    ]
+   ],
+   "crosslayer_beats_zz_mean": true,
+   "no_advantage_mean": true
+  },
+  "road": {
+   "crosslayer": [
+    0.7035996255003196,
+    0.05887147717202255
+   ],
+   "zz": [
+    0.5429719570540952,
+    0.03458637674883832
+   ],
+   "best_classical": [
+    "random_forest",
+    [
+     0.7200541334595574,
+     0.08891940104397994
+    ]
+   ],
+   "crosslayer_beats_zz_mean": true,
+   "no_advantage_mean": true
+  }
+ },
+ "runtime_s": 584.388011932373,
+ "interpreter": "python",
+ "note": "scripts/can_ids.py and scripts/road_ids.py unchanged; output root redirected"
+}

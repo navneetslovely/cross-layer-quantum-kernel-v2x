@@ -1,0 +1,54 @@
+# Step 20b (review F-METH-3): re-simulate the adaptive DoS MIMICRY end-to-end through SUMO+ns-3
+# (not the feature-space upper bound). The "mimicry" is a LOW flooding factor: the attacker floods
+# only slightly above the benign rate to look normal and evade the rate signature. A focused, short
+# run (1 seed, 1 density) at the stealthy-rate limit; if detection holds here, DoS resists mimicry
+# end-to-end. Mirrors configs/sim/dev_grid_flooding.yaml but tamed for tractability.
+scenario:
+  name: dev_grid_dos_mimicry
+  sumocfg: cosim/sumo/scenarios/dev_grid/dev_grid.sumocfg
+  step_length: 0.1
+  warmup: 30.0
+  duration: 90.0                 # short: ~60 s usable after warmup
+
+out_root: runs/dos_mimicry
+seeds: [1]
+node_pool: 1000
+
+rsu:
+  count: 9
+  margin: 100.0
+  z: 6.0
+
+sweep:
+  density_scale: [1.0]
+  tx_power_dbm: [20.0]
+  shadowing_sigma_db: [3.0]
+
+channel:
+  path_loss_exponent: 2.75
+  ref_loss_db: 47.86
+  ref_distance: 1.0
+  shadowing_sigma_db: 3.0
+  shadowing_tau_s: 1.0
+  nakagami: false
+  rx_sensitivity_dbm: -94.0
+  cca_threshold_dbm: -84.0
+  tx_power_dbm: 20.0
+  datarate: OfdmRate6MbpsBW10MHz
+
+bsm:
+  rate_hz: 10.0
+  size_bytes: 300
+
+attacks:
+  fraction: 0.30
+  onset_uniform: [10.0, 40.0]
+  mix:
+    flooding: 1
+  params:
+    flooding_factor: 1.5         # MIMICRY: 1.5x benign rate (stealthy), not the obvious 10x
+
+ns3:
+  run_via_wrapper: true
+n_jobs: 2
+sumo_binary: sumo

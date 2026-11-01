@@ -1,0 +1,65 @@
+{
+ "n_train": 3023,
+ "n_sv": 888,
+ "n_qubits": 8,
+ "C": 0.1,
+ "cpu": "arm",
+ "machine": "macOS-27.0.1-arm64-arm-64bit",
+ "torch_threads": 4,
+ "single_window": {
+  "statevector": {
+   "median_ms": 5.448916461318731,
+   "mean_ms": 5.432454226538539,
+   "min_ms": 5.071999970823526,
+   "reps": 50
+  },
+  "kernel_row_vs_sv": {
+   "median_ms": 5.4227704531513155,
+   "mean_ms": 5.47543493565172,
+   "min_ms": 5.337666952982545,
+   "reps": 50
+  },
+  "kernel_row_vs_all_train": {
+   "median_ms": 6.141583493445069,
+   "mean_ms": 6.153267398476601,
+   "min_ms": 6.070583942346275,
+   "reps": 50
+  },
+  "svm_decision": {
+   "median_ms": 0.05312496796250343,
+   "mean_ms": 0.05602249410003424,
+   "min_ms": 0.049875001423060894,
+   "reps": 200
+  }
+ },
+ "batch_1000_windows": {
+  "statevectors_total": {
+   "median_ms": 103.47845801152289,
+   "mean_ms": 103.86175820603967,
+   "min_ms": 102.70516702439636,
+   "reps": 5
+  },
+  "kernel_rows_vs_sv_total": {
+   "median_ms": 107.2116659488529,
+   "mean_ms": 107.26845837198198,
+   "min_ms": 106.09124996699393,
+   "reps": 5
+  },
+  "svm_decision_total": {
+   "median_ms": 3.095958032645285,
+   "mean_ms": 3.097616578452289,
+   "min_ms": 3.061041934415698,
+   "reps": 5
+  }
+ },
+ "per_window_ms": {
+  "cpu_single_sv": 5.475895421113819,
+  "cpu_batched_sv": 0.11030762398149818
+ },
+ "hardware_derived": {
+  "circuits_per_window_sv": 888,
+  "qpu_s_per_circuit": 0.3,
+  "qpu_s_per_window_sv": 266.4,
+  "qpu_s_per_window_all_train": 906.9
+ }
+}

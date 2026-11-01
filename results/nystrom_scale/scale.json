@@ -1,0 +1,75 @@
+{
+  "study": "nystrom_at_scale",
+  "started": "2026-06-23T22:23:44",
+  "params": {
+    "landmarks": 512,
+    "n_scale": 12000
+  },
+  "note": "quantum kernels evaluated via Nystr\u00f6m (O(N*l)) at N>>dense-cap; classical at same N on same test split. Closes the matched-N artifact on dev_grid+VeReMi (NextGen already settled at N=20k, earlier).",
+  "datasets": {
+    "dev_grid": {
+      "qsvm_crosslayer": {
+        "pr_auc": 0.885560879191919,
+        "roc_auc": 0.9274425318909391,
+        "kind": "quantum_nystrom"
+      },
+      "qsvm_zz": {
+        "pr_auc": 0.616627539816031,
+        "roc_auc": 0.8118943356890098,
+        "kind": "quantum_nystrom"
+      },
+      "random_forest": {
+        "pr_auc": 0.8969275758127526,
+        "roc_auc": 0.937546941500459,
+        "kind": "classical_fullN"
+      },
+      "xgboost": {
+        "pr_auc": 0.8961363451958951,
+        "roc_auc": 0.9334067560623163,
+        "kind": "classical_fullN"
+      },
+      "_summary": {
+        "n_train": 12000,
+        "n_test": 4000,
+        "crosslayer_beats_zz": true,
+        "best_classical": "random_forest",
+        "best_classical_roc": 0.937546941500459,
+        "qsvm_crosslayer_roc": 0.9274425318909391,
+        "no_quantum_advantage_at_scale": true,
+        "wall_s": 116.9
+      }
+    },
+    "veremi": {
+      "qsvm_crosslayer": {
+        "pr_auc": 0.8398983105100155,
+        "roc_auc": 0.9168292069875581,
+        "kind": "quantum_nystrom"
+      },
+      "qsvm_zz": {
+        "pr_auc": 0.5974991303418954,
+        "roc_auc": 0.8064077751246281,
+        "kind": "quantum_nystrom"
+      },
+      "random_forest": {
+        "pr_auc": 0.9420756234140957,
+        "roc_auc": 0.9728163880859622,
+        "kind": "classical_fullN"
+      },
+      "xgboost": {
+        "pr_auc": 0.9415517894631769,
+        "roc_auc": 0.9720464161534917,
+        "kind": "classical_fullN"
+      },
+      "_summary": {
+        "n_train": 9863,
+        "n_test": 4000,
+        "crosslayer_beats_zz": true,
+        "best_classical": "random_forest",
+        "best_classical_roc": 0.9728163880859622,
+        "qsvm_crosslayer_roc": 0.9168292069875581,
+        "no_quantum_advantage_at_scale": true,
+        "wall_s": 521.0
+      }
+    }
+  }
+}

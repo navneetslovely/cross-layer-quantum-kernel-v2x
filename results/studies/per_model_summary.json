@@ -1,0 +1,870 @@
+{
+  "generated": "2026-08-07T02:49:17",
+  "interpreter": "python",
+  "runtime_s": 1.3,
+  "item": "per_model -- per-model frontier correlations (selection-bias correction for best-over-models detectability)",
+  "protocol": {
+    "divergence_source": "results/studies/divergence.csv",
+    "divergence_column": "D",
+    "divergence_scope": "full",
+    "metrics_reported_separately": [
+      "energy",
+      "mmd_u"
+    ],
+    "never_combined_note": "energy and mmd_u are correlated with AUCs strictly separately; no averaging of divergences, models, or datasets.",
+    "auc_sources": {
+      "dev_grid": "results/crossattack_dev/crossattack_results.csv (held-out-attack protocol; models incl. matched-N qsvm_crosslayer/qsvm_zz/rbf_svm/random_forest/mlp and the full-train classical '__full' variants -- all kept as distinct models, mirroring a1._Y_dev_grid's max universe)",
+      "nextgen": "results/veremi_nextgen/veremi_nextgen_per_attack.csv restricted to variant=='full' exactly as a1._Y_nextgen"
+    },
+    "targets": [
+      "roc_auc (primary, matches published Y_rocauc)",
+      "pr_auc (secondary, *_pr columns)"
+    ],
+    "correlations": "Spearman rho + Kendall tau (scipy two-sided p recorded for reference only)",
+    "permutation_test": "EXACT one-sided permutation p, faithful port of scripts/meta_stats.py::exact_one_sided_p: rankdata average-tie ranks, statistic 1-6*sum d^2/(n(n^2-1)), count(rho_perm >= rho_obs - 1e-12)/n! over ALL n! permutations (dev_grid 9!=362880, nextgen 6!=720); direction PRE-REGISTERED positive (higher D -> higher AUC, the published frontier direction).",
+    "port_faithfulness_check": [
+      {
+        "dataset": "dev_grid",
+        "model": "rbf_svm",
+        "n": 9,
+        "verbatim": {
+          "stat": 0.5,
+          "p": 0.08883101851851852
+        },
+        "vectorised": {
+          "stat": 0.5,
+          "p": 0.08883101851851852
+        },
+        "match": true
+      },
+      {
+        "dataset": "nextgen",
+        "model": "rbf_svm",
+        "n": 6,
+        "verbatim": {
+          "stat": 0.8857142857142857,
+          "p": 0.016666666666666666
+        },
+        "vectorised": {
+          "stat": 0.8857142857142857,
+          "p": 0.016666666666666666
+        },
+        "match": true
+      }
+    ],
+    "reference_model": {
+      "model": "rbf_svm",
+      "why": "pre-specified reference: untuned classical RBF-SVM, present in both datasets, fixed before inspecting per-model correlations; no validation-selected ensemble exists in the result files, so a pre-specified reference model is used"
+    },
+    "envelope_handling": "best-over-models recomputed from the SAME per-model AUC table (per-attack max), appended as final row per dataset x metric with exploratory_upper_bound=True; never pooled with individual models in spreads",
+    "min_attacks_per_cell": 4,
+    "seeds": "none needed -- fully deterministic: exhaustive n! permutation enumeration, no sampling anywhere in per_model; upstream divergence seeds are recorded in divergence.csv 'seeds' column"
+  },
+  "published_envelope_for_context": {
+    "source": "results/frontier/controllability_validation.json",
+    "pooled_spearman_rho": 0.8203756627046467,
+    "dev_grid_spearman_rho": 0.7666666666666667,
+    "nextgen_spearman_rho": 0.8857142857142858,
+    "note": "published D_full is the a1 energy-only estimator on self-referentially standardised features; per_model correlates the CORRECTED divergence D (grouped cross-fit) instead, so envelope rows here need not equal the published rho exactly."
+  },
+  "sanity": {
+    "metric_rank_agreement_within_dataset": {
+      "dev_grid": {
+        "spearman_D_energy_vs_D_mmd_u": 1.0,
+        "orderings_identical": true
+      },
+      "nextgen": {
+        "spearman_D_energy_vs_D_mmd_u": 0.8285714285714287,
+        "orderings_identical": false
+      }
+    },
+    "note": "where energy and mmd_u order the attacks identically (rho=1.0), per-model rank correlations are identical across the two metric blocks by construction of rank statistics -- expected, not an error"
+  },
+  "coverage": {
+    "per_dataset": {
+      "dev_grid": {
+        "models": [
+          "mlp",
+          "mlp__full",
+          "qsvm_crosslayer",
+          "qsvm_zz",
+          "random_forest",
+          "random_forest__full",
+          "rbf_svm",
+          "rbf_svm__full"
+        ],
+        "n_models": 8,
+        "divergence_attacks": [
+          "const_offset",
+          "const_pos",
+          "data_falsification",
+          "drift",
+          "eventual_stop",
+          "random_offset",
+          "random_pos",
+          "replay",
+          "sybil"
+        ],
+        "n_base_attacks": 9,
+        "auc_attacks": [
+          "const_offset",
+          "const_pos",
+          "data_falsification",
+          "drift",
+          "eventual_stop",
+          "random_offset",
+          "random_pos",
+          "replay",
+          "sybil"
+        ],
+        "protocol": "held-out-attack (crossattack_dev)"
+      },
+      "nextgen": {
+        "models": [
+          "knn_bagging",
+          "lstm_seq",
+          "mlp",
+          "qsvm_crosslayer",
+          "qsvm_zz",
+          "random_forest",
+          "rbf_svm",
+          "rules",
+          "xgboost"
+        ],
+        "n_models": 9,
+        "divergence_attacks": [
+          "constantPositionOffset",
+          "dataReplay",
+          "dosAttack",
+          "randomPositionOffset",
+          "randomSpeedOffset",
+          "timeDelayAttack"
+        ],
+        "n_base_attacks": 6,
+        "auc_attacks": [
+          "constantPositionOffset",
+          "dataReplay",
+          "dosAttack",
+          "randomPositionOffset",
+          "randomSpeedOffset",
+          "timeDelayAttack"
+        ],
+        "protocol": "per-attack eval, variant=full (veremi_nextgen)"
+      }
+    },
+    "models_only_in_dev_grid": [
+      "mlp__full",
+      "random_forest__full",
+      "rbf_svm__full"
+    ],
+    "models_only_in_nextgen": [
+      "knn_bagging",
+      "lstm_seq",
+      "rules",
+      "xgboost"
+    ],
+    "models_in_both": [
+      "mlp",
+      "qsvm_crosslayer",
+      "qsvm_zz",
+      "random_forest",
+      "rbf_svm"
+    ],
+    "dropped_or_partial_cells": "none"
+  },
+  "spreads_across_individual_models": {
+    "dev_grid|energy": {
+      "n_models": 8,
+      "rho_min": 0.38333333333333336,
+      "rho_median": 0.575,
+      "rho_max": 0.9500000000000001,
+      "model_at_min": "rbf_svm__full",
+      "model_at_max": "qsvm_zz",
+      "n_rho_positive": 8,
+      "n_perm_p_le_0.05": 4,
+      "reference_rbf_svm": {
+        "spearman": 0.5,
+        "kendall": 0.3333333333333333,
+        "perm_p": 0.08883101851851852
+      },
+      "envelope_exploratory": {
+        "spearman": 0.7,
+        "kendall": 0.5555555555555556,
+        "perm_p": 0.021626984126984126
+      },
+      "pr_auc_rho_min_median_max": [
+        0.41666666666666663,
+        0.65,
+        0.7999999999999999
+      ]
+    },
+    "dev_grid|mmd_u": {
+      "n_models": 8,
+      "rho_min": 0.38333333333333336,
+      "rho_median": 0.575,
+      "rho_max": 0.9500000000000001,
+      "model_at_min": "rbf_svm__full",
+      "model_at_max": "qsvm_zz",
+      "n_rho_positive": 8,
+      "n_perm_p_le_0.05": 4,
+      "reference_rbf_svm": {
+        "spearman": 0.5,
+        "kendall": 0.3333333333333333,
+        "perm_p": 0.08883101851851852
+      },
+      "envelope_exploratory": {
+        "spearman": 0.7,
+        "kendall": 0.5555555555555556,
+        "perm_p": 0.021626984126984126
+      },
+      "pr_auc_rho_min_median_max": [
+        0.41666666666666663,
+        0.65,
+        0.7999999999999999
+      ]
+    },
+    "nextgen|energy": {
+      "n_models": 9,
+      "rho_min": 0.7142857142857143,
+      "rho_median": 0.8285714285714287,
+      "rho_max": 0.8857142857142858,
+      "model_at_min": "knn_bagging",
+      "model_at_max": "mlp",
+      "n_rho_positive": 9,
+      "n_perm_p_le_0.05": 6,
+      "reference_rbf_svm": {
+        "spearman": 0.8857142857142858,
+        "kendall": 0.7333333333333333,
+        "perm_p": 0.016666666666666666
+      },
+      "envelope_exploratory": {
+        "spearman": 0.942857142857143,
+        "kendall": 0.8666666666666666,
+        "perm_p": 0.008333333333333333
+      },
+      "pr_auc_rho_min_median_max": [
+        0.6,
+        0.8857142857142858,
+        0.8857142857142858
+      ]
+    },
+    "nextgen|mmd_u": {
+      "n_models": 9,
+      "rho_min": 0.5428571428571429,
+      "rho_median": 0.8285714285714287,
+      "rho_max": 1.0,
+      "model_at_min": "qsvm_zz",
+      "model_at_max": "lstm_seq",
+      "n_rho_positive": 9,
+      "n_perm_p_le_0.05": 5,
+      "reference_rbf_svm": {
+        "spearman": 0.8285714285714287,
+        "kendall": 0.7333333333333333,
+        "perm_p": 0.029166666666666667
+      },
+      "envelope_exploratory": {
+        "spearman": 0.942857142857143,
+        "kendall": 0.8666666666666666,
+        "perm_p": 0.008333333333333333
+      },
+      "pr_auc_rho_min_median_max": [
+        0.5428571428571429,
+        0.8285714285714287,
+        0.8857142857142858
+      ]
+    }
+  },
+  "verdict": {
+    "n_model_dataset_metric_cells": 34,
+    "fraction_rho_positive": "34/34",
+    "fraction_perm_p_le_0.05": "19/34",
+    "reference_model_rows": [
+      "dev_grid/energy: rho=+0.500 perm_p=0.0888",
+      "dev_grid/mmd_u: rho=+0.500 perm_p=0.0888",
+      "nextgen/energy: rho=+0.886 perm_p=0.0167",
+      "nextgen/mmd_u: rho=+0.829 perm_p=0.0292"
+    ],
+    "reference_positive_in_all_cells": true,
+    "reference_significant_in_all_cells": false,
+    "envelope_rows_exploratory": [
+      "dev_grid/energy: rho=+0.700 perm_p=0.0216",
+      "dev_grid/mmd_u: rho=+0.700 perm_p=0.0216",
+      "nextgen/energy: rho=+0.943 perm_p=0.0083",
+      "nextgen/mmd_u: rho=+0.943 perm_p=0.0083"
+    ],
+    "frontier_ordering_survives_without_envelope": "YES -- the positive divergence->detectability ordering holds for EVERY individual model (all 34 model x dataset x metric cells rho>0), not only the best-over-models envelope; the envelope is therefore an upper bound on strength, not the source of the sign.",
+    "terminology": "D(a) uses no detector, but the predictand Y(a) is a per-attack max over models, so the validation is reported per model ('detector-free divergence, validated per model'), with best-over-models kept only as an exploratory upper bound."
+  },
+  "per_model_table": [
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "mlp",
+      "n_attacks": 9,
+      "spearman": 0.43333333333333335,
+      "kendall": 0.2777777777777778,
+      "perm_p": 0.12495866402116403,
+      "spearman_p_two_sided": 0.24395243588005172,
+      "spearman_pr": 0.65,
+      "kendall_pr": 0.5555555555555556,
+      "perm_p_pr": 0.03328097442680776,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "mlp__full",
+      "n_attacks": 9,
+      "spearman": 0.5,
+      "kendall": 0.3888888888888889,
+      "perm_p": 0.08883101851851852,
+      "spearman_p_two_sided": 0.1704706607870538,
+      "spearman_pr": 0.65,
+      "kendall_pr": 0.5555555555555556,
+      "perm_p_pr": 0.03328097442680776,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "qsvm_crosslayer",
+      "n_attacks": 9,
+      "spearman": 0.6833333333333333,
+      "kendall": 0.5555555555555556,
+      "perm_p": 0.02515983245149912,
+      "spearman_p_two_sided": 0.04244227208707231,
+      "spearman_pr": 0.41666666666666663,
+      "kendall_pr": 0.3888888888888889,
+      "perm_p_pr": 0.1347911155202822,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "qsvm_zz",
+      "n_attacks": 9,
+      "spearman": 0.9500000000000001,
+      "kendall": 0.8333333333333334,
+      "perm_p": 0.0001763668430335097,
+      "spearman_p_two_sided": 8.762523965086185e-05,
+      "spearman_pr": 0.7999999999999999,
+      "kendall_pr": 0.611111111111111,
+      "perm_p_pr": 0.00691413139329806,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "random_forest",
+      "n_attacks": 9,
+      "spearman": 0.65,
+      "kendall": 0.3888888888888889,
+      "perm_p": 0.03328097442680776,
+      "spearman_p_two_sided": 0.058073058017148654,
+      "spearman_pr": 0.5333333333333333,
+      "kendall_pr": 0.3888888888888889,
+      "perm_p_pr": 0.07376267636684303,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "random_forest__full",
+      "n_attacks": 9,
+      "spearman": 0.6666666666666667,
+      "kendall": 0.4444444444444444,
+      "perm_p": 0.029444995590828926,
+      "spearman_p_two_sided": 0.049867230568885125,
+      "spearman_pr": 0.7666666666666667,
+      "kendall_pr": 0.611111111111111,
+      "perm_p_pr": 0.010694995590828925,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "rbf_svm",
+      "n_attacks": 9,
+      "spearman": 0.5,
+      "kendall": 0.3333333333333333,
+      "perm_p": 0.08883101851851852,
+      "spearman_p_two_sided": 0.1704706607870538,
+      "spearman_pr": 0.65,
+      "kendall_pr": 0.5,
+      "perm_p_pr": 0.03328097442680776,
+      "is_reference": true,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "rbf_svm__full",
+      "n_attacks": 9,
+      "spearman": 0.38333333333333336,
+      "kendall": 0.2222222222222222,
+      "perm_p": 0.15625,
+      "spearman_p_two_sided": 0.3084952723803716,
+      "spearman_pr": 0.7166666666666667,
+      "kendall_pr": 0.5555555555555556,
+      "perm_p_pr": 0.01843309082892416,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "energy",
+      "model": "best_over_models",
+      "n_attacks": 9,
+      "spearman": 0.7,
+      "kendall": 0.5555555555555556,
+      "perm_p": 0.021626984126984126,
+      "spearman_p_two_sided": 0.03576957497026173,
+      "spearman_pr": 0.7333333333333334,
+      "kendall_pr": 0.611111111111111,
+      "perm_p_pr": 0.015561618165784833,
+      "is_reference": false,
+      "exploratory_upper_bound": true
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "mlp",
+      "n_attacks": 9,
+      "spearman": 0.43333333333333335,
+      "kendall": 0.2777777777777778,
+      "perm_p": 0.12495866402116403,
+      "spearman_p_two_sided": 0.24395243588005172,
+      "spearman_pr": 0.65,
+      "kendall_pr": 0.5555555555555556,
+      "perm_p_pr": 0.03328097442680776,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "mlp__full",
+      "n_attacks": 9,
+      "spearman": 0.5,
+      "kendall": 0.3888888888888889,
+      "perm_p": 0.08883101851851852,
+      "spearman_p_two_sided": 0.1704706607870538,
+      "spearman_pr": 0.65,
+      "kendall_pr": 0.5555555555555556,
+      "perm_p_pr": 0.03328097442680776,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "qsvm_crosslayer",
+      "n_attacks": 9,
+      "spearman": 0.6833333333333333,
+      "kendall": 0.5555555555555556,
+      "perm_p": 0.02515983245149912,
+      "spearman_p_two_sided": 0.04244227208707231,
+      "spearman_pr": 0.41666666666666663,
+      "kendall_pr": 0.3888888888888889,
+      "perm_p_pr": 0.1347911155202822,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "qsvm_zz",
+      "n_attacks": 9,
+      "spearman": 0.9500000000000001,
+      "kendall": 0.8333333333333334,
+      "perm_p": 0.0001763668430335097,
+      "spearman_p_two_sided": 8.762523965086185e-05,
+      "spearman_pr": 0.7999999999999999,
+      "kendall_pr": 0.611111111111111,
+      "perm_p_pr": 0.00691413139329806,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "random_forest",
+      "n_attacks": 9,
+      "spearman": 0.65,
+      "kendall": 0.3888888888888889,
+      "perm_p": 0.03328097442680776,
+      "spearman_p_two_sided": 0.058073058017148654,
+      "spearman_pr": 0.5333333333333333,
+      "kendall_pr": 0.3888888888888889,
+      "perm_p_pr": 0.07376267636684303,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "random_forest__full",
+      "n_attacks": 9,
+      "spearman": 0.6666666666666667,
+      "kendall": 0.4444444444444444,
+      "perm_p": 0.029444995590828926,
+      "spearman_p_two_sided": 0.049867230568885125,
+      "spearman_pr": 0.7666666666666667,
+      "kendall_pr": 0.611111111111111,
+      "perm_p_pr": 0.010694995590828925,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "rbf_svm",
+      "n_attacks": 9,
+      "spearman": 0.5,
+      "kendall": 0.3333333333333333,
+      "perm_p": 0.08883101851851852,
+      "spearman_p_two_sided": 0.1704706607870538,
+      "spearman_pr": 0.65,
+      "kendall_pr": 0.5,
+      "perm_p_pr": 0.03328097442680776,
+      "is_reference": true,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "rbf_svm__full",
+      "n_attacks": 9,
+      "spearman": 0.38333333333333336,
+      "kendall": 0.2222222222222222,
+      "perm_p": 0.15625,
+      "spearman_p_two_sided": 0.3084952723803716,
+      "spearman_pr": 0.7166666666666667,
+      "kendall_pr": 0.5555555555555556,
+      "perm_p_pr": 0.01843309082892416,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "dev_grid",
+      "metric": "mmd_u",
+      "model": "best_over_models",
+      "n_attacks": 9,
+      "spearman": 0.7,
+      "kendall": 0.5555555555555556,
+      "perm_p": 0.021626984126984126,
+      "spearman_p_two_sided": 0.03576957497026173,
+      "spearman_pr": 0.7333333333333334,
+      "kendall_pr": 0.611111111111111,
+      "perm_p_pr": 0.015561618165784833,
+      "is_reference": false,
+      "exploratory_upper_bound": true
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "knn_bagging",
+      "n_attacks": 6,
+      "spearman": 0.7142857142857143,
+      "kendall": 0.6,
+      "perm_p": 0.06805555555555555,
+      "spearman_p_two_sided": 0.11078717201166179,
+      "spearman_pr": 0.8857142857142858,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.016666666666666666,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "lstm_seq",
+      "n_attacks": 6,
+      "spearman": 0.8285714285714287,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.029166666666666667,
+      "spearman_p_two_sided": 0.04156268221574335,
+      "spearman_pr": 0.8285714285714287,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.029166666666666667,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "mlp",
+      "n_attacks": 6,
+      "spearman": 0.8857142857142858,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.016666666666666666,
+      "spearman_p_two_sided": 0.01884548104956266,
+      "spearman_pr": 0.8857142857142858,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.016666666666666666,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "qsvm_crosslayer",
+      "n_attacks": 6,
+      "spearman": 0.8857142857142858,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.016666666666666666,
+      "spearman_p_two_sided": 0.01884548104956266,
+      "spearman_pr": 0.6,
+      "kendall_pr": 0.4666666666666666,
+      "perm_p_pr": 0.12083333333333333,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "qsvm_zz",
+      "n_attacks": 6,
+      "spearman": 0.8285714285714287,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.029166666666666667,
+      "spearman_p_two_sided": 0.04156268221574335,
+      "spearman_pr": 0.6,
+      "kendall_pr": 0.4666666666666666,
+      "perm_p_pr": 0.12083333333333333,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "random_forest",
+      "n_attacks": 6,
+      "spearman": 0.7142857142857143,
+      "kendall": 0.6,
+      "perm_p": 0.06805555555555555,
+      "spearman_p_two_sided": 0.11078717201166179,
+      "spearman_pr": 0.8857142857142858,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.016666666666666666,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "rbf_svm",
+      "n_attacks": 6,
+      "spearman": 0.8857142857142858,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.016666666666666666,
+      "spearman_p_two_sided": 0.01884548104956266,
+      "spearman_pr": 0.8857142857142858,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.016666666666666666,
+      "is_reference": true,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "rules",
+      "n_attacks": 6,
+      "spearman": 0.7714285714285715,
+      "kendall": 0.6,
+      "perm_p": 0.05138888888888889,
+      "spearman_p_two_sided": 0.07239650145772594,
+      "spearman_pr": 0.7714285714285715,
+      "kendall_pr": 0.6,
+      "perm_p_pr": 0.05138888888888889,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "xgboost",
+      "n_attacks": 6,
+      "spearman": 0.8857142857142858,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.016666666666666666,
+      "spearman_p_two_sided": 0.01884548104956266,
+      "spearman_pr": 0.8857142857142858,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.016666666666666666,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "energy",
+      "model": "best_over_models",
+      "n_attacks": 6,
+      "spearman": 0.942857142857143,
+      "kendall": 0.8666666666666666,
+      "perm_p": 0.008333333333333333,
+      "spearman_p_two_sided": 0.004804664723032055,
+      "spearman_pr": 0.8857142857142858,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.016666666666666666,
+      "is_reference": false,
+      "exploratory_upper_bound": true
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "knn_bagging",
+      "n_attacks": 6,
+      "spearman": 0.7714285714285715,
+      "kendall": 0.6,
+      "perm_p": 0.05138888888888889,
+      "spearman_p_two_sided": 0.07239650145772594,
+      "spearman_pr": 0.8285714285714287,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.029166666666666667,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "lstm_seq",
+      "n_attacks": 6,
+      "spearman": 1.0,
+      "kendall": 0.9999999999999999,
+      "perm_p": 0.001388888888888889,
+      "spearman_p_two_sided": 0.0,
+      "spearman_pr": 0.8857142857142858,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.016666666666666666,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "mlp",
+      "n_attacks": 6,
+      "spearman": 0.8285714285714287,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.029166666666666667,
+      "spearman_p_two_sided": 0.04156268221574335,
+      "spearman_pr": 0.8285714285714287,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.029166666666666667,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "qsvm_crosslayer",
+      "n_attacks": 6,
+      "spearman": 0.8285714285714287,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.029166666666666667,
+      "spearman_p_two_sided": 0.04156268221574335,
+      "spearman_pr": 0.7142857142857143,
+      "kendall_pr": 0.4666666666666666,
+      "perm_p_pr": 0.06805555555555555,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "qsvm_zz",
+      "n_attacks": 6,
+      "spearman": 0.5428571428571429,
+      "kendall": 0.4666666666666666,
+      "perm_p": 0.1486111111111111,
+      "spearman_p_two_sided": 0.26570262390670546,
+      "spearman_pr": 0.7142857142857143,
+      "kendall_pr": 0.4666666666666666,
+      "perm_p_pr": 0.06805555555555555,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "random_forest",
+      "n_attacks": 6,
+      "spearman": 0.7714285714285715,
+      "kendall": 0.6,
+      "perm_p": 0.05138888888888889,
+      "spearman_p_two_sided": 0.07239650145772594,
+      "spearman_pr": 0.8285714285714287,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.029166666666666667,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "rbf_svm",
+      "n_attacks": 6,
+      "spearman": 0.8285714285714287,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.029166666666666667,
+      "spearman_p_two_sided": 0.04156268221574335,
+      "spearman_pr": 0.8285714285714287,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.029166666666666667,
+      "is_reference": true,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "rules",
+      "n_attacks": 6,
+      "spearman": 0.7142857142857143,
+      "kendall": 0.6,
+      "perm_p": 0.06805555555555555,
+      "spearman_p_two_sided": 0.11078717201166179,
+      "spearman_pr": 0.5428571428571429,
+      "kendall_pr": 0.3333333333333333,
+      "perm_p_pr": 0.1486111111111111,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "xgboost",
+      "n_attacks": 6,
+      "spearman": 0.8285714285714287,
+      "kendall": 0.7333333333333333,
+      "perm_p": 0.029166666666666667,
+      "spearman_p_two_sided": 0.04156268221574335,
+      "spearman_pr": 0.8285714285714287,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.029166666666666667,
+      "is_reference": false,
+      "exploratory_upper_bound": false
+    },
+    {
+      "dataset": "nextgen",
+      "metric": "mmd_u",
+      "model": "best_over_models",
+      "n_attacks": 6,
+      "spearman": 0.942857142857143,
+      "kendall": 0.8666666666666666,
+      "perm_p": 0.008333333333333333,
+      "spearman_p_two_sided": 0.004804664723032055,
+      "spearman_pr": 0.8285714285714287,
+      "kendall_pr": 0.7333333333333333,
+      "perm_p_pr": 0.029166666666666667,
+      "is_reference": false,
+      "exploratory_upper_bound": true
+    }
+  ]
+}

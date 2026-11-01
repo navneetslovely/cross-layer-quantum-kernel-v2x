@@ -1,0 +1,2770 @@
+{
+  "generated": "2026-08-07T02:59:13",
+  "item": "correlations_correlation_statistics_hardening",
+  "runtime_s": 270.0,
+  "protocol": {
+    "dependency": "results/studies/divergence.csv",
+    "divergence_used": "divergence D_raw, scope='full' (grouped cross-fit, fold-A-only standardisation); D_raw == D for all 15 points (0 negative raw MMD values)",
+    "y_sources": {
+      "dev_grid": "results/crossattack_dev/crossattack_results.csv -- held-out-attack protocol; test = benign + held-out attack; 8 Y-definitions (5 matched-N models + 3 classical@full) + envelope",
+      "nextgen": "results/veremi_nextgen/veremi_nextgen_per_attack.csv variant='full' (9 models) + envelope; per-attack eval set = all test benign + that attack's positives, seed 7"
+    },
+    "prevalence_definition": "positive-window fraction of the SAME evaluation set on which the row's ROC/PR were computed (dev_grid: n_heldout/n_test; nextgen: n_pos/(n_pos+n_benign)); this is the PR-AUC chance baseline",
+    "reference_model": "rbf_svm -- pre-specified: the project-wide matched-N classical baseline used as the comparison anchor in RQ3/H2/H3 (pre-specified)",
+    "envelope_policy": "best-over-models retained, labelled 'exploratory_upper_envelope'; never used for the primary claim",
+    "spearman": "tie-aware (Pearson of average ranks); verified against scipy",
+    "kendall": "tau-b (tie-corrected); verified against scipy",
+    "permutation_test": "EXACT full enumeration of all n! pairings (dev_grid 9!=362880, nextgen 6!=720); one-sided in the pre-specified POSITIVE direction (higher divergence -> higher detectability); tie-aware; row-0 identity gives the observed statistic; generalises meta_stats.exact_one_sided_p (equality asserted on a tie-free combo, see self_check)",
+    "bootstrap_ci": "attack-level pairs bootstrap: B=3000 resamples of (D,Y) pairs with replacement, percentile [0.025,0.975]; degenerate replicates dropped and counted; rng=default_rng([20260807, ds_idx, metric_idx, ydef_idx, target_idx]) with ds order ['dev_grid', 'nextgen'], metric order ['energy', 'mmd_u'], ydefs sorted, target order ['roc_auc', 'pr_auc']",
+    "blocked_combination": "per-dataset EXACT one-sided permutation p combined by Stouffer sqrt(n)-weighted Z AND Fisher chi^2 (imported from scripts/meta_stats.py); combined ONLY when per-dataset directions are consistently positive (consistency rule); models absent from one dataset are marked IRRECOVERABLE",
+    "rank_standardised_pooling": "within-dataset mid-quantile ranks (rank-0.5)/n pooled; DESCRIPTIVE ONLY, no p-value",
+    "nextgen_y_ci": "shipped qkv2x.models.metrics.grouped_bootstrap_ci (transmitter groups, n_boot=200, seed=7) on stored per-window predictions -- same convention as the stored dev_grid CIs",
+    "claim_calibrator_thresholds": {
+      "strong_rho": 0.7,
+      "moderate_rho": 0.4,
+      "alpha": 0.05
+    },
+    "no_silent_pooling": "every pooled quantity is labelled blocked or descriptive",
+    "interpreter": "python",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3",
+    "seeds": {
+      "boot_seed_root": 20260807,
+      "y_ci_seed": 7,
+      "permutation": "deterministic (exhaustive enumeration, no RNG)"
+    }
+  },
+  "reproduction_checks": {
+    "nextgen_point_reproduction_max_abs_diff": 1.1102230246251565e-16,
+    "nextgen_reproduction_note": "per-attack roc/pr recomputed from predictions.parquet (seed 7) vs the published CSV",
+    "dev_grid_point_reproduction_max_abs_diff": 1.1102230246251565e-16,
+    "dev_grid_reproduction_note": "roc/pr recomputed from predictions.parquet for the 5 matched-N models x 9 attacks; positives verified == held-out attack",
+    "best_envelope_vs_published_controllability_max_abs_diff": 0.0,
+    "published_pooled_reproduction": {
+      "rho": 0.8203756627046467,
+      "p": 0.00017940728782808013,
+      "n": 15,
+      "matches_published": true
+    },
+    "scipy_crosscheck": "observed rho/tau matched scipy spearmanr/kendalltau to <1e-9 on every combo (asserted)",
+    "ms_helper_self_check": {
+      "combo": "nextgen/energy/best_over_models/roc_auc",
+      "ms_exact_one_sided_p": 0.008333333333333333,
+      "correlations_exact_one_sided_p": 0.008333333333333333,
+      "ms_rho": 0.9428571428571428,
+      "correlations_rho": 0.9428571428571428,
+      "agree": true
+    }
+  },
+  "per_dataset": {
+    "dev_grid": {
+      "energy": {
+        "best_over_models": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.7,
+            "spearman_exact_one_sided_perm_p": 0.021626984126984126,
+            "spearman_ci_lo": -0.22807017543859648,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.21212121212121213,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.7333333333333333,
+            "spearman_exact_one_sided_perm_p": 0.015561618165784833,
+            "spearman_ci_lo": 0.11106060606060607,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6111111111111112,
+            "kendall_exact_one_sided_perm_p": 0.012370480599647266,
+            "kendall_ci_lo": -0.03225806451612903,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "mlp": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.4333333333333333,
+            "spearman_exact_one_sided_perm_p": 0.12495866402116403,
+            "spearman_ci_lo": -0.5088787185354691,
+            "spearman_ci_hi": 0.9473684210526315,
+            "kendall_tau_b": 0.2777777777777778,
+            "kendall_exact_one_sided_perm_p": 0.17924382716049383,
+            "kendall_ci_lo": -0.5,
+            "kendall_ci_hi": 0.8709677419354839,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.6499999999999999,
+            "spearman_exact_one_sided_perm_p": 0.03328097442680776,
+            "spearman_ci_lo": -0.17867236024844718,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.16129032258064516,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "mlp__full": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.49999999999999994,
+            "spearman_exact_one_sided_perm_p": 0.08883101851851852,
+            "spearman_ci_lo": -0.36752136752136755,
+            "spearman_ci_hi": 0.9824561403508771,
+            "kendall_tau_b": 0.3888888888888889,
+            "kendall_exact_one_sided_perm_p": 0.09009038800705467,
+            "kendall_ci_lo": -0.3548387096774194,
+            "kendall_ci_hi": 0.9354838709677419,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.6499999999999999,
+            "spearman_exact_one_sided_perm_p": 0.03328097442680776,
+            "spearman_ci_lo": -0.17867236024844718,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.15175953079178878,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "qsvm_crosslayer": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.6833333333333332,
+            "spearman_exact_one_sided_perm_p": 0.02515983245149912,
+            "spearman_ci_lo": -0.1454901960784313,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.10344827586206896,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.41666666666666663,
+            "spearman_exact_one_sided_perm_p": 0.1347911155202822,
+            "spearman_ci_lo": -0.30434782608695654,
+            "spearman_ci_hi": 0.9824561403508771,
+            "kendall_tau_b": 0.3888888888888889,
+            "kendall_exact_one_sided_perm_p": 0.09009038800705467,
+            "kendall_ci_lo": -0.143073593073593,
+            "kendall_ci_hi": 0.9354838709677419,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "qsvm_zz": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.9499999999999998,
+            "spearman_exact_one_sided_perm_p": 0.0001763668430335097,
+            "spearman_ci_lo": 0.7192982456140351,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.8333333333333334,
+            "kendall_exact_one_sided_perm_p": 0.0004271384479717813,
+            "kendall_ci_lo": 0.5483870967741935,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.7999999999999999,
+            "spearman_exact_one_sided_perm_p": 0.00691413139329806,
+            "spearman_ci_lo": 0.16521739130434782,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6111111111111112,
+            "kendall_exact_one_sided_perm_p": 0.012370480599647266,
+            "kendall_ci_lo": 0.034482758620689655,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "random_forest": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.6499999999999999,
+            "spearman_exact_one_sided_perm_p": 0.03328097442680776,
+            "spearman_ci_lo": -0.3574248120300751,
+            "spearman_ci_hi": 0.9473684210526315,
+            "kendall_tau_b": 0.3888888888888889,
+            "kendall_exact_one_sided_perm_p": 0.09009038800705467,
+            "kendall_ci_lo": -0.4670967741935482,
+            "kendall_ci_hi": 0.8709677419354839,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.5333333333333332,
+            "spearman_exact_one_sided_perm_p": 0.07376267636684303,
+            "spearman_ci_lo": -0.2760167992926613,
+            "spearman_ci_hi": 0.9487179487179487,
+            "kendall_tau_b": 0.3888888888888889,
+            "kendall_exact_one_sided_perm_p": 0.09009038800705467,
+            "kendall_ci_lo": -0.25,
+            "kendall_ci_hi": 0.8787878787878788,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "random_forest__full": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.6666666666666666,
+            "spearman_exact_one_sided_perm_p": 0.029444995590828926,
+            "spearman_ci_lo": -0.28440366972477066,
+            "spearman_ci_hi": 0.9765537730243615,
+            "kendall_tau_b": 0.4444444444444444,
+            "kendall_exact_one_sided_perm_p": 0.05971946649029982,
+            "kendall_ci_lo": -0.3125,
+            "kendall_ci_hi": 0.9051428571428586,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.7666666666666666,
+            "spearman_exact_one_sided_perm_p": 0.010694995590828925,
+            "spearman_ci_lo": 0.12280701754385964,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6111111111111112,
+            "kendall_exact_one_sided_perm_p": 0.012370480599647266,
+            "kendall_ci_lo": 0.030303030303030304,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "rbf_svm": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.49999999999999994,
+            "spearman_exact_one_sided_perm_p": 0.08883101851851852,
+            "spearman_ci_lo": -0.36872380065207255,
+            "spearman_ci_hi": 0.944954128440367,
+            "kendall_tau_b": 0.3333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.12975914902998237,
+            "kendall_ci_lo": -0.42879464285714275,
+            "kendall_ci_hi": 0.8620689655172413,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.6499999999999999,
+            "spearman_exact_one_sided_perm_p": 0.03328097442680776,
+            "spearman_ci_lo": -0.08644302848575705,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5,
+            "kendall_exact_one_sided_perm_p": 0.037588183421516756,
+            "kendall_ci_lo": -0.06666666666666667,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "rbf_svm__full": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.3833333333333333,
+            "spearman_exact_one_sided_perm_p": 0.15625,
+            "spearman_ci_lo": -0.5675675675675675,
+            "spearman_ci_hi": 0.9444444444444444,
+            "kendall_tau_b": 0.2222222222222222,
+            "kendall_exact_one_sided_perm_p": 0.23835427689594357,
+            "kendall_ci_lo": -0.5625,
+            "kendall_ci_hi": 0.8571428571428571,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.7166666666666666,
+            "spearman_exact_one_sided_perm_p": 0.01843309082892416,
+            "spearman_ci_lo": 0.11926605504587157,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.03225806451612903,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        }
+      },
+      "mmd_u": {
+        "best_over_models": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.7,
+            "spearman_exact_one_sided_perm_p": 0.021626984126984126,
+            "spearman_ci_lo": -0.19658119658119658,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.16681034482758614,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.7333333333333333,
+            "spearman_exact_one_sided_perm_p": 0.015561618165784833,
+            "spearman_ci_lo": 0.11106060606060607,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6111111111111112,
+            "kendall_exact_one_sided_perm_p": 0.012370480599647266,
+            "kendall_ci_lo": 0.0,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "mlp": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.4333333333333333,
+            "spearman_exact_one_sided_perm_p": 0.12495866402116403,
+            "spearman_ci_lo": -0.5130434782608696,
+            "spearman_ci_hi": 0.9473684210526315,
+            "kendall_tau_b": 0.2777777777777778,
+            "kendall_exact_one_sided_perm_p": 0.17924382716049383,
+            "kendall_ci_lo": -0.5152037617554859,
+            "kendall_ci_hi": 0.8709677419354839,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.6499999999999999,
+            "spearman_exact_one_sided_perm_p": 0.03328097442680776,
+            "spearman_ci_lo": -0.21739130434782608,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.1724137931034483,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "mlp__full": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.49999999999999994,
+            "spearman_exact_one_sided_perm_p": 0.08883101851851852,
+            "spearman_ci_lo": -0.3217464996315401,
+            "spearman_ci_hi": 0.9824561403508771,
+            "kendall_tau_b": 0.3888888888888889,
+            "kendall_exact_one_sided_perm_p": 0.09009038800705467,
+            "kendall_ci_lo": -0.29082313681868727,
+            "kendall_ci_hi": 0.9354838709677419,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.6499999999999999,
+            "spearman_exact_one_sided_perm_p": 0.03328097442680776,
+            "spearman_ci_lo": -0.23086956521739127,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.18781249999999988,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "qsvm_crosslayer": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.6833333333333332,
+            "spearman_exact_one_sided_perm_p": 0.02515983245149912,
+            "spearman_ci_lo": -0.1559633027522936,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.13357142857142848,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.41666666666666663,
+            "spearman_exact_one_sided_perm_p": 0.1347911155202822,
+            "spearman_ci_lo": -0.30434782608695654,
+            "spearman_ci_hi": 0.981651376146789,
+            "kendall_tau_b": 0.3888888888888889,
+            "kendall_exact_one_sided_perm_p": 0.09009038800705467,
+            "kendall_ci_lo": -0.16129032258064516,
+            "kendall_ci_hi": 0.9310344827586207,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "qsvm_zz": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.9499999999999998,
+            "spearman_exact_one_sided_perm_p": 0.0001763668430335097,
+            "spearman_ci_lo": 0.7192982456140351,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.8333333333333334,
+            "kendall_exact_one_sided_perm_p": 0.0004271384479717813,
+            "kendall_ci_lo": 0.5483870967741935,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.7999999999999999,
+            "spearman_exact_one_sided_perm_p": 0.00691413139329806,
+            "spearman_ci_lo": 0.16521739130434782,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6111111111111112,
+            "kendall_exact_one_sided_perm_p": 0.012370480599647266,
+            "kendall_ci_lo": 0.034482758620689655,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "random_forest": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.6499999999999999,
+            "spearman_exact_one_sided_perm_p": 0.03328097442680776,
+            "spearman_ci_lo": -0.3684210526315789,
+            "spearman_ci_hi": 0.9482758620689655,
+            "kendall_tau_b": 0.3888888888888889,
+            "kendall_exact_one_sided_perm_p": 0.09009038800705467,
+            "kendall_ci_lo": -0.4838709677419355,
+            "kendall_ci_hi": 0.8710685483870971,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.5333333333333332,
+            "spearman_exact_one_sided_perm_p": 0.07376267636684303,
+            "spearman_ci_lo": -0.23086956521739127,
+            "spearman_ci_hi": 0.949000000000001,
+            "kendall_tau_b": 0.3888888888888889,
+            "kendall_exact_one_sided_perm_p": 0.09009038800705467,
+            "kendall_ci_lo": -0.22580645161290322,
+            "kendall_ci_hi": 0.8787878787878788,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "random_forest__full": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.6666666666666666,
+            "spearman_exact_one_sided_perm_p": 0.029444995590828926,
+            "spearman_ci_lo": -0.260078947368421,
+            "spearman_ci_hi": 0.981651376146789,
+            "kendall_tau_b": 0.4444444444444444,
+            "kendall_exact_one_sided_perm_p": 0.05971946649029982,
+            "kendall_ci_lo": -0.2903225806451613,
+            "kendall_ci_hi": 0.9310344827586207,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.7666666666666666,
+            "spearman_exact_one_sided_perm_p": 0.010694995590828925,
+            "spearman_ci_lo": 0.10502288329519459,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6111111111111112,
+            "kendall_exact_one_sided_perm_p": 0.012370480599647266,
+            "kendall_ci_lo": 0.0,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "rbf_svm": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.49999999999999994,
+            "spearman_exact_one_sided_perm_p": 0.08883101851851852,
+            "spearman_ci_lo": -0.3805309734513274,
+            "spearman_ci_hi": 0.9449666388657215,
+            "kendall_tau_b": 0.3333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.12975914902998237,
+            "kendall_ci_lo": -0.3939393939393939,
+            "kendall_ci_hi": 0.8620689655172413,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.6499999999999999,
+            "spearman_exact_one_sided_perm_p": 0.03328097442680776,
+            "spearman_ci_lo": -0.08628386699507387,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5,
+            "kendall_exact_one_sided_perm_p": 0.037588183421516756,
+            "kendall_ci_lo": -0.06666666666666667,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        },
+        "rbf_svm__full": {
+          "Y_roc": {
+            "n": 9,
+            "spearman_rho": 0.3833333333333333,
+            "spearman_exact_one_sided_perm_p": 0.15625,
+            "spearman_ci_lo": -0.6316590389016018,
+            "spearman_ci_hi": 0.9454668304668304,
+            "kendall_tau_b": 0.2222222222222222,
+            "kendall_exact_one_sided_perm_p": 0.23835427689594357,
+            "kendall_ci_lo": -0.5865517241379309,
+            "kendall_ci_hi": 0.8666666666666667,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          },
+          "Y_pr": {
+            "n": 9,
+            "spearman_rho": 0.7166666666666666,
+            "spearman_exact_one_sided_perm_p": 0.01843309082892416,
+            "spearman_ci_lo": -0.10526315789473684,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.5555555555555556,
+            "kendall_exact_one_sided_perm_p": 0.02230764991181658,
+            "kendall_ci_lo": -0.06741935483870942,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 362880
+          }
+        }
+      }
+    },
+    "nextgen": {
+      "energy": {
+        "best_over_models": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.9428571428571428,
+            "spearman_exact_one_sided_perm_p": 0.008333333333333333,
+            "spearman_ci_lo": 0.5151515151515151,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.8666666666666667,
+            "kendall_exact_one_sided_perm_p": 0.008333333333333333,
+            "kendall_ci_lo": 0.38461538461538464,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2998,
+            "n_boot_valid_tau": 2998,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.2,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": 0.1111111111111111,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "knn_bagging": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.7142857142857143,
+            "spearman_exact_one_sided_perm_p": 0.06805555555555555,
+            "spearman_ci_lo": -0.22580645161290322,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6,
+            "kendall_exact_one_sided_perm_p": 0.06805555555555555,
+            "kendall_ci_lo": -0.16666666666666666,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.2,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": 0.1111111111111111,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "lstm_seq": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "mlp": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.2,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": 0.1111111111111111,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.2,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": 0.1111111111111111,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2998,
+            "n_boot_valid_tau": 2998,
+            "n_perms": 720
+          }
+        },
+        "qsvm_crosslayer": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.6,
+            "spearman_exact_one_sided_perm_p": 0.12083333333333333,
+            "spearman_ci_lo": -0.3333333333333333,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.4666666666666667,
+            "kendall_exact_one_sided_perm_p": 0.1361111111111111,
+            "kendall_ci_lo": -0.23076923076923078,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "qsvm_zz": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.6,
+            "spearman_exact_one_sided_perm_p": 0.12083333333333333,
+            "spearman_ci_lo": -0.5,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.4666666666666667,
+            "kendall_exact_one_sided_perm_p": 0.1361111111111111,
+            "kendall_ci_lo": -0.3333333333333333,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          }
+        },
+        "random_forest": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.7142857142857143,
+            "spearman_exact_one_sided_perm_p": 0.06805555555555555,
+            "spearman_ci_lo": -0.22580645161290322,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6,
+            "kendall_exact_one_sided_perm_p": 0.06805555555555555,
+            "kendall_ci_lo": -0.16666666666666666,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.2,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": 0.1111111111111111,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "rbf_svm": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.2,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": 0.1111111111111111,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2996,
+            "n_boot_valid_tau": 2996,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "rules": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.7714285714285715,
+            "spearman_exact_one_sided_perm_p": 0.05138888888888889,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6,
+            "kendall_exact_one_sided_perm_p": 0.06805555555555555,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.7714285714285715,
+            "spearman_exact_one_sided_perm_p": 0.05138888888888889,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6,
+            "kendall_exact_one_sided_perm_p": 0.06805555555555555,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "xgboost": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          }
+        }
+      },
+      "mmd_u": {
+        "best_over_models": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.9428571428571428,
+            "spearman_exact_one_sided_perm_p": 0.008333333333333333,
+            "spearman_ci_lo": 0.5151515151515151,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.8666666666666667,
+            "kendall_exact_one_sided_perm_p": 0.008333333333333333,
+            "kendall_ci_lo": 0.38461538461538464,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "knn_bagging": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.7714285714285715,
+            "spearman_exact_one_sided_perm_p": 0.05138888888888889,
+            "spearman_ci_lo": -0.09090909090909091,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6,
+            "kendall_exact_one_sided_perm_p": 0.06805555555555555,
+            "kendall_ci_lo": -0.23076923076923078,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "lstm_seq": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 1.0,
+            "spearman_exact_one_sided_perm_p": 0.001388888888888889,
+            "spearman_ci_lo": 1.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 1.0,
+            "kendall_exact_one_sided_perm_p": 0.001388888888888889,
+            "kendall_ci_lo": 1.0,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8857142857142857,
+            "spearman_exact_one_sided_perm_p": 0.016666666666666666,
+            "spearman_ci_lo": 0.2,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": 0.1111111111111111,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "mlp": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "qsvm_crosslayer": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.7142857142857143,
+            "spearman_exact_one_sided_perm_p": 0.06805555555555555,
+            "spearman_ci_lo": -0.09090909090909091,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.4666666666666667,
+            "kendall_exact_one_sided_perm_p": 0.1361111111111111,
+            "kendall_ci_lo": -0.23076923076923078,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "qsvm_zz": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.5428571428571428,
+            "spearman_exact_one_sided_perm_p": 0.1486111111111111,
+            "spearman_ci_lo": -0.6363636363636364,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.4666666666666667,
+            "kendall_exact_one_sided_perm_p": 0.1361111111111111,
+            "kendall_ci_lo": -0.38461538461538464,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.7142857142857143,
+            "spearman_exact_one_sided_perm_p": 0.06805555555555555,
+            "spearman_ci_lo": -0.09090909090909091,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.4666666666666667,
+            "kendall_exact_one_sided_perm_p": 0.1361111111111111,
+            "kendall_ci_lo": -0.23076923076923078,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "random_forest": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.7714285714285715,
+            "spearman_exact_one_sided_perm_p": 0.05138888888888889,
+            "spearman_ci_lo": -0.09090909090909091,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6,
+            "kendall_exact_one_sided_perm_p": 0.06805555555555555,
+            "kendall_ci_lo": -0.23076923076923078,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "rbf_svm": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.0022727272727264976,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          }
+        },
+        "rules": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.7142857142857143,
+            "spearman_exact_one_sided_perm_p": 0.06805555555555555,
+            "spearman_ci_lo": -0.3333333333333333,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.6,
+            "kendall_exact_one_sided_perm_p": 0.06805555555555555,
+            "kendall_ci_lo": -0.23076923076923078,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.5428571428571428,
+            "spearman_exact_one_sided_perm_p": 0.1486111111111111,
+            "spearman_ci_lo": -0.8,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.3333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.23472222222222222,
+            "kendall_ci_lo": -0.6363636363636364,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          }
+        },
+        "xgboost": {
+          "Y_roc": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": 0.0,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 3000,
+            "n_boot_valid_tau": 3000,
+            "n_perms": 720
+          },
+          "Y_pr": {
+            "n": 6,
+            "spearman_rho": 0.8285714285714286,
+            "spearman_exact_one_sided_perm_p": 0.029166666666666667,
+            "spearman_ci_lo": 0.0,
+            "spearman_ci_hi": 1.0,
+            "kendall_tau_b": 0.7333333333333333,
+            "kendall_exact_one_sided_perm_p": 0.027777777777777776,
+            "kendall_ci_lo": -0.09090909090909091,
+            "kendall_ci_hi": 1.0,
+            "n_boot_valid_rho": 2999,
+            "n_boot_valid_tau": 2999,
+            "n_perms": 720
+          }
+        }
+      }
+    }
+  },
+  "blocked_pooled": {
+    "energy": {
+      "best_over_models": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.7,
+              "tau": 0.5555555555555556,
+              "spearman_perm_p": 0.021626984126984126,
+              "kendall_perm_p": 0.02230764991181658
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.9428571428571428,
+              "tau": 0.8666666666666667,
+              "spearman_perm_p": 0.008333333333333333,
+              "kendall_perm_p": 0.008333333333333333
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 3.0797387161774723,
+            "p": 0.0010359113217423453
+          },
+          "fisher_spearman": {
+            "chi2": 17.242610443236632,
+            "df": 4,
+            "p": 0.0017339984609067416
+          },
+          "stouffer_kendall": {
+            "Z": 3.069679975371784,
+            "p": 0.0010714412571694338
+          },
+          "fisher_kendall": {
+            "chi2": 17.180634713503558,
+            "df": 4,
+            "p": 0.0017828120178136422
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.7333333333333333,
+              "tau": 0.6111111111111112,
+              "spearman_perm_p": 0.015561618165784833,
+              "kendall_perm_p": 0.012370480599647266
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8857142857142857,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.016666666666666666,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 3.015532070377471,
+            "p": 0.0012826440442072016
+          },
+          "fisher_spearman": {
+            "chi2": 16.514584665261467,
+            "df": 4,
+            "p": 0.0024009741421574526
+          },
+          "stouffer_kendall": {
+            "Z": 2.950137327995428,
+            "p": 0.0015881635618314087
+          },
+          "fisher_kendall": {
+            "chi2": 15.951922359511295,
+            "df": 4,
+            "p": 0.0030843598232598384
+          },
+          "combinable": true
+        }
+      },
+      "knn_bagging": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'knn_bagging' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.7142857142857143
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'knn_bagging' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8857142857142857
+          }
+        }
+      },
+      "lstm_seq": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'lstm_seq' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8285714285714286
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'lstm_seq' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8285714285714286
+          }
+        }
+      },
+      "mlp": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.4333333333333333,
+              "tau": 0.2777777777777778,
+              "spearman_perm_p": 0.12495866402116403,
+              "kendall_perm_p": 0.17924382716049383
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8857142857142857,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.016666666666666666,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.237106338480951,
+            "p": 0.012639695399253218
+          },
+          "fisher_spearman": {
+            "chi2": 12.348233692843804,
+            "df": 4,
+            "p": 0.014941134277676788
+          },
+          "stouffer_kendall": {
+            "Z": 1.9221136993966534,
+            "p": 0.027295726330582203
+          },
+          "fisher_kendall": {
+            "chi2": 10.605054351183933,
+            "df": 4,
+            "p": 0.03138025254822562
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.6499999999999999,
+              "tau": 0.5555555555555556,
+              "spearman_perm_p": 0.03328097442680776,
+              "kendall_perm_p": 0.02230764991181658
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8857142857142857,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.016666666666666666,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.766984858220933,
+            "p": 0.002828869144773277
+          },
+          "fisher_spearman": {
+            "chi2": 14.99422789205639,
+            "df": 4,
+            "p": 0.004713203865657266
+          },
+          "stouffer_kendall": {
+            "Z": 2.7664340075667804,
+            "p": 0.0028336527033192846
+          },
+          "fisher_kendall": {
+            "chi2": 14.772689104851688,
+            "df": 4,
+            "p": 0.0051966566198718275
+          },
+          "combinable": true
+        }
+      },
+      "mlp__full": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'mlp__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.49999999999999994
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'mlp__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.6499999999999999
+          }
+        }
+      },
+      "qsvm_crosslayer": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.6833333333333332,
+              "tau": 0.5555555555555556,
+              "spearman_perm_p": 0.02515983245149912,
+              "kendall_perm_p": 0.02230764991181658
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8857142857142857,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.016666666666666666,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.8619628837839555,
+            "p": 0.0021051310446024134
+          },
+          "fisher_spearman": {
+            "chi2": 15.553702137429113,
+            "df": 4,
+            "p": 0.003680401705676987
+          },
+          "stouffer_kendall": {
+            "Z": 2.7664340075667804,
+            "p": 0.0028336527033192846
+          },
+          "fisher_kendall": {
+            "chi2": 14.772689104851688,
+            "df": 4,
+            "p": 0.0051966566198718275
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.41666666666666663,
+              "tau": 0.3888888888888889,
+              "spearman_perm_p": 0.1347911155202822,
+              "kendall_perm_p": 0.09009038800705467
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.6,
+              "tau": 0.4666666666666667,
+              "spearman_perm_p": 0.12083333333333333,
+              "kendall_perm_p": 0.1361111111111111
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 1.5956728169111374,
+            "p": 0.055280930346064655
+          },
+          "fisher_spearman": {
+            "chi2": 8.234744169269526,
+            "df": 4,
+            "p": 0.08334796859494953
+          },
+          "stouffer_kendall": {
+            "Z": 1.7325238876704159,
+            "p": 0.04159016385748299
+          },
+          "fisher_kendall": {
+            "chi2": 8.802451069569956,
+            "df": 4,
+            "p": 0.06623146306382534
+          },
+          "combinable": true
+        }
+      },
+      "qsvm_zz": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.9499999999999998,
+              "tau": 0.8333333333333334,
+              "spearman_perm_p": 0.0001763668430335097,
+              "kendall_perm_p": 0.0004271384479717813
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8285714285714286,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.029166666666666667,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 3.965092988343343,
+            "p": 3.6683670192044745e-05
+          },
+          "fisher_spearman": {
+            "chi2": 24.355346342016954,
+            "df": 4,
+            "p": 6.778638462452913e-05
+          },
+          "stouffer_kendall": {
+            "Z": 3.79379595888613,
+            "p": 7.418080204483282e-05
+          },
+          "fisher_kendall": {
+            "chi2": 22.683842603236666,
+            "df": 4,
+            "p": 0.00014643636416008675
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.7999999999999999,
+              "tau": 0.6111111111111112,
+              "spearman_perm_p": 0.00691413139329806,
+              "kendall_perm_p": 0.012370480599647266
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.6,
+              "tau": 0.4666666666666667,
+              "spearman_perm_p": 0.12083333333333333,
+              "kendall_perm_p": 0.1361111111111111
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.6473185151743213,
+            "p": 0.004056644764707636
+          },
+          "fisher_spearman": {
+            "chi2": 14.17506205414113,
+            "df": 4,
+            "p": 0.006756788803698667
+          },
+          "stouffer_kendall": {
+            "Z": 2.4337080184643574,
+            "p": 0.007472522615933607
+          },
+          "fisher_kendall": {
+            "chi2": 12.773451949278133,
+            "df": 4,
+            "p": 0.012437472688458257
+          },
+          "combinable": true
+        }
+      },
+      "random_forest": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.6499999999999999,
+              "tau": 0.3888888888888889,
+              "spearman_perm_p": 0.03328097442680776,
+              "kendall_perm_p": 0.09009038800705467
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.7142857142857143,
+              "tau": 0.6,
+              "spearman_perm_p": 0.06805555555555555,
+              "kendall_perm_p": 0.06805555555555555
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.363721812379983,
+            "p": 0.009046196205305848
+          },
+          "fisher_spearman": {
+            "chi2": 12.180400595411136,
+            "df": 4,
+            "p": 0.016058986062021267
+          },
+          "stouffer_kendall": {
+            "Z": 1.980744331971645,
+            "p": 0.023809976237325534
+          },
+          "fisher_kendall": {
+            "chi2": 10.188745430689847,
+            "df": 4,
+            "p": 0.037365521842592425
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.5333333333333332,
+              "tau": 0.3888888888888889,
+              "spearman_perm_p": 0.07376267636684303,
+              "kendall_perm_p": 0.09009038800705467
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8857142857142857,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.016666666666666666,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.467763991559748,
+            "p": 0.006797996363585218
+          },
+          "fisher_spearman": {
+            "chi2": 13.402493955628488,
+            "df": 4,
+            "p": 0.00946774314076067
+          },
+          "stouffer_kendall": {
+            "Z": 2.248953197201486,
+            "p": 0.012257736963778743
+          },
+          "fisher_kendall": {
+            "chi2": 11.980921479803119,
+            "df": 4,
+            "p": 0.017493703344605944
+          },
+          "combinable": true
+        }
+      },
+      "random_forest__full": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'random_forest__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.6666666666666666
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'random_forest__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.7666666666666666
+          }
+        }
+      },
+      "rbf_svm": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.49999999999999994,
+              "tau": 0.3333333333333333,
+              "spearman_perm_p": 0.08883101851851852,
+              "kendall_perm_p": 0.12975914902998237
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8857142857142857,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.016666666666666666,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.390041489932766,
+            "p": 0.008423234777267497
+          },
+          "fisher_spearman": {
+            "chi2": 13.0307278891177,
+            "df": 4,
+            "p": 0.011126623895541896
+          },
+          "stouffer_kendall": {
+            "Z": 2.084221086587876,
+            "p": 0.018570030768778507
+          },
+          "fisher_kendall": {
+            "chi2": 11.251188370245988,
+            "df": 4,
+            "p": 0.023881429535543303
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.6499999999999999,
+              "tau": 0.5,
+              "spearman_perm_p": 0.03328097442680776,
+              "kendall_perm_p": 0.037588183421516756
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8857142857142857,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.016666666666666666,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.766984858220933,
+            "p": 0.002828869144773277
+          },
+          "fisher_spearman": {
+            "chi2": 14.99422789205639,
+            "df": 4,
+            "p": 0.004713203865657266
+          },
+          "stouffer_kendall": {
+            "Z": 2.589146899234791,
+            "p": 0.004810702019824164
+          },
+          "fisher_kendall": {
+            "chi2": 13.729168974280253,
+            "df": 4,
+            "p": 0.0082115401176844
+          },
+          "combinable": true
+        }
+      },
+      "rbf_svm__full": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'rbf_svm__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.3833333333333333
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'rbf_svm__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.7166666666666666
+          }
+        }
+      },
+      "rules": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'rules' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.7714285714285715
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'rules' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.7714285714285715
+          }
+        }
+      },
+      "xgboost": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'xgboost' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8857142857142857
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'xgboost' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8857142857142857
+          }
+        }
+      }
+    },
+    "mmd_u": {
+      "best_over_models": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.7,
+              "tau": 0.5555555555555556,
+              "spearman_perm_p": 0.021626984126984126,
+              "kendall_perm_p": 0.02230764991181658
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.9428571428571428,
+              "tau": 0.8666666666666667,
+              "spearman_perm_p": 0.008333333333333333,
+              "kendall_perm_p": 0.008333333333333333
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 3.0797387161774723,
+            "p": 0.0010359113217423453
+          },
+          "fisher_spearman": {
+            "chi2": 17.242610443236632,
+            "df": 4,
+            "p": 0.0017339984609067416
+          },
+          "stouffer_kendall": {
+            "Z": 3.069679975371784,
+            "p": 0.0010714412571694338
+          },
+          "fisher_kendall": {
+            "chi2": 17.180634713503558,
+            "df": 4,
+            "p": 0.0017828120178136422
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.7333333333333333,
+              "tau": 0.6111111111111112,
+              "spearman_perm_p": 0.015561618165784833,
+              "kendall_perm_p": 0.012370480599647266
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8285714285714286,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.029166666666666667,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.866993121714238,
+            "p": 0.002071960093922576
+          },
+          "fisher_spearman": {
+            "chi2": 15.395353089390621,
+            "df": 4,
+            "p": 0.003947706038443162
+          },
+          "stouffer_kendall": {
+            "Z": 2.950137327995428,
+            "p": 0.0015881635618314087
+          },
+          "fisher_kendall": {
+            "chi2": 15.951922359511295,
+            "df": 4,
+            "p": 0.0030843598232598384
+          },
+          "combinable": true
+        }
+      },
+      "knn_bagging": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'knn_bagging' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.7714285714285715
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'knn_bagging' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8285714285714286
+          }
+        }
+      },
+      "lstm_seq": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'lstm_seq' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 1.0
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'lstm_seq' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8857142857142857
+          }
+        }
+      },
+      "mlp": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.4333333333333333,
+              "tau": 0.2777777777777778,
+              "spearman_perm_p": 0.12495866402116403,
+              "kendall_perm_p": 0.17924382716049383
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8285714285714286,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.029166666666666667,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.088567389817718,
+            "p": 0.018373341615989643
+          },
+          "fisher_spearman": {
+            "chi2": 11.22900211697296,
+            "df": 4,
+            "p": 0.02410739378352215
+          },
+          "stouffer_kendall": {
+            "Z": 1.9221136993966534,
+            "p": 0.027295726330582203
+          },
+          "fisher_kendall": {
+            "chi2": 10.605054351183933,
+            "df": 4,
+            "p": 0.03138025254822562
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.6499999999999999,
+              "tau": 0.5555555555555556,
+              "spearman_perm_p": 0.03328097442680776,
+              "kendall_perm_p": 0.02230764991181658
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8285714285714286,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.029166666666666667,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.6184459095576993,
+            "p": 0.004416564714917975
+          },
+          "fisher_spearman": {
+            "chi2": 13.874996316185545,
+            "df": 4,
+            "p": 0.007704890468692646
+          },
+          "stouffer_kendall": {
+            "Z": 2.7664340075667804,
+            "p": 0.0028336527033192846
+          },
+          "fisher_kendall": {
+            "chi2": 14.772689104851688,
+            "df": 4,
+            "p": 0.0051966566198718275
+          },
+          "combinable": true
+        }
+      },
+      "mlp__full": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'mlp__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.49999999999999994
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'mlp__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.6499999999999999
+          }
+        }
+      },
+      "qsvm_crosslayer": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.6833333333333332,
+              "tau": 0.5555555555555556,
+              "spearman_perm_p": 0.02515983245149912,
+              "kendall_perm_p": 0.02230764991181658
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8285714285714286,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.029166666666666667,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.7134239351207228,
+            "p": 0.003329592715608874
+          },
+          "fisher_spearman": {
+            "chi2": 14.434470561558268,
+            "df": 4,
+            "p": 0.006030041000636048
+          },
+          "stouffer_kendall": {
+            "Z": 2.7664340075667804,
+            "p": 0.0028336527033192846
+          },
+          "fisher_kendall": {
+            "chi2": 14.772689104851688,
+            "df": 4,
+            "p": 0.0051966566198718275
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.41666666666666663,
+              "tau": 0.3888888888888889,
+              "spearman_perm_p": 0.1347911155202822,
+              "kendall_perm_p": 0.09009038800705467
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.7142857142857143,
+              "tau": 0.4666666666666667,
+              "spearman_perm_p": 0.06805555555555555,
+              "kendall_perm_p": 0.1361111111111111
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 1.7978051335869787,
+            "p": 0.036103946779154884
+          },
+          "fisher_spearman": {
+            "chi2": 9.38291981035744,
+            "df": 4,
+            "p": 0.052209379511586086
+          },
+          "stouffer_kendall": {
+            "Z": 1.7325238876704159,
+            "p": 0.04159016385748299
+          },
+          "fisher_kendall": {
+            "chi2": 8.802451069569956,
+            "df": 4,
+            "p": 0.06623146306382534
+          },
+          "combinable": true
+        }
+      },
+      "qsvm_zz": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.9499999999999998,
+              "tau": 0.8333333333333334,
+              "spearman_perm_p": 0.0001763668430335097,
+              "kendall_perm_p": 0.0004271384479717813
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.5428571428571428,
+              "tau": 0.4666666666666667,
+              "spearman_perm_p": 0.1486111111111111,
+              "kendall_perm_p": 0.1361111111111111
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 3.427015122131278,
+            "p": 0.0003051275422568672
+          },
+          "fisher_spearman": {
+            "chi2": 21.098733548539986,
+            "df": 4,
+            "p": 0.00030270974055626314
+          },
+          "stouffer_kendall": {
+            "Z": 3.2773666493550593,
+            "p": 0.0005239010546057972
+          },
+          "fisher_kendall": {
+            "chi2": 19.505372193003506,
+            "df": 4,
+            "p": 0.0006251427691349659
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.7999999999999999,
+              "tau": 0.6111111111111112,
+              "spearman_perm_p": 0.00691413139329806,
+              "kendall_perm_p": 0.012370480599647266
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.7142857142857143,
+              "tau": 0.4666666666666667,
+              "spearman_perm_p": 0.06805555555555555,
+              "kendall_perm_p": 0.1361111111111111
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.8494508318501626,
+            "p": 0.0021897387144697938
+          },
+          "fisher_spearman": {
+            "chi2": 15.323237695229043,
+            "df": 4,
+            "p": 0.004075681901059185
+          },
+          "stouffer_kendall": {
+            "Z": 2.4337080184643574,
+            "p": 0.007472522615933607
+          },
+          "fisher_kendall": {
+            "chi2": 12.773451949278133,
+            "df": 4,
+            "p": 0.012437472688458257
+          },
+          "combinable": true
+        }
+      },
+      "random_forest": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.6499999999999999,
+              "tau": 0.3888888888888889,
+              "spearman_perm_p": 0.03328097442680776,
+              "kendall_perm_p": 0.09009038800705467
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.7714285714285715,
+              "tau": 0.6,
+              "spearman_perm_p": 0.05138888888888889,
+              "kendall_perm_p": 0.06805555555555555
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.4529633232727854,
+            "p": 0.007084239203303126
+          },
+          "fisher_spearman": {
+            "chi2": 12.742205366343942,
+            "df": 4,
+            "p": 0.012606592716878829
+          },
+          "stouffer_kendall": {
+            "Z": 1.980744331971645,
+            "p": 0.023809976237325534
+          },
+          "fisher_kendall": {
+            "chi2": 10.188745430689847,
+            "df": 4,
+            "p": 0.037365521842592425
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.5333333333333332,
+              "tau": 0.3888888888888889,
+              "spearman_perm_p": 0.07376267636684303,
+              "kendall_perm_p": 0.09009038800705467
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8285714285714286,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.029166666666666667,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.319225042896515,
+            "p": 0.010191418637797142
+          },
+          "fisher_spearman": {
+            "chi2": 12.283262379757645,
+            "df": 4,
+            "p": 0.01536458671388618
+          },
+          "stouffer_kendall": {
+            "Z": 2.248953197201486,
+            "p": 0.012257736963778743
+          },
+          "fisher_kendall": {
+            "chi2": 11.980921479803119,
+            "df": 4,
+            "p": 0.017493703344605944
+          },
+          "combinable": true
+        }
+      },
+      "random_forest__full": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'random_forest__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.6666666666666666
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'random_forest__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.7666666666666666
+          }
+        }
+      },
+      "rbf_svm": {
+        "Y_roc": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.49999999999999994,
+              "tau": 0.3333333333333333,
+              "spearman_perm_p": 0.08883101851851852,
+              "kendall_perm_p": 0.12975914902998237
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8285714285714286,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.029166666666666667,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.2415025412695333,
+            "p": 0.012496770550769186
+          },
+          "fisher_spearman": {
+            "chi2": 11.911496313246854,
+            "df": 4,
+            "p": 0.01802168063824236
+          },
+          "stouffer_kendall": {
+            "Z": 2.084221086587876,
+            "p": 0.018570030768778507
+          },
+          "fisher_kendall": {
+            "chi2": 11.251188370245988,
+            "df": 4,
+            "p": 0.023881429535543303
+          },
+          "combinable": true
+        },
+        "Y_pr": {
+          "per_dataset": {
+            "dev_grid": {
+              "n": 9,
+              "rho": 0.6499999999999999,
+              "tau": 0.5,
+              "spearman_perm_p": 0.03328097442680776,
+              "kendall_perm_p": 0.037588183421516756
+            },
+            "nextgen": {
+              "n": 6,
+              "rho": 0.8285714285714286,
+              "tau": 0.7333333333333333,
+              "spearman_perm_p": 0.029166666666666667,
+              "kendall_perm_p": 0.027777777777777776
+            }
+          },
+          "directions_consistent_positive": true,
+          "stouffer_spearman": {
+            "Z": 2.6184459095576993,
+            "p": 0.004416564714917975
+          },
+          "fisher_spearman": {
+            "chi2": 13.874996316185545,
+            "df": 4,
+            "p": 0.007704890468692646
+          },
+          "stouffer_kendall": {
+            "Z": 2.589146899234791,
+            "p": 0.004810702019824164
+          },
+          "fisher_kendall": {
+            "chi2": 13.729168974280253,
+            "df": 4,
+            "p": 0.0082115401176844
+          },
+          "combinable": true
+        }
+      },
+      "rbf_svm__full": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'rbf_svm__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.3833333333333333
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on dev_grid; no published run of 'rbf_svm__full' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "dev_grid": 0.7166666666666666
+          }
+        }
+      },
+      "rules": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'rules' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.7142857142857143
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'rules' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.5428571428571428
+          }
+        }
+      },
+      "xgboost": {
+        "Y_roc": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'xgboost' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8285714285714286
+          }
+        },
+        "Y_pr": {
+          "combined": "IRRECOVERABLE",
+          "reason": "model evaluated only on nextgen; no published run of 'xgboost' exists on the other dataset, so a cross-dataset blocked p cannot be computed",
+          "per_dataset_rho": {
+            "nextgen": 0.8285714285714286
+          }
+        }
+      }
+    }
+  },
+  "rank_standardised_pooled_descriptive": {
+    "energy": {
+      "best_over_models": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7821428571428571,
+          "kendall_tau_b": 0.638095238095238,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7714285714285715,
+          "kendall_tau_b": 0.638095238095238,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "mlp": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.5928571428571429,
+          "kendall_tau_b": 0.44761904761904764,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7071428571428572,
+          "kendall_tau_b": 0.580952380952381,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "qsvm_crosslayer": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7535714285714286,
+          "kendall_tau_b": 0.6190476190476191,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.46785714285714286,
+          "kendall_tau_b": 0.37142857142857144,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "qsvm_zz": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.9,
+          "kendall_tau_b": 0.7142857142857143,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7035714285714286,
+          "kendall_tau_b": 0.4857142857142857,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "random_forest": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.6571428571428571,
+          "kendall_tau_b": 0.42857142857142855,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.6571428571428571,
+          "kendall_tau_b": 0.4857142857142857,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "rbf_svm": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.6285714285714286,
+          "kendall_tau_b": 0.42857142857142855,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.6892857142857143,
+          "kendall_tau_b": 0.5238095238095238,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      }
+    },
+    "mmd_u": {
+      "best_over_models": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.8,
+          "kendall_tau_b": 0.6761904761904762,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7678571428571429,
+          "kendall_tau_b": 0.638095238095238,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "mlp": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.5892857142857143,
+          "kendall_tau_b": 0.4095238095238095,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7035714285714286,
+          "kendall_tau_b": 0.580952380952381,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "qsvm_crosslayer": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.75,
+          "kendall_tau_b": 0.6190476190476191,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.5214285714285715,
+          "kendall_tau_b": 0.4095238095238095,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "qsvm_zz": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7892857142857143,
+          "kendall_tau_b": 0.5619047619047619,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.7571428571428571,
+          "kendall_tau_b": 0.5238095238095238,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "random_forest": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.6892857142857143,
+          "kendall_tau_b": 0.42857142857142855,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.6535714285714286,
+          "kendall_tau_b": 0.4857142857142857,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      },
+      "rbf_svm": {
+        "Y_roc": {
+          "n_pooled": 15,
+          "spearman_rho": 0.625,
+          "kendall_tau_b": 0.42857142857142855,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        },
+        "Y_pr": {
+          "n_pooled": 15,
+          "spearman_rho": 0.6857142857142857,
+          "kendall_tau_b": 0.4857142857142857,
+          "descriptive_only": true,
+          "note": "within-dataset mid-quantile ranks (rank-0.5)/n pooled across datasets; NO p-value attached -- inference is the blocked Stouffer/Fisher combination above"
+        }
+      }
+    }
+  },
+  "claim_calibrator": {
+    "rules": {
+      "monotonically orders": "ONLY if per-dataset Spearman rho == 1 in every dataset",
+      "strongly associated": "min per-dataset rho >= 0.7 AND blocked Stouffer p < 0.05",
+      "moderately associated": "min per-dataset rho >= 0.4 AND blocked Stouffer p < 0.05",
+      "otherwise": "no association adjective; per-dataset values only"
+    },
+    "target": "Y_roc (the published Y)",
+    "verdicts": {
+      "energy/rbf_svm": {
+        "per_dataset_rho": {
+          "dev_grid": 0.49999999999999994,
+          "nextgen": 0.8857142857142857
+        },
+        "min_rho": 0.49999999999999994,
+        "blocked_stouffer_p": 0.008423234777267497,
+        "supported_phrase": "moderately associated",
+        "monotonically_orders_supported": false
+      },
+      "energy/qsvm_crosslayer": {
+        "per_dataset_rho": {
+          "dev_grid": 0.6833333333333332,
+          "nextgen": 0.8857142857142857
+        },
+        "min_rho": 0.6833333333333332,
+        "blocked_stouffer_p": 0.0021051310446024134,
+        "supported_phrase": "moderately associated",
+        "monotonically_orders_supported": false
+      },
+      "energy/best_over_models": {
+        "per_dataset_rho": {
+          "dev_grid": 0.7,
+          "nextgen": 0.9428571428571428
+        },
+        "min_rho": 0.7,
+        "blocked_stouffer_p": 0.0010359113217423453,
+        "supported_phrase": "strongly associated",
+        "monotonically_orders_supported": false
+      },
+      "mmd_u/rbf_svm": {
+        "per_dataset_rho": {
+          "dev_grid": 0.49999999999999994,
+          "nextgen": 0.8285714285714286
+        },
+        "min_rho": 0.49999999999999994,
+        "blocked_stouffer_p": 0.012496770550769186,
+        "supported_phrase": "moderately associated",
+        "monotonically_orders_supported": false
+      },
+      "mmd_u/qsvm_crosslayer": {
+        "per_dataset_rho": {
+          "dev_grid": 0.6833333333333332,
+          "nextgen": 0.8285714285714286
+        },
+        "min_rho": 0.6833333333333332,
+        "blocked_stouffer_p": 0.003329592715608874,
+        "supported_phrase": "moderately associated",
+        "monotonically_orders_supported": false
+      },
+      "mmd_u/best_over_models": {
+        "per_dataset_rho": {
+          "dev_grid": 0.7,
+          "nextgen": 0.9428571428571428
+        },
+        "min_rho": 0.7,
+        "blocked_stouffer_p": 0.0010359113217423453,
+        "supported_phrase": "strongly associated",
+        "monotonically_orders_supported": false
+      }
+    },
+    "ledger_text": "The model-free divergence is 'moderately associated' with the pre-specified reference model (rbf_svm) detectability (energy: rho_dev=+0.50, rho_ng=+0.89, blocked p=0.008423) and 'strongly associated' with the exploratory best-over-models upper envelope (rho_dev=+0.70, rho_ng=+0.94, blocked p=0.001036). The phrase 'monotonically orders' is NOT supported (no per-dataset rho equals 1)."
+  },
+  "old_vs_new": {
+    "published": {
+      "source": "results/frontier/controllability_validation.json screens.D_full.pooled",
+      "rho": 0.8203756627046467,
+      "p": 0.00017940728782808013,
+      "n": 15,
+      "kendall_tau": 0.6698641270570838,
+      "kendall_p": 0.0005236624799359954,
+      "construction_flaws": [
+        "energy distance only (MMD computed but dropped)",
+        "Y = max over models per attack (optimistic upper envelope, selection bias)",
+        "raw D values pooled across datasets with no blocking (scale conflation)",
+        "divergence standardised on pooled benign+attack data (self-referential scaling; fixed in divergence)"
+      ]
+    },
+    "published_reproduced_here": {
+      "rho": 0.8203756627046467,
+      "p": 0.00017940728782808013,
+      "n": 15,
+      "matches_published": true
+    },
+    "same_construction_with_divergence": {
+      "energy/Y_roc": {
+        "rho": 0.9258270006122157,
+        "p_two_sided_asymptotic": 7.44715937097458e-07,
+        "tau": 0.8038369524685005,
+        "n": 15,
+        "label": "NON-INFERENTIAL (unblocked raw pooling, envelope Y) -- delta record only"
+      },
+      "mmd_u/Y_roc": {
+        "rho": 0.9311889330481938,
+        "p_two_sided_asymptotic": 4.6332255033566664e-07,
+        "tau": 0.8229759275272742,
+        "n": 15,
+        "label": "NON-INFERENTIAL (unblocked raw pooling, envelope Y) -- delta record only"
+      }
+    },
+    "new_primary_inference": {
+      "energy/rbf_svm/Y_roc": {
+        "per_dataset": {
+          "dev_grid": {
+            "n": 9,
+            "rho": 0.49999999999999994,
+            "tau": 0.3333333333333333,
+            "spearman_perm_p": 0.08883101851851852,
+            "kendall_perm_p": 0.12975914902998237
+          },
+          "nextgen": {
+            "n": 6,
+            "rho": 0.8857142857142857,
+            "tau": 0.7333333333333333,
+            "spearman_perm_p": 0.016666666666666666,
+            "kendall_perm_p": 0.027777777777777776
+          }
+        },
+        "stouffer_p": 0.008423234777267497,
+        "fisher_p": 0.011126623895541896
+      },
+      "energy/best_over_models/Y_roc": {
+        "per_dataset": {
+          "dev_grid": {
+            "n": 9,
+            "rho": 0.7,
+            "tau": 0.5555555555555556,
+            "spearman_perm_p": 0.021626984126984126,
+            "kendall_perm_p": 0.02230764991181658
+          },
+          "nextgen": {
+            "n": 6,
+            "rho": 0.9428571428571428,
+            "tau": 0.8666666666666667,
+            "spearman_perm_p": 0.008333333333333333,
+            "kendall_perm_p": 0.008333333333333333
+          }
+        },
+        "stouffer_p": 0.0010359113217423453,
+        "fisher_p": 0.0017339984609067416
+      },
+      "mmd_u/rbf_svm/Y_roc": {
+        "per_dataset": {
+          "dev_grid": {
+            "n": 9,
+            "rho": 0.49999999999999994,
+            "tau": 0.3333333333333333,
+            "spearman_perm_p": 0.08883101851851852,
+            "kendall_perm_p": 0.12975914902998237
+          },
+          "nextgen": {
+            "n": 6,
+            "rho": 0.8285714285714286,
+            "tau": 0.7333333333333333,
+            "spearman_perm_p": 0.029166666666666667,
+            "kendall_perm_p": 0.027777777777777776
+          }
+        },
+        "stouffer_p": 0.012496770550769186,
+        "fisher_p": 0.01802168063824236
+      },
+      "mmd_u/best_over_models/Y_roc": {
+        "per_dataset": {
+          "dev_grid": {
+            "n": 9,
+            "rho": 0.7,
+            "tau": 0.5555555555555556,
+            "spearman_perm_p": 0.021626984126984126,
+            "kendall_perm_p": 0.02230764991181658
+          },
+          "nextgen": {
+            "n": 6,
+            "rho": 0.9428571428571428,
+            "tau": 0.8666666666666667,
+            "spearman_perm_p": 0.008333333333333333,
+            "kendall_perm_p": 0.008333333333333333
+          }
+        },
+        "stouffer_p": 0.0010359113217423453,
+        "fisher_p": 0.0017339984609067416
+      }
+    },
+    "delta_note": "The single published number (pooled rho=0.820, p=1.8e-4, n=15) is replaced by per-dataset Spearman/Kendall with exact permutation p and attack-level bootstrap CIs, combined across datasets ONLY via dataset-blocked Stouffer/Fisher on the per-dataset exact p-values; the envelope Y is retained solely as a labelled exploratory upper envelope next to every individual model and the pre-specified reference model."
+  }
+}
