@@ -1,7 +1,7 @@
 # A Cross-Layer Quantum Kernel for Misbehaviour Detection in Vehicular Networks
 
 Code, configuration and result files for the paper **"A Cross-Layer Quantum Kernel for
-Misbehaviour Detection in Vehicular Networks"** (under review): the SUMO + ns-3.42 802.11p
+Misbehaviour Detection in Vehicular Networks"**: the SUMO + ns-3.42 802.11p
 co-simulation testbed, the cross-layer quantum-kernel detector and the classical baselines,
 the experiment and analysis scripts, and the CSV/JSON result files behind the tables and
 figures of the paper.
